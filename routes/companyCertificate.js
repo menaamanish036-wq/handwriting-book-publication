@@ -1,116 +1,65 @@
-const express = require("express");
 const mongoose = require("mongoose");
-const router = express.Router();
 
-const CompanyCertificate = require("../models/CompanyCertificate");
-const { requireLogin, requireAdmin } = require("../middleware/auth");
+const companyCertificateSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 200
+    },
 
-// CUSTOMER: VIEW COMPANY CERTIFICATE
-router.get("/", requireLogin, async (req, res) => {
-  try {
-    const certificate = await CompanyCertificate.findOne({
-      isActive: true
-    }).lean();
+    description: {
+      type: String,
+      default: "",
+      trim: true
+    },
 
-    res.json({
-      success: true,
-      certificate
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to load company certificate."
-    });
-  }
-});
+    fileId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
 
-// ADMIN: VIEW COMPANY CERTIFICATE
-router.get("/admin", requireLogin, requireAdmin, async (req, res) => {
-  try {
-    const certificate = await CompanyCertificate.findOne().lean();
+    fileName: {
+      type: String,
+      required: true,
+      trim: true
+    },
 
-    res.json({
-      success: true,
-      certificate
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to load certificate."
-    });
-  }
-});
+    fileType: {
+      type: String,
+      enum: [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/pdf"
+      ],
+      required: true
+    },
 
-// ADMIN: ADD OR UPDATE COMPANY CERTIFICATE DETAILS
-router.put("/", requireLogin, requireAdmin, async (req, res) => {
-  try {
-    const {
-      title,
-      fileId,
-      fileName,
-      fileType,
-      isActive
-    } = req.body;
+    isActive: {
+      type: Boolean,
+      default: true
+    },
 
-    if (
-      fileId &&
-      !mongoose.isValidObjectId(fileId)
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid certificate file ID."
-      });
+    uploadedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null
     }
-
-    const updates = {
-      updatedBy: req.user._id
-    };
-
-    if (title !== undefined) updates.title = title;
-    if (fileId !== undefined) updates.fileId = fileId || null;
-    if (fileName !== undefined) updates.fileName = fileName;
-    if (fileType !== undefined) updates.fileType = fileType;
-    if (isActive !== undefined) updates.isActive = isActive;
-
-    const certificate = await CompanyCertificate.findOneAndUpdate(
-      {},
-      { $set: updates },
-      {
-        new: true,
-        upsert: true,
-        runValidators: true,
-        setDefaultsOnInsert: true
-      }
-    );
-
-    res.json({
-      success: true,
-      message: "Company certificate details saved.",
-      certificate
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to save company certificate."
-    });
+  },
+  {
+    timestamps: true
   }
-});
+);
 
-// ADMIN: REMOVE COMPANY CERTIFICATE
-router.delete("/", requireLogin, requireAdmin, async (req, res) => {
-  try {
-    await CompanyCertificate.deleteMany({});
-
-    res.json({
-      success: true,
-      message: "Company certificate removed."
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to remove company certificate."
-    });
-  }
-});
-
-module.exports = router;
+module.exports = mongoose.model(
+  "CompanyCertificate",
+  companyCertificateSchema
+);
