@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<title>Customer Dashboard | Handwriting Book Publication</title><style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#090909;color:#fff;min-height:100vh}
+header{background:#111;border-bottom:1px solid #b99335;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:15px}
+header h2{color:#d8b45a;font-size:19px}
+button{cursor:pointer;border:0;border-radius:7px;padding:11px 15px;font-weight:bold}
+.logout{background:#b99335;color:#111}
+main{max-width:1100px;margin:auto;padding:25px 18px}
+.welcome{margin-bottom:22px}
+.welcome h1{color:#d8b45a;font-size:25px;margin-bottom:8px}
+.welcome p{color:#aaa}
+.card{background:#141414;border:1px solid #393024;border-radius:12px;padding:20px;margin-bottom:20px}
+.card h2{color:#d8b45a;font-size:19px;margin-bottom:15px}
+.status{padding:12px;border-radius:8px;margin-bottom:20px;line-height:1.6;background:#28220f;border:1px solid #8c702c;color:#f0d58d}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
+.project{background:#1b1b1b;border:1px solid #514124;border-radius:10px;padding:17px}
+.project h3{color:#e3c36d;margin-bottom:12px}
+.project p{color:#ccc;font-size:14px;margin:8px 0}
+.project button{width:100%;margin-top:12px;background:#c6a34a;color:#111}
+.item{padding:13px 0;border-bottom:1px solid #333;line-height:1.6}
+.item:last-child{border:0}
+.muted{color:#999;font-size:14px}
+.empty{color:#999;padding:10px 0}
+.error{background:#401919;color:#ffaaaa;padding:12px;border-radius:7px;margin-bottom:15px}
+.success{background:#12351f;color:#8df0a8;padding:12px;border-radius:7px;margin-bottom:15px}
+.loading{color:#d8b45a}
+@media(max-width:500px){header{align-items:flex-start;flex-direction:column}.welcome h1{font-size:22px}}
+</style></head><body><header>
+<h2>Handwriting Book Publication</h2>
+<button class="logout" id="logoutBtn">Logout</button>
+</header><main><div id="message"></div><section class="welcome">
+<h1>Welcome, <span id="customerName">Customer</span></h1>
+<p>Your personal customer dashboard</p>
+</section><div id="accountStatus" class="status">
+Loading account status...
+</div><section class="card">
+<h2>Available Projects</h2>
+<div id="projects" class="grid">
+<p class="loading">Loading projects...</p>
+</div>
+</section><section class="card">
+<h2>My Registrations</h2>
+<div id="enrollments">
+<p class="loading">Loading registrations...</p>
+</div>
+</section><section class="card">
+<h2>My Salary</h2>
+<div id="salaries">
+<p class="loading">Loading salary records...</p>
+</div>
+</section><section class="card">
+<h2>Notifications</h2>
+<div id="notifications">
+<p class="loading">Loading notifications...</p>
+</div>
+</section><section class="card">
+<h2>Account Information</h2>
+<div id="profile">
+<p class="loading">Loading profile...</p>
+</div>
+</section></main><script>
+const messageBox = document.getElementById("message");
+
+function showMessage(message,type="success"){
+    messageBox.className=type;
+    messageBox.textContent=message;
+}
+
+async function api(url,options={}){
+    const response=await fetch(url,{
+        credentials:"same-origin",
+        ...options,
+        headers:{
+            ...(options.headers||{})
+        }
+    });
+
+    const data=await response.json();
+
+    if(!response.ok){
+        throw new Error(data.message||"Request failed.");
+    }
+
+    return data;
+}
+
+function money(value){
+    return "₹"+Number(value||0).toLocaleString("en-IN");
+}
+
+function date(value){
+    if(!value)return "Not available";
+    return new Date(value).toLocaleString("en-IN");
+}
+
+function escapeHTML(value){
+    return String(value??"").replace(/[&<>"']/g,char=>({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+    })[char]);
+}
+
+async function loadAccount(){
+    try{
+        const data=await api("/api/auth/me");
+        document.getElementById("customerName").textContent=data.customer.fullName;
+
+        const status=data.customer.accountStatus;
+
+        const statusBox=document.getElementById("accountStatus");
+
+        if(status==="approved"){
+            statusBox.textContent="Your customer account is approved. You can use the available project services.";
+        }else if(status==="pending"){
+            statusBox.textContent="Your account is awaiting admin approval. Project registration and other services may remain unavailable until approval.";
+        }else{
+            statusBox.textContent="Your account is not approved. Please contact customer support.";
+        }
+
+    }catch(error){
+        window.location.href="/";
+    }
+}
+
+async function loadProjects(){
+    const box=document.getElementById("projects");
+
+    try{
+        const data=await api("/api/projects");
+
+        if(!data.projects.length){
+            box.innerHTML='<p class="empty">No projects are currently available.</p>';
+            return;
+        }
+
+        box.innerHTML=data.projects.map(project=>`
+            <div class="project">
+                <h3>${escapeHTML(project.projectName)}</h3>
+                <p>Pages: ${project.pages}</p>
+                <p>Sides: ${project.sides}</p>
+                <p>Duration: ${project.durationDays} days</p>
+                <p>Salary: ${money(project.salary)}</p>
+                <p>Registration Fee: ${money(project.registrationFee)}</p>
+                <p>${escapeHTML(project.description||"")}</p>
+                <button onclick="applyProject('${project._id}')">Select Project</button>
+            </div>
+        `).join("");
+
+    }catch(error){
+        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    }
+}
+
+async function applyProject(projectId){
+    if(!confirm("Do you want to register for this project?"))return;
+
+    try{
+        const data=await api("/api/enrollments",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({projectId})
+        });
+
+        showMessage(data.message);
+        loadEnrollments();
+
+    }catch(error){
+        showMessage(error.message,"error");
+    }
+}
+
+async function loadEnrollments(){
+    const box=document.getElementById("enrollments");
+
+    try{
+        const data=await api("/api/enrollments/my");
+
+        if(!data.enrollments.length){
+            box.innerHTML='<p class="empty">You have not registered for any project yet.</p>';
+            return;
+        }
+
+        box.innerHTML=data.enrollments.map(item=>`
+            <div class="item">
+                <strong>${escapeHTML(item.projectSnapshot.projectName)}</strong>
+                <p class="muted">Registration: ${escapeHTML(item.registrationStatus)}</p>
+                <p class="muted">Payment: ${escapeHTML(item.paymentStatus)}</p>
+                <p class="muted">Salary: ${money(item.projectSnapshot.salary)}</p>
+                <p class="muted">Registered: ${date(item.createdAt)}</p>
+            </div>
+        `).join("");
+
+    }catch(error){
+        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    }
+}
+
+async function loadSalaries(){
+    const box=document.getElementById("salaries");
+
+    try{
+        const data=await api("/api/salaries/my");
+
+        if(!data.salaries.length){
+            box.innerHTML='<p class="empty">No salary records available yet.</p>';
+            return;
+        }
+
+        box.innerHTML=data.salaries.map(salary=>`
+            <div class="item">
+                <strong>Total Salary: ${money(salary.totalSalary)}</strong>
+                <p class="muted">50% Advance: ${money(salary.advanceAmount)}</p>
+                <p class="muted">Advance Status: ${escapeHTML(salary.advanceStatus)}</p>
+                <p class="muted">Advance Due: ${date(salary.advanceDueAt)}</p>
+                <p class="muted">Remaining 50%: ${money(salary.remainingAmount)}</p>
+                <p class="muted">Remaining Status: ${escapeHTML(salary.remainingStatus)}</p>
+            </div>
+        `).join("");
+
+    }catch(error){
+        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    }
+}
+
+async function loadNotifications(){
+    const box=document.getElementById("notifications");
+
+    try{
+        const data=await api("/api/notifications");
+
+        if(!data.notifications.length){
+            box.innerHTML='<p class="empty">No notifications available.</p>';
+            return;
+        }
+
+        box.innerHTML=data.notifications.map(item=>`
+            <div class="item">
+                <strong>${escapeHTML(item.title)}</strong>
+                <p>${escapeHTML(item.message)}</p>
+                <p class="muted">${date(item.createdAt)}</p>
+            </div>
+        `).join("");
+
+    }catch(error){
+        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    }
+}
+
+async function loadProfile(){
+    const box=document.getElementById("profile");
+
+    try{
+        const data=await api("/api/profile");
+        const p=data.profile;
+
+        box.innerHTML=`
+            <div class="item">
+                <p>Name: ${escapeHTML(p.fullName)}</p>
+                <p>Customer ID: ${escapeHTML(p.customerId||"Pending")}</p>
+                <p>Email: ${escapeHTML(p.email)}</p>
+                <p>Mobile: ${escapeHTML(p.mobile)}</p>
+                <p>WhatsApp: ${escapeHTML(p.whatsapp||"Not added")}</p>
+                <p>Address: ${escapeHTML(p.address||"Not added")}</p>
+                <p>City: ${escapeHTML(p.city||"Not added")}</p>
+                <p>District: ${escapeHTML(p.district||"Not added")}</p>
+                <p>State: ${escapeHTML(p.state||"Not added")}</p>
+                <p>PIN Code: ${escapeHTML(p.pinCode||"Not added")}</p>
+                <p>Account Status: ${escapeHTML(p.accountStatus)}</p>
+            </div>
+        `;
+
+    }catch(error){
+        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    }
+}
+
+document.getElementById("logoutBtn").addEventListener("click",async()=>{
+    try{
+        await api("/api/auth/logout",{method:"POST"});
+        window.location.href="/";
+    }catch(error){
+        showMessage(error.message,"error");
+    }
+});
+
+async function loadDashboard(){
+    await loadAccount();
+
+    await Promise.all([
+        loadProjects(),
+        loadEnrollments(),
+        loadSalaries(),
+        loadNotifications(),
+        loadProfile()
+    ]);
+}
+
+loadDashboard();
+</script></body>
+  </html>
