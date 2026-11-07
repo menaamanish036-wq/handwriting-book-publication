@@ -23,208 +23,215 @@ app.use(compression());
 app.use(express.json({ limit: "2mb" }));
 
 app.use(express.urlencoded({
-    extended: true,
-    limit: "2mb"
+extended: true,
+limit: "2mb"
 }));
 
 // API RATE LIMIT
 app.use("/api", rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 200,
-    standardHeaders: true,
-    legacyHeaders: false
+windowMs: 15 * 60 * 1000,
+limit: 200,
+standardHeaders: true,
+legacyHeaders: false
 }));
 
 async function startServer() {
-    try {
-        const SESSION_SECRET = process.env.SESSION_SECRET;
+try {
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
-        if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
-            throw new Error(
-                "SESSION_SECRET must contain at least 32 characters."
-            );
+    if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
+        throw new Error(
+            "SESSION_SECRET must contain at least 32 characters."
+        );
+    }
+
+    // CONNECT DATABASE
+    await connectDB();
+
+    console.log("Database connected successfully.");
+
+    // SESSION CONFIGURATION
+    app.use(session({
+        name: "hbps.sid",
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+
+        store: MongoStore.create({
+            client: mongoose.connection.getClient(),
+            collectionName: "sessions",
+            ttl: 14 * 24 * 60 * 60
+        }),
+
+        cookie: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 14 * 24 * 60 * 60 * 1000
+        }
+    }));
+
+    // CUSTOMER AUTHENTICATION
+    app.use(
+        "/api/auth",
+        require("./routes/auth")
+    );
+
+    // ADMIN AUTHENTICATION
+    app.use(
+        "/api/admin/auth",
+        require("./routes/adminAuth")
+    );
+
+    // CUSTOMER PROJECTS
+    app.use(
+        "/api/projects",
+        require("./routes/projects")
+    );
+
+    // PROJECT ENROLLMENTS
+    app.use(
+        "/api/enrollments",
+        require("./routes/enrollments")
+    );
+
+    // WORK ASSIGNMENTS
+    app.use(
+        "/api/work-assignments",
+        require("./routes/workAssignments")
+    );
+
+    // ADMIN PROJECT MANAGEMENT
+    app.use(
+        "/api/admin/projects",
+        require("./routes/adminProjects")
+    );
+
+    // CUSTOMER PROFILE
+    app.use(
+        "/api/profile",
+        require("./routes/profile")
+    );
+
+    // NOTIFICATIONS
+    app.use(
+        "/api/notifications",
+        require("./routes/notifications")
+    );
+
+    // CUSTOMER CHARGES
+    app.use(
+        "/api/customer-charges",
+        require("./routes/customerCharges")
+    );
+
+    // CUSTOMER SUPPORT
+    app.use(
+        "/api/support",
+        require("./routes/support")
+    );
+
+    // CUSTOMER WORK SHOWCASE
+    app.use(
+        "/api/showcase",
+        require("./routes/showcase")
+    );
+
+    // WEBSITE SETTINGS
+    app.use(
+        "/api/settings",
+        require("./routes/settings")
+    );
+
+    // COMPANY CERTIFICATE
+    app.use(
+        "/api/company-certificate",
+        require("./routes/companyCertificate")
+    );
+
+    // ACTIVITY LOGS
+    app.use(
+        "/api/activity-logs",
+        require("./routes/activityLogs")
+    );
+
+    // FILE UPLOADS
+    app.use(
+        "/api/uploads",
+        require("./routes/uploads")
+    );
+
+    // PAYMENTS
+    app.use(
+        "/api/payments",
+        require("./routes/payments")
+    );
+
+    // SALARY MANAGEMENT
+    app.use(
+        "/api/salaries",
+        require("./routes/salaries")
+    );
+
+    // HEALTH CHECK
+    app.get("/api/health", (req, res) => {
+        res.status(200).json({
+            success: true,
+            message: "Server is running.",
+            database: "Connected"
+        });
+    });
+
+    // STATIC WEBSITE FILES
+    app.use(express.static(
+        path.join(__dirname, "public")
+    ));
+
+    // ERROR HANDLER
+    app.use((err, req, res, next) => {
+        console.error("Application error:", err);
+
+        if (res.headersSent) {
+            return next(err);
         }
 
-        // CONNECT DATABASE
-        await connectDB();
-
-        console.log("Database connected successfully.");
-
-        // SESSION CONFIGURATION
-        app.use(session({
-            name: "hbps.sid",
-            secret: SESSION_SECRET,
-            resave: false,
-            saveUninitialized: false,
-
-            store: MongoStore.create({
-                client: mongoose.connection.getClient(),
-                collectionName: "sessions",
-                ttl: 14 * 24 * 60 * 60
-            }),
-
-            cookie: {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: 14 * 24 * 60 * 60 * 1000
-            }
-        }));
-
-        // CUSTOMER AUTHENTICATION
-        app.use(
-            "/api/auth",
-            require("./routes/auth")
-        );
-
-        // ADMIN AUTHENTICATION
-        app.use(
-            "/api/admin/auth",
-            require("./routes/adminAuth")
-        );
-
-        // CUSTOMER PROJECTS
-        app.use(
-            "/api/projects",
-            require("./routes/projects")
-        );
-
-        // PROJECT ENROLLMENTS
-        app.use(
-            "/api/enrollments",
-            require("./routes/enrollments")
-        );
-
-        // WORK ASSIGNMENTS
-        app.use(
-            "/api/work-assignments",
-            require("./routes/workAssignments")
-        );
-
-        // ADMIN PROJECT MANAGEMENT
-        app.use(
-            "/api/admin/projects",
-            require("./routes/adminProjects")
-        );
-
-        // CUSTOMER PROFILE
-        app.use(
-            "/api/profile",
-            require("./routes/profile")
-        );
-
-        // NOTIFICATIONS
-        app.use(
-            "/api/notifications",
-            require("./routes/notifications")
-        );
-
-        // CUSTOMER CHARGES
-        app.use(
-            "/api/customer-charges",
-            require("./routes/customerCharges")
-        );
-
-        // CUSTOMER SUPPORT
-        app.use(
-            "/api/support",
-            require("./routes/support")
-        );
-
-        // CUSTOMER WORK SHOWCASE
-        app.use(
-            "/api/showcase",
-            require("./routes/showcase")
-        );
-
-        // WEBSITE SETTINGS
-        app.use(
-            "/api/settings",
-            require("./routes/settings")
-        );
-
-        // COMPANY CERTIFICATE
-        app.use(
-            "/api/company-certificate",
-            require("./routes/companyCertificate")
-        );
-
-        // ACTIVITY LOGS
-        app.use(
-            "/api/activity-logs",
-            require("./routes/activityLogs")
-        );
-
-        // FILE UPLOADS
-        app.use(
-            "/api/uploads",
-            require("./routes/uploads")
-        );
-
-        // PAYMENTS
-        app.use(
-            "/api/payments",
-            require("./routes/payments")
-        );
-
-        // HEALTH CHECK
-        app.get("/api/health", (req, res) => {
-            res.status(200).json({
-                success: true,
-                message: "Server is running.",
-                database: "Connected"
-            });
+        res.status(err.status || 500).json({
+            success: false,
+            message: "Internal server error."
         });
+    });
 
-        // STATIC WEBSITE FILES
-        app.use(express.static(
-            path.join(__dirname, "public")
-        ));
-
-        // ERROR HANDLER
-        app.use((err, req, res, next) => {
-            console.error("Application error:", err);
-
-            if (res.headersSent) {
-                return next(err);
-            }
-
-            res.status(err.status || 500).json({
-                success: false,
-                message: "Internal server error."
-            });
+    // UNKNOWN API ROUTES
+    app.use("/api", (req, res) => {
+        res.status(404).json({
+            success: false,
+            message: "API route not found."
         });
+    });
 
-        // UNKNOWN API ROUTES
-        app.use("/api", (req, res) => {
-            res.status(404).json({
-                success: false,
-                message: "API route not found."
-            });
-        });
+    // UNKNOWN PAGES
+    app.use((req, res) => {
+        res.status(404).send("Page not found.");
+    });
 
-        // UNKNOWN PAGES
-        app.use((req, res) => {
-            res.status(404).send("Page not found.");
-        });
+    // START SERVER
+    const PORT = process.env.PORT || 5000;
 
-        // START SERVER
-        const PORT = process.env.PORT || 5000;
-
-        app.listen(PORT, "0.0.0.0", () => {
-            console.log(
-                `Server running on port ${PORT}`
-            );
-        });
-
-    } catch (error) {
-        console.error(
-            "Server startup failed:",
-            error.message
+    app.listen(PORT, "0.0.0.0", () => {
+        console.log(
+            `Server running on port ${PORT}`
         );
+    });
 
-        process.exit(1);
-    }
+} catch (error) {
+    console.error(
+        "Server startup failed:",
+        error.message
+    );
+
+    process.exit(1);
+}
+
 }
 
 startServer();
