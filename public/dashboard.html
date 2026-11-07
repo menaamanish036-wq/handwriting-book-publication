@@ -12,6 +12,7 @@ body{background:#090909;color:#fff;min-height:100vh}
 header{background:#111;border-bottom:1px solid #b99335;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:15px}
 header h2{color:#d8b45a;font-size:19px}
 button{cursor:pointer;border:0;border-radius:7px;padding:11px 15px;font-weight:bold}
+button:disabled{opacity:.5;cursor:not-allowed}
 .logout{background:#b99335;color:#111}
 main{max-width:1100px;margin:auto;padding:25px 18px}
 .welcome{margin-bottom:22px}
@@ -37,7 +38,6 @@ main{max-width:1100px;margin:auto;padding:25px 18px}
 .payment-form input,.submission-form input,.submission-form textarea{width:100%;padding:12px;border:1px solid #555;border-radius:6px;background:#101010;color:#fff}
 .submission-form textarea{min-height:85px;resize:vertical}
 .payment-form button,.submission-form button{background:#c6a34a;color:#111;margin-top:14px;width:100%}
-.payment-form button:disabled,.submission-form button:disabled{opacity:.5;cursor:not-allowed}
 .badge{display:inline-block;padding:4px 9px;border-radius:5px;background:#28220f;color:#f0d58d;font-size:12px}
 .work-card{margin-bottom:15px}
 .work-card button{background:#c6a34a;color:#111;width:100%;margin-top:12px}
@@ -84,7 +84,7 @@ header{align-items:flex-start;flex-direction:column}
 
 <section class="card">
 <h2>Registration Payment</h2>
-<p class="muted">Select your registered project below to submit its registration payment. Use only official company payment details.</p>
+<p class="muted">Submit your registration payment details and screenshot for verification.</p>
 <div id="paymentSection">
 <p class="loading">Loading payment information...</p>
 </div>
@@ -129,461 +129,476 @@ header{align-items:flex-start;flex-direction:column}
 </main>
 
 <script>
-const messageBox=document.getElementById("message");
+"use strict";
 
-function showMessage(message,type="success"){
-    messageBox.className=type;
-    messageBox.textContent=message;
-    window.scrollTo({top:0,behavior:"smooth"});
+const messageBox = document.getElementById("message");
+
+let currentEnrollments = [];
+
+function showMessage(message, type = "success") {
+    messageBox.className = type;
+    messageBox.textContent = message;
+    window.scrollTo({top: 0, behavior: "smooth"});
 }
 
-async function api(url,options={}){
-    const response=await fetch(url,{
-        credentials:"same-origin",
+async function api(url, options = {}) {
+    const response = await fetch(url, {
+        credentials: "same-origin",
         ...options,
-        headers:{
-            ...(options.headers||{})
+        headers: {
+            ...(options.headers || {})
         }
     });
 
-    let data={};
+    let data;
 
-    try{
-        data=await response.json();
-    }catch(error){
+    try {
+        data = await response.json();
+    } catch (error) {
         throw new Error("Invalid server response.");
     }
 
-    if(!response.ok){
-        throw new Error(data.message||"Request failed.");
+    if (!response.ok) {
+        throw new Error(data.message || "Request failed.");
     }
 
     return data;
 }
 
-function money(value){
-    return "₹"+Number(value||0).toLocaleString("en-IN");
+function money(value) {
+    return "₹" + Number(value || 0).toLocaleString("en-IN");
 }
 
-function date(value){
-    if(!value)return "Not available";
-    return new Date(value).toLocaleString("en-IN");
+function date(value) {
+    if (!value) return "Not available";
+
+    const parsed = new Date(value);
+
+    if (Number.isNaN(parsed.getTime())) {
+        return "Not available";
+    }
+
+    return parsed.toLocaleString("en-IN");
 }
 
-function escapeHTML(value){
-    return String(value??"").replace(/[&<>"']/g,char=>({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
     })[char]);
 }
 
-let currentEnrollments=[];
-let currentPayments=[];
+/* ACCOUNT INFORMATION */
 
-async function loadAccount(){
-    const data=await api("/api/auth/me");
+async function loadAccount() {
+    const data = await api("/api/auth/me");
 
-    document.getElementById("customerName").textContent=
-        data.customer.fullName;
+    if (!data.customer) {
+        throw new Error("Customer account information was not returned.");
+    }
 
-    const status=data.customer.accountStatus;
-    const statusBox=document.getElementById("accountStatus");
+    document.getElementById("customerName").textContent =
+        data.customer.fullName || "Customer";
 
-    if(status==="approved"){
-        statusBox.textContent="Your customer account is approved. You can use the available project services.";
-    }else if(status==="pending"){
-        statusBox.textContent="Your account is awaiting admin approval. Please wait for approval before proceeding with project services.";
-    }else{
-        statusBox.textContent="Your account is not approved. Please contact customer support.";
+    const status = data.customer.accountStatus;
+    const statusBox = document.getElementById("accountStatus");
+
+    if (status === "approved") {
+        statusBox.textContent =
+            "Your customer account is approved. You can use the available project services.";
+    } else if (status === "pending") {
+        statusBox.textContent =
+            "Your account is awaiting admin approval. Please wait for approval.";
+    } else {
+        statusBox.textContent =
+            "Your account is not approved. Please contact customer support.";
     }
 }
 
-async function loadProjects(){
-    const box=document.getElementById("projects");
+/* PROJECTS */
 
-    try{
-        const data=await api("/api/projects");
+async function loadProjects() {
+    const box = document.getElementById("projects");
 
-        if(!data.projects||!data.projects.length){
-            box.innerHTML='<p class="empty">No projects are currently available.</p>';
+    try {
+        const data = await api("/api/projects");
+        const projects = data.projects || [];
+
+        if (!projects.length) {
+            box.innerHTML =
+                '<p class="empty">No projects are currently available.</p>';
             return;
         }
 
-        box.innerHTML=data.projects.map(project=>`
+        box.innerHTML = projects.map(project => `
             <div class="project">
                 <h3>${escapeHTML(project.projectName)}</h3>
-                <p>Pages: ${Number(project.pages)||0}</p>
-                <p>Sides: ${Number(project.sides)||0}</p>
-                <p>Duration: ${Number(project.durationDays)||0} days</p>
+                <p>Pages: ${Number(project.pages) || 0}</p>
+                <p>Sides: ${Number(project.sides) || 0}</p>
+                <p>Duration: ${Number(project.durationDays) || 0} days</p>
                 <p>Salary: ${money(project.salary)}</p>
                 <p>Registration Fee: ${money(project.registrationFee)}</p>
-                <p>${escapeHTML(project.description||"")}</p>
-                <button onclick="applyProject('${project._id}')">Select Project</button>
+                <p>${escapeHTML(project.description || "")}</p>
+                <button type="button" onclick="applyProject('${project._id}')">
+                    Select Project
+                </button>
             </div>
         `).join("");
 
-    }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    } catch (error) {
+        box.innerHTML =
+            `<p class="empty">${escapeHTML(error.message)}</p>`;
     }
 }
 
-async function applyProject(projectId){
-    if(!confirm("Do you want to register for this project?"))return;
+async function applyProject(projectId) {
+    if (!confirm("Do you want to register for this project?")) {
+        return;
+    }
 
-    try{
-        const data=await api("/api/enrollments",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({projectId})
+    try {
+        const data = await api("/api/enrollments", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({projectId})
         });
 
-        showMessage(data.message||"Project registration submitted.");
+        showMessage(data.message || "Project enrollment created successfully.");
+
         await loadEnrollments();
         await loadPaymentSection();
 
-    }catch(error){
-        showMessage(error.message,"error");
+    } catch (error) {
+        showMessage(error.message, "error");
     }
 }
 
-async function loadEnrollments(){
-    const box=document.getElementById("enrollments");
+/* ENROLLMENTS */
 
-    try{
-        const data=await api("/api/enrollments/my");
-        currentEnrollments=data.enrollments||[];
+async function loadEnrollments() {
+    const box = document.getElementById("enrollments");
 
-        if(!currentEnrollments.length){
-            box.innerHTML='<p class="empty">You have not registered for any project yet.</p>';
+    try {
+        const data = await api("/api/enrollments/my");
+
+        currentEnrollments = data.enrollments || [];
+
+        if (!currentEnrollments.length) {
+            box.innerHTML =
+                '<p class="empty">You have not registered for any project yet.</p>';
             return;
         }
 
-        box.innerHTML=currentEnrollments.map(item=>`
-            <div class="item">
-                <strong>${escapeHTML(item.projectSnapshot.projectName)}</strong>
-                <p class="muted">Registration: ${escapeHTML(item.registrationStatus)}</p>
-                <p class="muted">Payment: ${escapeHTML(item.paymentStatus)}</p>
-                <p class="muted">Salary: ${money(item.projectSnapshot.salary)}</p>
-                <p class="muted">Registration Fee: ${money(item.projectSnapshot.registrationFee)}</p>
-                <p class="muted">Registered: ${date(item.createdAt)}</p>
-            </div>
-        `).join("");
+        box.innerHTML = currentEnrollments.map(item => {
+            const project = item.projectSnapshot || {};
 
-    }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+            return `
+                <div class="item">
+                    <strong>${escapeHTML(project.projectName || "Project")}</strong>
+                    <p class="muted">Registration: ${escapeHTML(item.registrationStatus)}</p>
+                    <p class="muted">Payment: ${escapeHTML(item.paymentStatus)}</p>
+                    <p class="muted">Salary: ${money(project.salary)}</p>
+                    <p class="muted">Registration Fee: ${money(project.registrationFee)}</p>
+                    <p class="muted">Registered: ${date(item.createdAt)}</p>
+                </div>
+            `;
+        }).join("");
+
+    } catch (error) {
+        box.innerHTML =
+            `<p class="empty">${escapeHTML(error.message)}</p>`;
     }
 }
 
-async function loadPaymentSection(){
-    const box=document.getElementById("paymentSection");
+/* REGISTRATION PAYMENT */
 
-    try{
-        if(!currentEnrollments.length){
-            box.innerHTML='<p class="empty">Register for a project first to see its payment information.</p>';
+async function loadPaymentSection() {
+    const box = document.getElementById("paymentSection");
+
+    try {
+        if (!currentEnrollments.length) {
+            box.innerHTML =
+                '<p class="empty">Register for a project first to see its payment information.</p>';
             return;
         }
 
-        const paymentsData=await api("/api/payments/my");
-        currentPayments=paymentsData.payments||[];
+        const paymentData = await api("/api/payments/my");
+        const payments = paymentData.payments || [];
 
-        const payable=currentEnrollments.filter(item=>
-            item.registrationStatus==="pending" &&
-            item.paymentStatus!=="approved" &&
-            item.paymentStatus!=="pending"
-        );
+        const payable = currentEnrollments.filter(item => {
+            const hasPendingPayment = payments.some(payment =>
+                String(payment.enrollment?._id || payment.enrollment) === String(item._id) &&
+                payment.status === "pending"
+            );
 
-        if(!payable.length){
-            box.innerHTML='<p class="empty">No registration payment is currently waiting for submission. Check your payment history for updates.</p>';
-            return;
-        }
-
-        box.innerHTML=payable.map(item=>`
-            <div class="payment-form">
-                <h3>${escapeHTML(item.projectSnapshot.projectName)}</h3>
-                <p class="muted">Registration Fee: ${money(item.projectSnapshot.registrationFee)}</p>
-                <p class="muted">Please obtain the official company payment QR/details before making payment.</p>
-
-                <form onsubmit="submitPayment(event,'${item._id}')">
-                    <label>Transaction ID</label>
-                    <input type="text" name="transactionId" maxlength="120" required placeholder="Enter your UPI transaction ID">
-
-                    <label>Payment Screenshot</label>
-                    <input type="file" name="screenshot" accept="image/jpeg,image/png,image/webp" required>
-
-                    <button type="submit">Submit Payment</button>
-                </form>
-            </div>
-        `).join("");
-
-    }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
-    }
-}
-
-async function submitPayment(event,enrollmentId){
-    event.preventDefault();
-
-    const form=event.target;
-    const button=form.querySelector("button");
-    const transactionId=form.elements.transactionId.value.trim();
-    const file=form.elements.screenshot.files[0];
-
-    if(!transactionId||!file){
-        showMessage("Please enter the transaction ID and select a screenshot.","error");
-        return;
-    }
-
-    if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
-        showMessage("Only JPG, PNG or WEBP screenshots are allowed.","error");
-        return;
-    }
-
-    if(file.size>5*1024*1024){
-        showMessage("Screenshot size must be less than 5 MB.","error");
-        return;
-    }
-
-    button.disabled=true;
-    button.textContent="Uploading...";
-
-    try{
-        const formData=new FormData();
-        formData.append("file",file);
-
-        const uploadResponse=await fetch("/api/uploads",{
-            method:"POST",
-            credentials:"same-origin",
-            body:formData
+            return item.registrationStatus === "pending" &&
+                item.paymentStatus !== "approved" &&
+                !hasPendingPayment;
         });
 
-        const uploadData=await uploadResponse.json();
-
-        if(!uploadResponse.ok){
-            throw new Error(uploadData.message||"Screenshot upload failed.");
+        if (!payable.length) {
+            box.innerHTML =
+                '<p class="empty">No registration payment is currently waiting for submission. Check your payment history for updates.</p>';
+            return;
         }
 
-        const fileId=uploadData.file&&uploadData.file.fileId;
+        box.innerHTML = payable.map(item => {
+            const project = item.projectSnapshot || {};
 
-        if(!fileId){
-            throw new Error("Uploaded screenshot ID was not returned by the server.");
+            return `
+                <div class="payment-form">
+                    <h3>${escapeHTML(project.projectName || "Project")}</h3>
+                    <p class="muted">Registration Fee: ${money(project.registrationFee)}</p>
+                    <p class="muted">Use the official payment details provided by the company.</p>
+
+                    <form onsubmit="submitPayment(event, '${item._id}')">
+                        <label>Transaction ID</label>
+                        <input
+                            type="text"
+                            name="transactionId"
+                            maxlength="120"
+                            required
+                            placeholder="Enter your UPI transaction ID"
+                        >
+
+                        <label>Payment Screenshot</label>
+                        <input
+                            type="file"
+                            name="screenshot"
+                            accept="image/jpeg,image/png,image/webp"
+                            required
+                        >
+
+                        <button type="submit">Submit Payment</button>
+                    </form>
+                </div>
+            `;
+        }).join("");
+
+    } catch (error) {
+        box.innerHTML =
+            `<p class="empty">${escapeHTML(error.message)}</p>`;
+    }
+}
+
+async function submitPayment(event, enrollmentId) {
+    event.preventDefault();
+
+    const form = event.target;
+    const button = form.querySelector("button");
+    const transactionId = form.elements.transactionId.value.trim();
+    const file = form.elements.screenshot.files[0];
+
+    if (!transactionId || !file) {
+        showMessage("Please enter the transaction ID and select a screenshot.", "error");
+        return;
+    }
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        showMessage("Only JPG, PNG or WEBP screenshots are allowed.", "error");
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        showMessage("Screenshot size must be less than 5 MB.", "error");
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Uploading...";
+
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const uploadResponse = await fetch("/api/uploads", {
+            method: "POST",
+            credentials: "same-origin",
+            body: formData
+        });
+
+        const uploadData = await uploadResponse.json();
+
+        if (!uploadResponse.ok) {
+            throw new Error(uploadData.message || "Screenshot upload failed.");
         }
 
-        button.textContent="Submitting Payment...";
+        const fileId = uploadData.file && uploadData.file.fileId;
 
-        const paymentData=await api("/api/payments",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({
+        if (!fileId) {
+            throw new Error("Screenshot file ID was not returned by the server.");
+        }
+
+        button.textContent = "Submitting Payment...";
+
+        const result = await api("/api/payments", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
                 enrollmentId,
                 transactionId,
-                paymentScreenshotId:fileId
+                paymentScreenshotId: fileId
             })
         });
 
-        showMessage(paymentData.message||"Payment submitted successfully.");
+        showMessage(result.message || "Payment submitted for verification.");
+
         form.reset();
 
         await loadEnrollments();
         await loadPaymentSection();
         await loadPayments();
 
-    }catch(error){
-        showMessage(error.message,"error");
-    }finally{
-        button.disabled=false;
-        button.textContent="Submit Payment";
+    } catch (error) {
+        showMessage(error.message, "error");
+    } finally {
+        button.disabled = false;
+        button.textContent = "Submit Payment";
     }
 }
 
-async function loadPayments(){
-    const box=document.getElementById("payments");
+/* PAYMENT HISTORY */
 
-    try{
-        const data=await api("/api/payments/my");
-        const payments=data.payments||[];
+async function loadPayments() {
+    const box = document.getElementById("payments");
 
-        if(!payments.length){
-            box.innerHTML='<p class="empty">No payment records available.</p>';
+    try {
+        const data = await api("/api/payments/my");
+        const payments = data.payments || [];
+
+        if (!payments.length) {
+            box.innerHTML =
+                '<p class="empty">No payment records available.</p>';
             return;
         }
 
-        box.innerHTML=payments.map(payment=>`
+        box.innerHTML = payments.map(payment => `
             <div class="item">
                 <strong>${money(payment.amount)}</strong>
                 <p class="muted">Type: ${escapeHTML(payment.paymentType)}</p>
                 <p class="muted">Transaction ID: ${escapeHTML(payment.transactionId)}</p>
                 <p class="muted">Status: <span class="badge">${escapeHTML(payment.status)}</span></p>
                 <p class="muted">Submitted: ${date(payment.createdAt)}</p>
-                ${payment.adminRemarks?`<p class="muted">Admin Remarks: ${escapeHTML(payment.adminRemarks)}</p>`:""}
+                ${payment.adminRemarks
+                    ? `<p class="muted">Admin Remarks: ${escapeHTML(payment.adminRemarks)}</p>`
+                    : ""}
             </div>
         `).join("");
 
-    }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    } catch (error) {
+        box.innerHTML =
+            `<p class="empty">${escapeHTML(error.message)}</p>`;
     }
 }
 
 /* CUSTOMER WORK ASSIGNMENTS */
 
-async function loadWorkAssignments(){
-    const box=document.getElementById("workAssignments");
+async function loadWorkAssignments() {
+    const box = document.getElementById("workAssignments");
 
-    try{
-        const data=await api("/api/work-assignments/my");
-        const assignments=data.assignments||[];
+    try {
+        const data = await api("/api/work-assignments/my");
+        const assignments = data.assignments || [];
 
-        if(!assignments.length){
-            box.innerHTML='<p class="empty">No work has been assigned to you yet.</p>';
+        if (!assignments.length) {
+            box.innerHTML =
+                '<p class="empty">No work has been assigned to you yet.</p>';
             return;
         }
 
-        box.innerHTML=assignments.map(work=>{
-            const canSubmit=[
+        box.innerHTML = assignments.map(work => {
+            const canSubmit = [
                 "assigned",
                 "in_progress",
                 "correction_required"
             ].includes(work.status);
 
-            const files=(work.submissionFileIds||[]).map(id=>`
-                <a class="file-link" href="/api/uploads/${encodeURIComponent(id)}" target="_blank" rel="noopener">View submitted file</a>
+            const files = (work.submissionFileIds || []).map(id => `
+                <a
+                    class="file-link"
+                    href="/api/uploads/${encodeURIComponent(id)}"
+                    target="_blank"
+                    rel="noopener"
+                >View submitted file</a>
             `).join("");
 
             return `
                 <div class="work-card">
                     <h3>${escapeHTML(work.title)}</h3>
 
-                    <p>Assigned Pages: ${Number(work.totalPages)||0}</p>
+                    <p>Assigned Pages: ${Number(work.totalPages) || 0}</p>
                     <p>Assigned Date: ${date(work.assignedDate)}</p>
                     <p>Deadline: ${date(work.deadline)}</p>
                     <p>Status: <span class="badge">${escapeHTML(work.status)}</span></p>
 
                     <p><strong>Instructions:</strong></p>
-                    <div class="instructions">${escapeHTML(work.instructions||"Write all assigned work in English uppercase letters A-Z.")}</div>
+                    <div class="instructions">${escapeHTML(
+                        work.instructions ||
+                        "Write all assigned work in English uppercase letters A-Z."
+                    )}</div>
 
-                    ${work.adminRemarks?`
+                    ${work.adminRemarks ? `
                         <p><strong>Admin Remarks:</strong></p>
                         <div class="instructions">${escapeHTML(work.adminRemarks)}</div>
-                    `:""}
+                    ` : ""}
 
-                    ${files?`
+                    ${files ? `
                         <p><strong>Previously Submitted Files:</strong></p>
                         <div>${files}</div>
-                    `:""}
+                    ` : ""}
 
-                    ${canSubmit?`
-                        <form class="submission-form" onsubmit="submitWork(event,'${work._id}')">
+                    ${canSubmit ? `
+                        <form class="submission-form" onsubmit="submitWork(event, '${work._id}')">
                             <label>Upload Completed Work (Images or PDF)</label>
-                            <input type="file" name="workFiles" accept="image/jpeg,image/png,image/webp,application/pdf" multiple required>
+                            <input
+                                type="file"
+                                name="workFiles"
+                                accept="image/jpeg,image/png,image/webp,application/pdf"
+                                multiple
+                                required
+                            >
 
                             <label>Remarks (Optional)</label>
-                            <textarea name="customerRemarks" maxlength="2000" placeholder="Write a message for the admin"></textarea>
+                            <textarea
+                                name="customerRemarks"
+                                maxlength="2000"
+                                placeholder="Write a message for the admin"
+                            ></textarea>
 
                             <button type="submit">Submit Completed Work</button>
                         </form>
-                    `:""}
+                    ` : ""}
 
-                    ${work.status==="submitted"||work.status==="under_review"?`
-                        <p class="muted">Your work has been submitted. Please wait for admin review.</p>
-                    `:""}
+                    ${work.status === "submitted" || work.status === "under_review"
+                        ? '<p class="muted">Your work has been submitted. Please wait for admin review.</p>'
+                        : ""}
 
-                    ${work.status==="approved"?`
-                        <p class="muted">Your work has been approved. Waiting for final completion.</p>
-                    `:""}
+                    ${work.status === "approved"
+                        ? '<p class="muted">Your work has been approved. Waiting for final completion.</p>'
+                        : ""}
 
-                    ${work.status==="completed"?`
-                        <p class="muted">This assignment has been completed.</p>
-                    `:""}
+                    ${work.status === "completed"
+                        ? '<p class="muted">This assignment has been completed.</p>'
+                        : ""}
                 </div>
             `;
         }).join("");
 
-    }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    } catch (error) {
+        box.innerHTML =
+            `<p class="empty">${escapeHTML(error.message)}</p>`;
     }
 }
 
-async function submitWork(event,assignmentId){
+/* SUBMIT COMPLETED WORK */
+
+async function submitWork(event, assignmentId) {
     event.preventDefault();
 
-    const form=event.target;
-    const button=form.querySelector("button");
-    const files=Array.from(form.elements.workFiles.files||[]);
-    const remarks=form.elements.customerRemarks.value.trim();
-
-    if(files.length<1||files.length>20){
-        showMessage("Please select between 1 and 20 files.","error");
-        return;
-    }
-
-    const allowedTypes=[
-        "image/jpeg",
-        "image/png",
-        "image/webp",
-        "application/pdf"
-    ];
-
-    for(const file of files){
-        if(!allowedTypes.includes(file.type)){
-            showMessage("Only JPG, PNG, WEBP and PDF files are allowed.","error");
-            return;
-        }
-
-        if(file.size>10*1024*1024){
-            showMessage("Each work file must be smaller than 10 MB.","error");
-            return;
-        }
-    }
-
-    button.disabled=true;
-    button.textContent="Uploading Work Files...";
-
-    try{
-        const fileIds=[];
-
-        for(let i=0;i<files.length;i++){
-            const formData=new FormData();
-            formData.append("file",files[i]);
-
-            const response=await fetch("/api/uploads",{
-                method:"POST",
-                credentials:"same-origin",
-                body:formData
-            });
-
-            let uploadData={};
-
-            try{
-                uploadData=await response.json();
-            }catch(error){
-                throw new Error("Invalid file upload response.");
-            }
-
-            if(!response.ok){
-                throw new Error(uploadData.message||"Unable to upload a work file.");
-            }
-
-            const fileId=uploadData.file&&uploadData.file.fileId;
-
-            if(!fileId){
-                throw new Error("The server did not return a work file ID.");
-            }
-
-            fileIds.push(String(fileId));
-            button.textContent=`Uploading ${i+1} of ${files.length}...`;
-        }
-
-        button.textContent="Submitting Work...";
-
-        const result=await api(`/api/work-assignments/${encodeURIComponent(assignmentId)}/submit`,{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({
-                fileIds,
-                customerRemarks:remarks
-            })
-        });
-
-        showMessage(result.message||"Your work has been submitted
+    const form = event.target;
+    const button = form.querySelector("button");
+    const files = Array.from(form.elements.workFiles.files || []);
+    const remarks = form.
