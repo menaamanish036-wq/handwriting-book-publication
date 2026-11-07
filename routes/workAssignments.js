@@ -13,7 +13,9 @@ const {
     requireAdmin
 } = require("../middleware/auth");
 
-// ADMIN: ASSIGN WORK TO CUSTOMER
+const FILE_COLLECTION = "uploads.files";
+
+// ADMIN: ASSIGN WORK
 router.post(
     "/admin",
     requireLogin,
@@ -47,10 +49,7 @@ router.post(
 
             const pages = Number(totalPages);
 
-            if (
-                !Number.isInteger(pages) ||
-                pages < 1
-            ) {
+            if (!Number.isInteger(pages) || pages < 1) {
                 return res.status(400).json({
                     success: false,
                     message: "Enter a valid page count."
@@ -75,10 +74,13 @@ router.post(
                 });
             }
 
-            if (pages > enrollment.projectSnapshot.pages) {
+            if (
+                !enrollment.projectSnapshot ||
+                pages > enrollment.projectSnapshot.pages
+            ) {
                 return res.status(400).json({
                     success: false,
-                    message: "Assigned pages cannot exceed project pages."
+                    message: "Assigned pages exceed project limits."
                 });
             }
 
@@ -118,14 +120,11 @@ router.post(
                     type: "work",
                     createdBy: req.user._id
                 });
-            } catch (notificationError) {
-                console.error(
-                    "Work notification error:",
-                    notificationError
-                );
+            } catch (error) {
+                console.error("Notification error:", error);
             }
 
-            res.status(201).json({
+            return res.status(201).json({
                 success: true,
                 message: "Work assigned successfully.",
                 assignment
@@ -134,7 +133,7 @@ router.post(
         } catch (error) {
             console.error("Assign work error:", error);
 
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 message: "Unable to assign work."
             });
@@ -142,22 +141,27 @@ router.post(
     }
 );
 
-// CUSTOMER: VIEW OWN ASSIGNMENTS
+// CUSTOMER: VIEW OWN WORK
 router.get("/my", requireLogin, async (req, res) => {
     try {
         const assignments = await WorkAssignment.find({
             customer: req.user._id
         })
-            .populate("enrollment", "projectSnapshot registrationStatus")
+            .populate(
+                "enrollment",
+                "projectSnapshot registrationStatus"
+            )
             .sort({ createdAt: -1 });
 
-        res.json({
+        return res.json({
             success: true,
             assignments
         });
 
     } catch (error) {
-        res.status(500).json({
+        console.error("Load work error:", error);
+
+        return res.status(500).json({
             success: false,
             message: "Unable to load your work."
         });
@@ -174,10 +178,7 @@ router.post("/:id/submit", requireLogin, async (req, res) => {
             });
         }
 
-        const {
-            fileIds,
-            customerRemarks
-        } = req.body;
+        const { fileIds, customerRemarks } = req.body;
 
         if (
             !Array.isArray(fileIds) ||
@@ -190,16 +191,14 @@ router.post("/:id/submit", requireLogin, async (req, res) => {
             });
         }
 
-        const validIds = fileIds.every(
-            id => mongoose.isValidObjectId(id)
-        );
-
-        if (!validIds) {
+        if (!fileIds.every(id => mongoose.isValidObjectId(id))) {
             return res.status(400).json({
                 success: false,
-                message: "One or more file IDs are invalid."
+                message: "Invalid file ID."
             });
         }
+
+        const uniqueIds = [...new Set(fileIds)];
 
         const assignment = await WorkAssignment.findOne({
             _id: req.params.id,
@@ -224,14 +223,12 @@ router.post("/:id/submit", requireLogin, async (req, res) => {
             });
         }
 
-        const uniqueIds = [...new Set(fileIds)];
-
         const objectIds = uniqueIds.map(
             id => new mongoose.Types.ObjectId(id)
         );
 
         const uploadedFiles = await mongoose.connection.db
-            .collection("uploads.files")
+            .collection(FILE_COLLECTION)
             .find({
                 _id: { $in: objectIds },
                 "metadata.uploadedBy": String(req.user._id)
@@ -246,6 +243,7 @@ router.post("/:id/submit", requireLogin, async (req, res) => {
         }
 
         assignment.submissionFileIds = uniqueIds;
+
         assignment.customerRemarks =
             typeof customerRemarks === "string"
                 ? customerRemarks.trim().slice(0, 2000)
@@ -270,14 +268,11 @@ router.post("/:id/submit", requireLogin, async (req, res) => {
                 target: "admin",
                 type: "work"
             });
-        } catch (notificationError) {
-            console.error(
-                "Submission notification error:",
-                notificationError
-            );
+        } catch (error) {
+            console.error("Submission notification error:", error);
         }
 
-        res.json({
+        return res.json({
             success: true,
             message: "Work submitted successfully.",
             assignment
@@ -286,14 +281,14 @@ router.post("/:id/submit", requireLogin, async (req, res) => {
     } catch (error) {
         console.error("Work submission error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Unable to submit work."
         });
     }
 });
 
-// ADMIN: VIEW ALL WORK ASSIGNMENTS
+// ADMIN: VIEW ALL WORK
 router.get(
     "/admin/all",
     requireLogin,
@@ -301,17 +296,25 @@ router.get(
     async (req, res) => {
         try {
             const assignments = await WorkAssignment.find()
-                .populate("customer", "fullName email mobile customerId")
-                .populate("enrollment", "projectSnapshot")
+                .populate(
+                    "customer",
+                    "fullName email mobile"
+                )
+                .populate(
+                    "enrollment",
+                    "projectSnapshot"
+                )
                 .sort({ createdAt: -1 });
 
-            res.json({
+            return res.json({
                 success: true,
                 assignments
             });
 
         } catch (error) {
-            res.status(500).json({
+            console.error("Admin work list error:", error);
+
+            return res.status(500).json({
                 success: false,
                 message: "Unable to load work assignments."
             });
@@ -333,10 +336,7 @@ router.patch(
                 });
             }
 
-            const {
-                status,
-                adminRemarks
-            } = req.body;
+            const { status, adminRemarks } = req.body;
 
             const allowedStatuses = [
                 "under_review",
@@ -363,15 +363,58 @@ router.patch(
                 });
             }
 
-            if (![
-                "submitted",
-                "under_review"
-            ].includes(assignment.status) &&
-                status !== "correction_required") {
+            // COMPLETED WORK CANNOT BE REOPENED
+            if (assignment.status === "completed") {
+                return res.status(400).json({
+                    success: false,
+                    message: "This assignment is already completed."
+                });
+            }
+
+            // COMPLETED IS ALLOWED ONLY AFTER ADMIN APPROVAL
+            if (
+                status === "completed" &&
+                assignment.status !== "approved"
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Approve the submitted work before completing it."
+                });
+            }
+
+            // REVIEW IS ALLOWED ONLY FOR SUBMITTED WORK
+            if (
+                status !== "completed" &&
+                ![
+                    "submitted",
+                    "under_review"
+                ].includes(assignment.status)
+            ) {
                 return res.status(400).json({
                     success: false,
                     message: "Assignment is not ready for review."
                 });
+            }
+
+            // CHECK SALARY RECORD BEFORE COMPLETION
+            let salary = null;
+
+            if (status === "completed") {
+                salary = await Salary.findOne({
+                    enrollment: assignment.enrollment
+                });
+
+                if (!salary) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Salary record not found for this enrollment."
+                    });
+                }
+
+                if (!salary.workCompletedAt) {
+                    salary.workCompletedAt = new Date();
+                    await salary.save();
+                }
             }
 
             assignment.status = status;
@@ -385,18 +428,6 @@ router.patch(
 
             if (status === "completed") {
                 assignment.completedAt = new Date();
-
-                await Salary.findOneAndUpdate(
-                    {
-                        enrollment: assignment.enrollment
-                    },
-                    {
-                        $set: {
-                            workCompletedAt: new Date(),
-                            remainingStatus: "pending"
-                        }
-                    }
-                );
             }
 
             await assignment.save();
@@ -410,23 +441,22 @@ router.patch(
                     type: "work",
                     createdBy: req.user._id
                 });
-            } catch (notificationError) {
-                console.error(
-                    "Review notification error:",
-                    notificationError
-                );
+            } catch (error) {
+                console.error("Review notification error:", error);
             }
 
-            res.json({
+            return res.json({
                 success: true,
-                message: "Work review updated successfully.",
+                message: status === "completed"
+                    ? "Work completed. Remaining salary is now eligible for processing."
+                    : "Work review updated successfully.",
                 assignment
             });
 
         } catch (error) {
             console.error("Work review error:", error);
 
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 message: "Unable to review work."
             });
