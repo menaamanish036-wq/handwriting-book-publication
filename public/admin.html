@@ -1,39 +1,739 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
 <title>Admin Panel | Handwriting Book Publication</title>
 <style>
-:root{--bg:#090909;--panel:#151515;--line:#35302a;--gold:#d7ad58;--text:#f5f1e8;--muted:#aaa195;--red:#d66b62;--green:#6fc18b}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}header{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1,h2,h3{margin:0 0 12px}h1{font-size:20px;color:var(--gold)}h2{font-size:19px;color:var(--gold)}main{max-width:1150px;margin:24px auto;padding:0 14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:0 0 18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}label{display:block;color:var(--muted);font-size:13px;margin:10px 0 5px}input,select,textarea{width:100%;background:#0d0d0d;border:1px solid #494137;border-radius:8px;padding:11px;color:var(--text);font:inherit}textarea{min-height:75px;resize:vertical}button{background:var(--gold);color:#17120a;border:0;border-radius:8px;padding:11px 15px;font-weight:bold;cursor:pointer;margin:8px 6px 0 0}button.secondary{background:#302a20;color:var(--text);border:1px solid #685638}button.danger{background:#6d2825;color:white}button:disabled{opacity:.5}.hidden{display:none!important}.muted{color:var(--muted)}.status{padding:10px;border-radius:8px;margin:10px 0;background:#242018;color:var(--gold)}.row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-top:1px solid var(--line);padding:12px 0}.row:first-child{border-top:0}.thumb{max-width:100px;max-height:100px;object-fit:contain;border:1px solid var(--line);border-radius:6px}.pill{font-size:12px;padding:4px 8px;border-radius:20px;background:#29251e;color:var(--gold)}.login{max-width:420px;margin:8vh auto}.small{font-size:12px}.actions{display:flex;gap:5px;flex-wrap:wrap}.filehint{font-size:12px;color:var(--muted);margin-top:5px}a{color:var(--gold)}
-</style></head><body>
-<header><h1>Handwriting Book Publication — Admin</h1><div id="topActions" class="hidden"><span id="adminName" class="muted"></span> <button class="secondary" onclick="logout()">Logout</button></div></header>
+:root{--bg:#090909;--panel:#151515;--line:#35302a;--gold:#d7ad58;--text:#f5f1e8;--muted:#aaa195;--red:#d66b62;--green:#6fc18b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
+header{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1,h2,h3{margin:0 0 12px}
+h1{font-size:20px;color:var(--gold)}
+h2{font-size:19px;color:var(--gold)}
+main{max-width:1150px;margin:24px auto;padding:0 14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+label{display:block;color:var(--muted);font-size:13px;margin:10px 0 5px}
+input,select,textarea{width:100%;background:#0d0d0d;border:1px solid #494137;border-radius:8px;padding:11px;color:var(--text);font:inherit}
+textarea{min-height:70px;resize:vertical}
+button{background:var(--gold);color:#17120a;border:0;border-radius:8px;padding:10px 14px;font-weight:bold;cursor:pointer;margin:8px 6px 0 0}
+button.secondary{background:#302a20;color:var(--text);border:1px solid #685638}
+button.danger{background:#6d2825;color:white}
+button:disabled{opacity:.5}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.status{padding:10px;border-radius:8px;margin:10px 0;background:#242018;color:var(--gold)}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-top:1px solid var(--line);padding:12px 0}
+.row:first-child{border-top:0}
+.thumb{max-width:100px;max-height:100px;object-fit:contain;border:1px solid var(--line);border-radius:6px}
+.pill{font-size:12px;padding:4px 8px;border-radius:20px;background:#29251e;color:var(--gold)}
+.login{max-width:420px;margin:8vh auto}
+.small{font-size:12px}
+.actions{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.filehint{font-size:12px;color:var(--muted);margin-top:5px}
+a{color:var(--gold)}
+.section-note{margin:0 0 12px;color:var(--muted);line-height:1.5}
+.item-title{font-weight:bold}
+.empty{color:var(--muted);padding:12px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.two{grid-template-columns:1fr}header{padding:14px}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Handwriting Book Publication — Admin</h1>
+<div id="topActions" class="hidden">
+<span id="adminName" class="muted"></span>
+<button class="secondary" onclick="logout()">Logout</button>
+</div>
+</header>
+
 <main>
-<section id="loginBox" class="card login"><h2>Admin Login</h2><p class="muted">Sign in with your existing admin account.</p><form id="loginForm"><label>Admin email</label><input id="loginEmail" type="email" autocomplete="username" required><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required><button type="submit">Login</button></form><div id="loginMsg" class="status hidden"></div></section>
+
+<section id="loginBox" class="card login">
+<h2>Admin Login</h2>
+<p class="section-note">Sign in with your existing admin account.</p>
+<form id="loginForm">
+<label>Admin email</label>
+<input id="loginEmail" type="email" autocomplete="username" required>
+<label>Password</label>
+<input id="loginPassword" type="password" autocomplete="current-password" required>
+<button type="submit">Login</button>
+</form>
+<div id="loginMsg" class="status hidden"></div>
+</section>
+
 <section id="panel" class="hidden">
+
 <div id="notice" class="status hidden" role="status"></div>
-<section class="card"><h2>Customer Charges</h2><p class="muted">Select a customer, add an individual charge, and manage its status.</p><div class="grid"><div><label>Customer</label><select id="chargeCustomer"><option value="">Loading customers…</option></select></div><div><label>Amount (INR)</label><input id="chargeAmount" type="number" min="1" step="0.01" placeholder="e.g. 500"></div><div><label>Reason</label><input id="chargeReason" maxlength="500" placeholder="Reason for charge"></div><div><label>Notes (optional)</label><input id="chargeNotes" placeholder="Additional notes"></div></div><button onclick="addCharge()">Add Customer Charge</button><div id="chargesList" style="margin-top:14px"></div></section>
-<section class="card"><h2>Customer Work Showcase / Gallery</h2><p class="muted">Upload customer work screenshots or photos. New items remain hidden until you publish them.</p><div class="grid"><div><label>Title</label><input id="showTitle" maxlength="150" placeholder="Example: Handwriting Sample"></div><div><label>Customer name (optional)</label><input id="showCustomer" placeholder="Customer name"></div><div><label>Work type</label><input id="showType" value="Handwriting Work"></div><div><label>Display order</label><input id="showOrder" type="number" value="0"></div></div><label>Description (optional)</label><textarea id="showDescription" maxlength="1000" placeholder="Short description"></textarea><label>Select screenshot / image / PDF (max 10 MB)</label><input id="showFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><div class="filehint">Allowed: JPG, PNG, WEBP, PDF. Upload one file per gallery item.</div><button onclick="addShowcase()">Upload and Add to Gallery</button><div id="showcaseList" style="margin-top:14px"></div></section>
-<section class="card"><h2>Company Certificate</h2><p class="muted">Upload a new certificate or replace the current one. Customers with access to their dashboard can view the active certificate.</p><div id="currentCertificate" class="muted">Loading certificate…</div><label>Certificate title</label><input id="certTitle" placeholder="Company Certificate"><label>Choose certificate file (max 10 MB)</label><input id="certFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><div class="filehint">Allowed: JPG, PNG, WEBP, PDF.</div><button onclick="saveCertificate()">Upload / Replace Certificate</button><button class="danger" onclick="deleteCertificate()">Remove Certificate</button></section>
-</section></main>
+
+<section class="card">
+<h2>Customer Charges</h2>
+<p class="section-note">Add an individual charge to a customer and manage its amount, reason and status.</p>
+
+<div class="grid">
+<div>
+<label>Customer</label>
+<select id="chargeCustomer">
+<option value="">Loading customers…</option>
+</select>
+</div>
+<div>
+<label>Amount (INR)</label>
+<input id="chargeAmount" type="number" min="0.01" step="0.01" placeholder="e.g. 500">
+</div>
+<div>
+<label>Reason</label>
+<input id="chargeReason" maxlength="500" placeholder="Reason for charge">
+</div>
+<div>
+<label>Notes (optional)</label>
+<input id="chargeNotes" placeholder="Additional notes">
+</div>
+</div>
+
+<button onclick="addCharge()">Add Customer Charge</button>
+<div id="chargesList" style="margin-top:14px"></div>
+</section>
+
+<section class="card">
+<h2>Customer Work Showcase / Gallery</h2>
+<p class="section-note">Upload real customer handwriting work screenshots or photos. New items stay hidden until you publish them.</p>
+
+<div class="grid">
+<div>
+<label>Title</label>
+<input id="showTitle" maxlength="150" placeholder="Example: Handwriting Sample">
+</div>
+<div>
+<label>Customer name (optional)</label>
+<input id="showCustomer" placeholder="Customer name">
+</div>
+<div>
+<label>Work type</label>
+<input id="showType" value="Handwriting Work">
+</div>
+<div>
+<label>Display order</label>
+<input id="showOrder" type="number" value="0">
+</div>
+</div>
+
+<label>Description (optional)</label>
+<textarea id="showDescription" maxlength="1000" placeholder="Short description"></textarea>
+
+<label>Select screenshot / image / PDF (max 10 MB)</label>
+<input id="showFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf">
+
+<div class="filehint">Allowed: JPG, PNG, WEBP, PDF. Upload one file per gallery item.</div>
+
+<button onclick="addShowcase()">Upload and Add to Gallery</button>
+<div id="showcaseList" style="margin-top:14px"></div>
+</section>
+
+<section class="card">
+<h2>Company Certificates & Documents</h2>
+<p class="section-note">Add each genuine company certificate or supporting document separately. You can add multiple documents, replace a file, edit its title, publish/hide it, or delete it. Only upload genuine documents you are authorized to display.</p>
+
+<div class="grid">
+<div>
+<label>Document title</label>
+<input id="certTitle" maxlength="200" placeholder="e.g. Udyam Registration Certificate">
+</div>
+<div>
+<label>Description (optional)</label>
+<input id="certDescription" placeholder="Issuing organization / details">
+</div>
+</div>
+
+<label>Select certificate / document (max 10 MB)</label>
+<input id="certFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf">
+
+<div class="filehint">Allowed: JPG, PNG, WEBP, PDF. Each document is stored as a separate entry.</div>
+
+<button onclick="addCertificate()">Upload New Document</button>
+<div id="certificatesList" style="margin-top:14px"></div>
+</section>
+
+</section>
+</main>
+
 <script>
-const $=id=>document.getElementById(id);const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-async function api(url,opts={}){const res=await fetch(url,{credentials:'same-origin',...opts});let data={};try{data=await res.json()}catch{}if(!res.ok||data.success===false)throw new Error(data.message||`Request failed (${res.status})`);return data}
-function note(msg,bad=false){$('notice').textContent=msg;$('notice').classList.remove('hidden');$('notice').style.color=bad?'#ff9b91':'var(--gold)';window.scrollTo({top:0,behavior:'smooth'})}
-async function checkSession(){try{const d=await api('/api/admin/auth/me');$('loginBox').classList.add('hidden');$('panel').classList.remove('hidden');$('topActions').classList.remove('hidden');$('adminName').textContent=d.admin.fullName||d.admin.email;await Promise.all([loadCustomers(),loadCharges(),loadShowcase(),loadCertificate()])}catch{$('loginBox').classList.remove('hidden');$('panel').classList.add('hidden');$('topActions').classList.add('hidden')}}
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginMsg').classList.add('hidden');try{await api('/api/admin/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:$('loginEmail').value.trim(),password:$('loginPassword').value})});await checkSession()}catch(err){$('loginMsg').textContent=err.message;$('loginMsg').classList.remove('hidden')}});
-async function logout(){try{await api('/api/admin/auth/logout',{method:'POST'})}finally{location.href='/admin.html'}}
-async function loadCustomers(){const d=await api('/api/admin/customers');$('chargeCustomer').innerHTML='<option value="">Choose customer</option>'+d.customers.map(c=>`<option value="${esc(c._id)}">${esc(c.fullName)} — ${esc(c.mobile||c.email)}</option>`).join('')}
-async function loadCharges(){const d=await api('/api/customer-charges/admin/all');$('chargesList').innerHTML=d.charges.length?d.charges.map(c=>`<div class="row"><div><b>${esc(c.customer?.fullName||'Customer')}</b> <span class="pill">${esc(c.status)}</span><div>₹${Number(c.amount).toLocaleString('en-IN')} — ${esc(c.reason)}</div><div class="small muted">${esc(c.customer?.mobile||'')} ${esc(c.notes||'')}</div></div><div class="actions"><select id="st-${esc(c._id)}"><option value="unpaid" ${c.status==='unpaid'?'selected':''}>Unpaid</option><option value="paid" ${c.status==='paid'?'selected':''}>Paid</option><option value="waived" ${c.status==='waived'?'selected':''}>Waived</option></select><button class="secondary" onclick="changeCharge('${esc(c._id)}')">Save status</button><button class="danger" onclick="removeCharge('${esc(c._id)}')">Delete</button></div></div>`).join(''):'<p class="muted">No customer charges yet.</p>'}
-async function addCharge(){try{const customerId=$('chargeCustomer').value,amount=$('chargeAmount').value,reason=$('chargeReason').value.trim();if(!customerId||!amount||!reason)throw new Error('Choose a customer and enter amount and reason.');await api('/api/customer-charges/admin/'+encodeURIComponent(customerId),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,reason,notes:$('chargeNotes').value})});$('chargeAmount').value='';$('chargeReason').value='';$('chargeNotes').value='';await loadCharges();note('Customer charge added successfully.')}catch(e){note(e.message,true)}}
-async function changeCharge(id){try{await api('/api/customer-charges/admin/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:$('st-'+id).value})});await loadCharges();note('Charge status updated.')}catch(e){note(e.message,true)}}
-async function removeCharge(id){if(!confirm('Delete this customer charge?'))return;try{await api('/api/customer-charges/admin/'+id,{method:'DELETE'});await loadCharges();note('Charge deleted.')}catch(e){note(e.message,true)}}
-async function uploadFile(file){if(!file)throw new Error('Please select a file.');if(file.size>10*1024*1024)throw new Error('File size must be 10 MB or less.');const fd=new FormData();fd.append('file',file);const d=await api('/api/uploads',{method:'POST',body:fd});if(!d.file?.fileId)throw new Error('Upload response did not contain a file ID.');return d.file}
-async function loadShowcase(){const d=await api('/api/showcase/admin/all');$('showcaseList').innerHTML=d.items.length?d.items.map(x=>`<div class="row"><div><b>${esc(x.title)}</b> <span class="pill">${x.isPublished?'Published':'Hidden'}</span><div class="small muted">${esc(x.customerName||'')} · ${esc(x.workType||'')} · ${esc(x.fileName||'No file')}</div>${x.fileId?`<a href="/api/uploads/${esc(x.fileId)}" target="_blank" rel="noopener">View uploaded file</a>`:''}</div><div class="actions"><button class="secondary" onclick="toggleShowcase('${esc(x._id)}',${!x.isPublished})">${x.isPublished?'Hide':'Publish'}</button><button class="danger" onclick="deleteShowcase('${esc(x._id)}')">Delete</button></div></div>`).join(''):'<p class="muted">No showcase items yet.</p>'}
-async function addShowcase(){try{const title=$('showTitle').value.trim();if(!title)throw new Error('Enter a gallery title.');const file=await uploadFile($('showFile').files[0]);await api('/api/showcase',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,customerName:$('showCustomer').value,workType:$('showType').value,description:$('showDescription').value,displayOrder:$('showOrder').value,fileId:file.fileId,fileName:file.fileName,fileType:file.fileType})});$('showTitle').value='';$('showCustomer').value='';$('showDescription').value='';$('showFile').value='';await loadShowcase();note('Work uploaded. It is hidden until you publish it.')}catch(e){note(e.message,true)}}
-async function toggleShowcase(id,publish){try{await api('/api/showcase/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({isPublished:publish})});await loadShowcase();note(publish?'Work published.':'Work hidden.')}catch(e){note(e.message,true)}}
-async function deleteShowcase(id){if(!confirm('Delete this gallery item?'))return;try{await api('/api/showcase/'+id,{method:'DELETE'});await loadShowcase();note('Gallery item deleted.')}catch(e){note(e.message,true)}}
-async function loadCertificate(){const d=await api('/api/company-certificate/admin');const c=d.certificate;if(!c){$('currentCertificate').textContent='No company certificate uploaded yet.';return}$('certTitle').value=c.title||'';$('currentCertificate').innerHTML=`<div class="row"><div><b>${esc(c.title)}</b><div class="small muted">${esc(c.fileName||'')}</div><a href="/api/uploads/${esc(c.fileId)}" target="_blank" rel="noopener">View current certificate</a></div><span class="pill">${c.isActive?'Active':'Inactive'}</span></div>`}
-async function saveCertificate(){try{const title=$('certTitle').value.trim();if(!title)throw new Error('Enter the certificate title.');const file=await uploadFile($('certFile').files[0]);await api('/api/company-certificate',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,fileId:file.fileId,fileName:file.fileName,fileType:file.fileType,isActive:true})});$('certFile').value='';await loadCertificate();note('Company certificate uploaded / replaced successfully.')}catch(e){note(e.message,true)}}
-async function deleteCertificate(){if(!confirm('Remove the company certificate?'))return;try{await api('/api/company-certificate',{method:'DELETE'});$('certFile').value='';$('certTitle').value='';await loadCertificate();note('Company certificate removed.')}catch(e){note(e.message,true)}}
+'use strict';
+
+const $ = id => document.getElementById(id);
+
+const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[c]));
+
+async function api(url,opts={}){
+const res=await fetch(url,{
+credentials:'same-origin',
+...opts
+});
+
+let data={};
+
+try{
+data=await res.json();
+}catch{}
+
+if(!res.ok||data.success===false){
+throw new Error(data.message||`Request failed (${res.status})`);
+}
+
+return data;
+}
+
+function note(msg,bad=false){
+$('notice').textContent=msg;
+$('notice').classList.remove('hidden');
+$('notice').style.color=bad?'#ff9b91':'var(--gold)';
+window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function jsonOpts(method,body){
+return{
+method,
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(body)
+};
+}
+
+async function checkSession(){
+try{
+const d=await api('/api/admin/auth/me');
+
+$('loginBox').classList.add('hidden');
+$('panel').classList.remove('hidden');
+$('topActions').classList.remove('hidden');
+
+$('adminName').textContent=d.admin.fullName||d.admin.email;
+
+await Promise.all([
+loadCustomers(),
+loadCharges(),
+loadShowcase(),
+loadCertificates()
+]);
+
+}catch{
+$('loginBox').classList.remove('hidden');
+$('panel').classList.add('hidden');
+$('topActions').classList.add('hidden');
+}
+}
+
+$('loginForm').addEventListener('submit',async e=>{
+e.preventDefault();
+
+$('loginMsg').classList.add('hidden');
+
+try{
+await api('/api/admin/auth/login',jsonOpts('POST',{
+email:$('loginEmail').value.trim(),
+password:$('loginPassword').value
+}));
+
+await checkSession();
+
+}catch(err){
+$('loginMsg').textContent=err.message;
+$('loginMsg').classList.remove('hidden');
+}
+});
+
+async function logout(){
+try{
+await api('/api/admin/auth/logout',{method:'POST'});
+}finally{
+location.href='/admin.html';
+}
+}
+
+async function loadCustomers(){
+const d=await api('/api/admin/customers');
+
+$('chargeCustomer').innerHTML=
+'<option value="">Choose customer</option>'+
+(d.customers||[]).map(c=>
+`<option value="${esc(c._id)}">${esc(c.fullName)} — ${esc(c.mobile||c.email||'')}</option>`
+).join('');
+}
+
+async function loadCharges(){
+const d=await api('/api/customer-charges/admin/all');
+const list=d.charges||[];
+
+$('chargesList').innerHTML=list.length?list.map(c=>`
+<div class="row">
+<div>
+<div class="item-title">
+${esc(c.customer?.fullName||'Customer')}
+<span class="pill">${esc(c.status)}</span>
+</div>
+<div>₹${Number(c.amount||0).toLocaleString('en-IN')} — ${esc(c.reason)}</div>
+<div class="small muted">
+${esc(c.customer?.mobile||c.customer?.email||'')}
+${esc(c.notes||'')}
+</div>
+</div>
+
+<div class="actions">
+<button class="secondary" onclick="editCharge('${esc(c._id)}','${Number(c.amount)||0}','${esc(c.reason)}','${esc(c.notes||'')}')">Edit</button>
+
+<select id="charge-status-${esc(c._id)}" aria-label="Charge status">
+<option value="unpaid" ${c.status==='unpaid'?'selected':''}>Unpaid</option>
+<option value="paid" ${c.status==='paid'?'selected':''}>Paid</option>
+<option value="waived" ${c.status==='waived'?'selected':''}>Waived</option>
+</select>
+
+<button class="secondary" onclick="changeCharge('${esc(c._id)}')">Save status</button>
+<button class="danger" onclick="removeCharge('${esc(c._id)}')">Delete</button>
+</div>
+</div>
+`).join(''):'<div class="empty">No customer charges yet.</div>';
+}
+
+async function addCharge(){
+try{
+const customerId=$('chargeCustomer').value;
+const amount=$('chargeAmount').value;
+const reason=$('chargeReason').value.trim();
+
+if(!customerId||!amount||!reason){
+throw new Error('Choose a customer and enter amount and reason.');
+}
+
+await api(
+'/api/customer-charges/admin/'+encodeURIComponent(customerId),
+jsonOpts('POST',{
+amount,
+reason,
+notes:$('chargeNotes').value
+})
+);
+
+$('chargeAmount').value='';
+$('chargeReason').value='';
+$('chargeNotes').value='';
+
+await loadCharges();
+
+note('Customer charge added successfully.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function editCharge(id,amount,reason,notes){
+const nextAmount=prompt('Enter charge amount (INR):',String(amount));
+if(nextAmount===null)return;
+
+const nextReason=prompt('Enter charge reason:',reason);
+if(nextReason===null)return;
+
+const nextNotes=prompt('Enter notes (optional):',notes);
+if(nextNotes===null)return;
+
+try{
+await api(
+'/api/customer-charges/admin/'+id,
+jsonOpts('PATCH',{
+amount:nextAmount,
+reason:nextReason,
+notes:nextNotes
+})
+);
+
+await loadCharges();
+note('Charge details updated.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function changeCharge(id){
+try{
+await api(
+'/api/customer-charges/admin/'+id,
+jsonOpts('PATCH',{
+status:$('charge-status-'+id).value
+})
+);
+
+await loadCharges();
+note('Charge status updated.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function removeCharge(id){
+if(!confirm('Delete this customer charge?'))return;
+
+try{
+await api('/api/customer-charges/admin/'+id,{method:'DELETE'});
+await loadCharges();
+note('Customer charge deleted.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function uploadFile(file){
+if(!file)throw new Error('Please select a file.');
+
+if(file.size>10*1024*1024){
+throw new Error('File size must be 10 MB or less.');
+}
+
+const allowed=[
+'image/jpeg',
+'image/png',
+'image/webp',
+'application/pdf'
+];
+
+if(!allowed.includes(file.type)){
+throw new Error('Only JPG, PNG, WEBP and PDF files are allowed.');
+}
+
+const fd=new FormData();
+fd.append('file',file);
+
+const d=await api('/api/uploads',{
+method:'POST',
+body:fd
+});
+
+if(!d.file?.fileId){
+throw new Error('Upload response did not contain a file ID.');
+}
+
+return d.file;
+}
+
+async function loadShowcase(){
+const d=await api('/api/showcase/admin/all');
+const items=d.items||[];
+
+$('showcaseList').innerHTML=items.length?items.map(x=>`
+<div class="row">
+<div>
+<div class="item-title">
+${esc(x.title)}
+<span class="pill">${x.isPublished?'Published':'Hidden'}</span>
+</div>
+
+<div class="small muted">
+${esc(x.customerName||'')} ·
+${esc(x.workType||'')} ·
+${esc(x.fileName||'No file')}
+</div>
+
+${x.fileId?`<a href="/api/uploads/${esc(x.fileId)}" target="_blank" rel="noopener">View uploaded file</a>`:''}
+</div>
+
+<div class="actions">
+<button class="secondary" onclick="editShowcase('${esc(x._id)}','${esc(x.title)}','${esc(x.customerName||'')}','${esc(x.workType||'')}','${esc(x.description||'')}','${Number(x.displayOrder)||0}')">Edit details</button>
+
+<button class="secondary" onclick="replaceShowcaseFile('${esc(x._id)}')">Replace file</button>
+
+<button class="secondary" onclick="toggleShowcase('${esc(x._id)}',${!x.isPublished})">
+${x.isPublished?'Hide':'Publish'}
+</button>
+
+<button class="danger" onclick="deleteShowcase('${esc(x._id)}')">Delete</button>
+</div>
+</div>
+`).join(''):'<div class="empty">No showcase items yet.</div>';
+}
+
+async function addShowcase(){
+try{
+const title=$('showTitle').value.trim();
+
+if(!title){
+throw new Error('Enter a gallery title.');
+}
+
+const file=await uploadFile($('showFile').files[0]);
+
+await api('/api/showcase',jsonOpts('POST',{
+title,
+customerName:$('showCustomer').value,
+workType:$('showType').value,
+description:$('showDescription').value,
+displayOrder:$('showOrder').value,
+fileId:file.fileId,
+fileName:file.fileName,
+fileType:file.fileType
+}));
+
+$('showTitle').value='';
+$('showCustomer').value='';
+$('showDescription').value='';
+$('showFile').value='';
+
+await loadShowcase();
+
+note('Customer work uploaded. It is hidden until you publish it.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function editShowcase(id,title,customerName,workType,description,displayOrder){
+const t=prompt('Gallery title:',title);
+if(t===null)return;
+
+const c=prompt('Customer name:',customerName);
+if(c===null)return;
+
+const w=prompt('Work type:',workType);
+if(w===null)return;
+
+const d=prompt('Description:',description);
+if(d===null)return;
+
+const o=prompt('Display order:',String(displayOrder));
+if(o===null)return;
+
+try{
+await api('/api/showcase/'+id,jsonOpts('PATCH',{
+title:t,
+customerName:c,
+workType:w,
+description:d,
+displayOrder:o
+}));
+
+await loadShowcase();
+note('Gallery details updated.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function replaceShowcaseFile(id){
+try{
+const file=await pickAndUpload();
+if(!file)return;
+
+await api('/api/showcase/'+id,jsonOpts('PATCH',{
+fileId:file.fileId,
+fileName:file.fileName,
+fileType:file.fileType
+}));
+
+await loadShowcase();
+note('Gallery file replaced.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+function pickAndUpload(){
+return new Promise(resolve=>{
+const input=document.createElement('input');
+
+input.type='file';
+input.accept='image/jpeg,image/png,image/webp,application/pdf';
+
+input.onchange=async()=>{
+if(!input.files[0])return resolve(null);
+
+try{
+resolve(await uploadFile(input.files[0]));
+}catch(e){
+note(e.message,true);
+resolve(null);
+}
+};
+
+input.click();
+});
+}
+
+async function toggleShowcase(id,publish){
+try{
+await api('/api/showcase/'+id,jsonOpts('PATCH',{
+isPublished:publish
+}));
+
+await loadShowcase();
+
+note(publish?'Work published.':'Work hidden.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function deleteShowcase(id){
+if(!confirm('Delete this gallery item?'))return;
+
+try{
+await api('/api/showcase/'+id,{method:'DELETE'});
+await loadShowcase();
+note('Gallery item deleted.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function loadCertificates(){
+const d=await api('/api/company-certificate/admin');
+const items=d.certificates||[];
+
+$('certificatesList').innerHTML=items.length?items.map(c=>`
+<div class="row">
+<div>
+<div class="item-title">
+${esc(c.title)}
+<span class="pill">${c.isActive?'Visible':'Hidden'}</span>
+</div>
+
+<div class="small muted">
+${esc(c.description||'')} · ${esc(c.fileName||'')}
+</div>
+
+${c.fileId?`<a href="/api/uploads/${esc(c.fileId)}" target="_blank" rel="noopener">View document</a>`:''}
+</div>
+
+<div class="actions">
+<button class="secondary" onclick="editCertificate('${esc(c._id)}','${esc(c.title)}','${esc(c.description||'')}')">Edit title/details</button>
+
+<button class="secondary" onclick="replaceCertificateFile('${esc(c._id)}')">Replace file</button>
+
+<button class="secondary" onclick="toggleCertificate('${esc(c._id)}',${!c.isActive})">
+${c.isActive?'Hide':'Show'}
+</button>
+
+<button class="danger" onclick="deleteCertificate('${esc(c._id)}')">Delete</button>
+</div>
+</div>
+`).join(''):'<div class="empty">No company documents uploaded yet. Add each genuine document separately.</div>';
+}
+
+async function addCertificate(){
+try{
+const title=$('certTitle').value.trim();
+
+if(!title){
+throw new Error('Enter the document title.');
+}
+
+const file=await uploadFile($('certFile').files[0]);
+
+await api('/api/company-certificate',jsonOpts('POST',{
+title,
+description:$('certDescription').value.trim(),
+fileId:file.fileId,
+fileName:file.fileName,
+fileType:file.fileType
+}));
+
+$('certTitle').value='';
+$('certDescription').value='';
+$('certFile').value='';
+
+await loadCertificates();
+
+note('Company document uploaded successfully.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function editCertificate(id,title,description){
+const t=prompt('Document title:',title);
+if(t===null)return;
+
+const d=prompt('Description:',description);
+if(d===null)return;
+
+try{
+await api('/api/company-certificate/'+id,jsonOpts('PATCH',{
+title:t,
+description:d
+}));
+
+await loadCertificates();
+note('Document details updated.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function replaceCertificateFile(id){
+try{
+const file=await pickAndUpload();
+if(!file)return;
+
+await api('/api/company-certificate/'+id,jsonOpts('PATCH',{
+fileId:file.fileId,
+fileName:file.fileName,
+fileType:file.fileType
+}));
+
+await loadCertificates();
+note('Company document file replaced.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function toggleCertificate(id,active){
+try{
+await api('/api/company-certificate/'+id,jsonOpts('PATCH',{
+isActive:active
+}));
+
+await loadCertificates();
+
+note(active?'Document is now visible.':'Document hidden.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
+async function deleteCertificate(id){
+if(!confirm('Permanently remove this company document from the website?'))return;
+
+try{
+await api('/api/company-certificate/'+id,{method:'DELETE'});
+await loadCertificates();
+note('Company document deleted.');
+
+}catch(e){
+note(e.message,true);
+}
+}
+
 checkSession();
-</script></body></html>
+</script>
+</body>
+</html>
