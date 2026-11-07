@@ -29,6 +29,12 @@ main{max-width:1100px;margin:auto;padding:25px 18px}
 .error{background:#401919;color:#ffaaaa;padding:12px;border-radius:7px;margin-bottom:15px}
 .success{background:#12351f;color:#8df0a8;padding:12px;border-radius:7px;margin-bottom:15px}
 .loading{color:#d8b45a}
+.payment-form{background:#1b1b1b;border:1px solid #514124;padding:16px;border-radius:9px;margin-top:12px}
+.payment-form label{display:block;color:#ddd;margin:12px 0 6px}
+.payment-form input{width:100%;padding:12px;border:1px solid #555;border-radius:6px;background:#101010;color:#fff}
+.payment-form button{background:#c6a34a;color:#111;margin-top:14px;width:100%}
+.payment-form button:disabled{opacity:.5;cursor:not-allowed}
+.badge{display:inline-block;padding:4px 9px;border-radius:5px;background:#28220f;color:#f0d58d;font-size:12px}
 @media(max-width:500px){header{align-items:flex-start;flex-direction:column}.welcome h1{font-size:22px}}
 </style></head><body><header>
 <h2>Handwriting Book Publication</h2>
@@ -36,9 +42,7 @@ main{max-width:1100px;margin:auto;padding:25px 18px}
 </header><main><div id="message"></div><section class="welcome">
 <h1>Welcome, <span id="customerName">Customer</span></h1>
 <p>Your personal customer dashboard</p>
-</section><div id="accountStatus" class="status">
-Loading account status...
-</div><section class="card">
+</section><div id="accountStatus" class="status">Loading account status...</div><section class="card">
 <h2>Available Projects</h2>
 <div id="projects" class="grid">
 <p class="loading">Loading projects...</p>
@@ -47,6 +51,20 @@ Loading account status...
 <h2>My Registrations</h2>
 <div id="enrollments">
 <p class="loading">Loading registrations...</p>
+</div>
+</section><section class="card">
+<h2>Registration Payment</h2>
+<p class="muted">
+Select your registered project below to submit its registration payment.
+Use only the official payment details provided by the company.
+</p>
+<div id="paymentSection">
+<p class="loading">Loading payment information...</p>
+</div>
+</section><section class="card">
+<h2>My Payment History</h2>
+<div id="payments">
+<p class="loading">Loading payment records...</p>
 </div>
 </section><section class="card">
 <h2>My Salary</h2>
@@ -64,11 +82,12 @@ Loading account status...
 <p class="loading">Loading profile...</p>
 </div>
 </section></main><script>
-const messageBox = document.getElementById("message");
+const messageBox=document.getElementById("message");
 
 function showMessage(message,type="success"){
     messageBox.className=type;
     messageBox.textContent=message;
+    window.scrollTo({top:0,behavior:"smooth"});
 }
 
 async function api(url,options={}){
@@ -80,7 +99,13 @@ async function api(url,options={}){
         }
     });
 
-    const data=await response.json();
+    let data={};
+
+    try{
+        data=await response.json();
+    }catch(error){
+        throw new Error("Invalid server response.");
+    }
 
     if(!response.ok){
         throw new Error(data.message||"Request failed.");
@@ -108,25 +133,27 @@ function escapeHTML(value){
     })[char]);
 }
 
+let currentEnrollments=[];
+let currentPayments=[];
+
 async function loadAccount(){
-    try{
-        const data=await api("/api/auth/me");
-        document.getElementById("customerName").textContent=data.customer.fullName;
+    const data=await api("/api/auth/me");
 
-        const status=data.customer.accountStatus;
+    document.getElementById("customerName").textContent=
+        data.customer.fullName;
 
-        const statusBox=document.getElementById("accountStatus");
+    const status=data.customer.accountStatus;
+    const statusBox=document.getElementById("accountStatus");
 
-        if(status==="approved"){
-            statusBox.textContent="Your customer account is approved. You can use the available project services.";
-        }else if(status==="pending"){
-            statusBox.textContent="Your account is awaiting admin approval. Project registration and other services may remain unavailable until approval.";
-        }else{
-            statusBox.textContent="Your account is not approved. Please contact customer support.";
-        }
-
-    }catch(error){
-        window.location.href="/";
+    if(status==="approved"){
+        statusBox.textContent=
+            "Your customer account is approved. You can use the available project services.";
+    }else if(status==="pending"){
+        statusBox.textContent=
+            "Your account is awaiting admin approval. Please wait for approval before proceeding with project services.";
+    }else{
+        statusBox.textContent=
+            "Your account is not approved. Please contact customer support.";
     }
 }
 
@@ -136,7 +163,7 @@ async function loadProjects(){
     try{
         const data=await api("/api/projects");
 
-        if(!data.projects.length){
+        if(!data.projects || !data.projects.length){
             box.innerHTML='<p class="empty">No projects are currently available.</p>';
             return;
         }
@@ -144,18 +171,21 @@ async function loadProjects(){
         box.innerHTML=data.projects.map(project=>`
             <div class="project">
                 <h3>${escapeHTML(project.projectName)}</h3>
-                <p>Pages: ${project.pages}</p>
-                <p>Sides: ${project.sides}</p>
-                <p>Duration: ${project.durationDays} days</p>
+                <p>Pages: ${Number(project.pages)||0}</p>
+                <p>Sides: ${Number(project.sides)||0}</p>
+                <p>Duration: ${Number(project.durationDays)||0} days</p>
                 <p>Salary: ${money(project.salary)}</p>
                 <p>Registration Fee: ${money(project.registrationFee)}</p>
                 <p>${escapeHTML(project.description||"")}</p>
-                <button onclick="applyProject('${project._id}')">Select Project</button>
+                <button onclick="applyProject('${project._id}')">
+                    Select Project
+                </button>
             </div>
         `).join("");
 
     }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+        box.innerHTML=
+            '<p class="empty">'+escapeHTML(error.message)+'</p>';
     }
 }
 
@@ -170,7 +200,8 @@ async function applyProject(projectId){
         });
 
         showMessage(data.message);
-        loadEnrollments();
+        await loadEnrollments();
+        await loadPaymentSection();
 
     }catch(error){
         showMessage(error.message,"error");
@@ -183,23 +214,228 @@ async function loadEnrollments(){
     try{
         const data=await api("/api/enrollments/my");
 
-        if(!data.enrollments.length){
-            box.innerHTML='<p class="empty">You have not registered for any project yet.</p>';
+        currentEnrollments=data.enrollments||[];
+
+        if(!currentEnrollments.length){
+            box.innerHTML=
+                '<p class="empty">You have not registered for any project yet.</p>';
             return;
         }
 
-        box.innerHTML=data.enrollments.map(item=>`
+        box.innerHTML=currentEnrollments.map(item=>`
             <div class="item">
                 <strong>${escapeHTML(item.projectSnapshot.projectName)}</strong>
-                <p class="muted">Registration: ${escapeHTML(item.registrationStatus)}</p>
-                <p class="muted">Payment: ${escapeHTML(item.paymentStatus)}</p>
-                <p class="muted">Salary: ${money(item.projectSnapshot.salary)}</p>
+                <p class="muted">
+                    Registration: ${escapeHTML(item.registrationStatus)}
+                </p>
+                <p class="muted">
+                    Payment: ${escapeHTML(item.paymentStatus)}
+                </p>
+                <p class="muted">
+                    Salary: ${money(item.projectSnapshot.salary)}
+                </p>
+                <p class="muted">
+                    Registration Fee: ${money(item.projectSnapshot.registrationFee)}
+                </p>
                 <p class="muted">Registered: ${date(item.createdAt)}</p>
             </div>
         `).join("");
 
     }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+        box.innerHTML=
+            '<p class="empty">'+escapeHTML(error.message)+'</p>';
+    }
+}
+
+async function loadPaymentSection(){
+    const box=document.getElementById("paymentSection");
+
+    try{
+        if(!currentEnrollments.length){
+            box.innerHTML=
+                '<p class="empty">Register for a project first to see its payment information.</p>';
+            return;
+        }
+
+        const paymentsData=await api("/api/payments/my");
+        currentPayments=paymentsData.payments||[];
+
+        const payable=currentEnrollments.filter(item=>
+            item.registrationStatus==="pending" &&
+            item.paymentStatus!=="approved" &&
+            item.paymentStatus!=="pending"
+        );
+
+        if(!payable.length){
+            box.innerHTML=
+                '<p class="empty">No registration payment is currently waiting for submission. Check your payment history for updates.</p>';
+            return;
+        }
+
+        box.innerHTML=payable.map(item=>`
+            <div class="payment-form">
+                <h3>${escapeHTML(item.projectSnapshot.projectName)}</h3>
+                <p class="muted">
+                    Registration Fee: ${money(item.projectSnapshot.registrationFee)}
+                </p>
+
+                <p class="muted">
+                    Please obtain the official company payment QR/details before making payment.
+                </p>
+
+                <form onsubmit="submitPayment(event,'${item._id}')">
+                    <label>Transaction ID</label>
+                    <input
+                        type="text"
+                        name="transactionId"
+                        maxlength="120"
+                        required
+                        placeholder="Enter your UPI transaction ID"
+                    >
+
+                    <label>Payment Screenshot</label>
+                    <input
+                        type="file"
+                        name="screenshot"
+                        accept="image/jpeg,image/png,image/webp"
+                        required
+                    >
+
+                    <button type="submit">Submit Payment</button>
+                </form>
+            </div>
+        `).join("");
+
+    }catch(error){
+        box.innerHTML=
+            '<p class="empty">'+escapeHTML(error.message)+'</p>';
+    }
+}
+
+async function submitPayment(event,enrollmentId){
+    event.preventDefault();
+
+    const form=event.target;
+    const button=form.querySelector("button");
+    const transactionId=form.elements.transactionId.value.trim();
+    const file=form.elements.screenshot.files[0];
+
+    if(!transactionId){
+        showMessage("Please enter your transaction ID.","error");
+        return;
+    }
+
+    if(!file){
+        showMessage("Please select your payment screenshot.","error");
+        return;
+    }
+
+    const allowedTypes=[
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ];
+
+    if(!allowedTypes.includes(file.type)){
+        showMessage("Only JPG, PNG or WEBP screenshots are allowed.","error");
+        return;
+    }
+
+    if(file.size>5*1024*1024){
+        showMessage("Screenshot size must be less than 5 MB.","error");
+        return;
+    }
+
+    button.disabled=true;
+    button.textContent="Uploading...";
+
+    try{
+        const formData=new FormData();
+        formData.append("file",file);
+
+        const uploadResponse=await fetch("/api/uploads",{
+            method:"POST",
+            credentials:"same-origin",
+            body:formData
+        });
+
+        const uploadData=await uploadResponse.json();
+
+        if(!uploadResponse.ok){
+            throw new Error(uploadData.message||"Screenshot upload failed.");
+        }
+
+        const fileId=uploadData.file && uploadData.file.id;
+
+        if(!fileId){
+            throw new Error("Uploaded screenshot ID was not returned by the server.");
+        }
+
+        button.textContent="Submitting Payment...";
+
+        const paymentData=await api("/api/payments",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+                enrollmentId,
+                transactionId,
+                paymentScreenshotId:fileId
+            })
+        });
+
+        showMessage(paymentData.message||"Payment submitted successfully.");
+
+        form.reset();
+
+        await loadEnrollments();
+        await loadPaymentSection();
+        await loadPayments();
+
+    }catch(error){
+        showMessage(error.message,"error");
+    }finally{
+        button.disabled=false;
+        button.textContent="Submit Payment";
+    }
+}
+
+async function loadPayments(){
+    const box=document.getElementById("payments");
+
+    try{
+        const data=await api("/api/payments/my");
+        const payments=data.payments||[];
+
+        if(!payments.length){
+            box.innerHTML=
+                '<p class="empty">No payment records available.</p>';
+            return;
+        }
+
+        box.innerHTML=payments.map(payment=>`
+            <div class="item">
+                <strong>${money(payment.amount)}</strong>
+                <p class="muted">
+                    Type: ${escapeHTML(payment.paymentType)}
+                </p>
+                <p class="muted">
+                    Transaction ID: ${escapeHTML(payment.transactionId)}
+                </p>
+                <p class="muted">
+                    Status: <span class="badge">${escapeHTML(payment.status)}</span>
+                </p>
+                <p class="muted">Submitted: ${date(payment.createdAt)}</p>
+                ${payment.adminRemarks?`
+                    <p class="muted">
+                        Admin Remarks: ${escapeHTML(payment.adminRemarks)}
+                    </p>
+                `:""}
+            </div>
+        `).join("");
+
+    }catch(error){
+        box.innerHTML=
+            '<p class="empty">'+escapeHTML(error.message)+'</p>';
     }
 }
 
@@ -208,25 +444,41 @@ async function loadSalaries(){
 
     try{
         const data=await api("/api/salaries/my");
+        const salaries=data.salaries||[];
 
-        if(!data.salaries.length){
-            box.innerHTML='<p class="empty">No salary records available yet.</p>';
+        if(!salaries.length){
+            box.innerHTML=
+                '<p class="empty">No salary records available yet.</p>';
             return;
         }
 
-        box.innerHTML=data.salaries.map(salary=>`
+        box.innerHTML=salaries.map(salary=>`
             <div class="item">
                 <strong>Total Salary: ${money(salary.totalSalary)}</strong>
-                <p class="muted">50% Advance: ${money(salary.advanceAmount)}</p>
-                <p class="muted">Advance Status: ${escapeHTML(salary.advanceStatus)}</p>
-                <p class="muted">Advance Due: ${date(salary.advanceDueAt)}</p>
-                <p class="muted">Remaining 50%: ${money(salary.remainingAmount)}</p>
-                <p class="muted">Remaining Status: ${escapeHTML(salary.remainingStatus)}</p>
+                <p class="muted">
+                    50% Advance: ${money(salary.advanceAmount)}
+                </p>
+                <p class="muted">
+                    Advance Status: ${escapeHTML(salary.advanceStatus)}
+                </p>
+                <p class="muted">
+                    Advance Due: ${date(salary.advanceDueAt)}
+                </p>
+                <p class="muted">
+                    Remaining 50%: ${money(salary.remainingAmount)}
+                </p>
+                <p class="muted">
+                    Remaining Status: ${escapeHTML(salary.remainingStatus)}
+                </p>
+                <p class="muted">
+                    Work Completed: ${date(salary.workCompletedAt)}
+                </p>
             </div>
         `).join("");
 
     }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+        box.innerHTML=
+            '<p class="empty">'+escapeHTML(error.message)+'</p>';
     }
 }
 
@@ -235,13 +487,15 @@ async function loadNotifications(){
 
     try{
         const data=await api("/api/notifications");
+        const notifications=data.notifications||[];
 
-        if(!data.notifications.length){
-            box.innerHTML='<p class="empty">No notifications available.</p>';
+        if(!notifications.length){
+            box.innerHTML=
+                '<p class="empty">No notifications available.</p>';
             return;
         }
 
-        box.innerHTML=data.notifications.map(item=>`
+        box.innerHTML=notifications.map(item=>`
             <div class="item">
                 <strong>${escapeHTML(item.title)}</strong>
                 <p>${escapeHTML(item.message)}</p>
@@ -250,7 +504,8 @@ async function loadNotifications(){
         `).join("");
 
     }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+        box.innerHTML=
+            '<p class="empty">'+escapeHTML(error.message)+'</p>';
     }
 }
 
@@ -278,7 +533,8 @@ async function loadProfile(){
         `;
 
     }catch(error){
-        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+        box.innerHTML=
+            '<p class="empty">'+escapeHTML(error.message)+'</p>';
     }
 }
 
@@ -292,17 +548,25 @@ document.getElementById("logoutBtn").addEventListener("click",async()=>{
 });
 
 async function loadDashboard(){
-    await loadAccount();
+    try{
+        await loadAccount();
 
-    await Promise.all([
-        loadProjects(),
-        loadEnrollments(),
-        loadSalaries(),
-        loadNotifications(),
-        loadProfile()
-    ]);
+        await Promise.all([
+            loadProjects(),
+            loadEnrollments(),
+            loadSalaries(),
+            loadNotifications(),
+            loadProfile(),
+            loadPayments()
+        ]);
+
+        await loadPaymentSection();
+
+    }catch(error){
+        window.location.href="/";
+    }
 }
 
 loadDashboard();
 </script></body>
-  </html>
+</html>
