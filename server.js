@@ -1,32 +1,27 @@
 require("dotenv").config();
 
 const express = require("express");
-const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const helmet = require("helmet");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
-const path = require("path");
+
+const connectDB = require("./config/db");
 
 const app = express();
 
 app.set("trust proxy", 1);
 
-// Security
 app.use(helmet());
-
 app.use(compression());
 
-// Request body limits
 app.use(express.json({ limit: "2mb" }));
-
 app.use(express.urlencoded({
     extended: true,
     limit: "2mb"
 }));
 
-// Rate limiting
 app.use("/api", rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 200,
@@ -34,36 +29,28 @@ app.use("/api", rateLimit({
     legacyHeaders: false
 }));
 
-// Start application
 async function startServer() {
     try {
-        const MONGODB_URI = process.env.MONGODB_URI;
-        const SESSION_SECRET = process.env.SESSION_SECRET;
-
-        if (!MONGODB_URI) {
-            throw new Error("MONGODB_URI is missing.");
-        }
-
-        if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
+        if (!process.env.SESSION_SECRET ||
+            process.env.SESSION_SECRET.length < 32) {
             throw new Error(
                 "SESSION_SECRET must contain at least 32 characters."
             );
         }
 
-        // Connect MongoDB
-        await mongoose.connect(MONGODB_URI);
+        await connectDB();
 
-        console.log("MongoDB connected successfully.");
+        console.log("Database connected.");
 
-        // Session configuration
         app.use(session({
             name: "hbps.sid",
-            secret: SESSION_SECRET,
+            secret: process.env.SESSION_SECRET,
             resave: false,
             saveUninitialized: false,
 
             store: MongoStore.create({
-                client: mongoose.connection.getClient(),
+                client: require("mongoose")
+                    .connection.getClient(),
                 collectionName: "sessions",
                 ttl: 14 * 24 * 60 * 60
             }),
@@ -76,7 +63,62 @@ async function startServer() {
             }
         }));
 
-        // Health check
+        // CUSTOMER AUTHENTICATION
+        app.use("/api/auth",
+            require("./routes/auth"));
+
+        // ADMIN AUTHENTICATION
+        app.use("/api/admin/auth",
+            require("./routes/adminAuth"));
+
+        // PROJECTS
+        app.use("/api/projects",
+            require("./routes/projects"));
+
+        app.use("/api/admin/projects",
+            require("./routes/adminProjects"));
+
+        // CUSTOMER PROFILE
+        app.use("/api/profile",
+            require("./routes/profile"));
+
+        // NOTIFICATIONS
+        app.use("/api/notifications",
+            require("./routes/notifications"));
+
+        // CUSTOMER CHARGES
+        app.use("/api/customer-charges",
+            require("./routes/customerCharges"));
+
+        // SUPPORT
+        app.use("/api/support",
+            require("./routes/support"));
+
+        // CUSTOMER WORK SHOWCASE
+        app.use("/api/showcase",
+            require("./routes/showcase"));
+
+        // WEBSITE SETTINGS
+        app.use("/api/settings",
+            require("./routes/settings"));
+
+        // COMPANY CERTIFICATE
+        app.use("/api/company-certificate",
+            require("./routes/companyCertificate"));
+
+        // ACTIVITY LOGS
+        app.use("/api/activity-logs",
+            require("./routes/activityLogs"));
+
+        // FILE UPLOADS
+        app.use("/api/uploads",
+            require("./routes/uploads"));
+
+        // PAYMENTS
+        app.use("/api/payments",
+            require("./routes/payments"));
+
+        // HEALTH CHECK
         app.get("/api/health", (req, res) => {
             res.status(200).json({
                 success: true,
@@ -85,12 +127,7 @@ async function startServer() {
             });
         });
 
-        // Website files
-        app.use(express.static(
-            path.join(__dirname, "public")
-        ));
-
-        // Unknown API routes
+        // UNKNOWN API ROUTES
         app.use("/api", (req, res) => {
             res.status(404).json({
                 success: false,
@@ -98,12 +135,12 @@ async function startServer() {
             });
         });
 
-        // 404 handler
+        // UNKNOWN PAGES
         app.use((req, res) => {
             res.status(404).send("Page not found.");
         });
 
-        // Error handler
+        // ERROR HANDLER
         app.use((err, req, res, next) => {
             console.error(err);
 
@@ -113,15 +150,20 @@ async function startServer() {
             });
         });
 
-        // Start server
         const PORT = process.env.PORT || 5000;
 
         app.listen(PORT, "0.0.0.0", () => {
-            console.log(`Server running on port ${PORT}`);
+            console.log(
+                `Server running on port ${PORT}`
+            );
         });
 
     } catch (error) {
-        console.error("Startup error:", error.message);
+        console.error(
+            "Server startup failed:",
+            error.message
+        );
+
         process.exit(1);
     }
 }
