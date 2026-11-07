@@ -6,6 +6,7 @@ const MongoStore = require("connect-mongo");
 const helmet = require("helmet");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
+const mongoose = require("mongoose");
 
 const connectDB = require("./config/db");
 
@@ -31,8 +32,10 @@ app.use("/api", rateLimit({
 
 async function startServer() {
     try {
-        if (!process.env.SESSION_SECRET ||
-            process.env.SESSION_SECRET.length < 32) {
+        if (
+            !process.env.SESSION_SECRET ||
+            process.env.SESSION_SECRET.length < 32
+        ) {
             throw new Error(
                 "SESSION_SECRET must contain at least 32 characters."
             );
@@ -49,8 +52,7 @@ async function startServer() {
             saveUninitialized: false,
 
             store: MongoStore.create({
-                client: require("mongoose")
-                    .connection.getClient(),
+                client: mongoose.connection.getClient(),
                 collectionName: "sessions",
                 ttl: 14 * 24 * 60 * 60
             }),
@@ -75,6 +77,11 @@ async function startServer() {
         app.use("/api/projects",
             require("./routes/projects"));
 
+        // ENROLLMENTS
+        app.use("/api/enrollments",
+            require("./routes/enrollments"));
+
+        // ADMIN PROJECTS
         app.use("/api/admin/projects",
             require("./routes/adminProjects"));
 
