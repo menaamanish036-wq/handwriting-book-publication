@@ -1,9 +1,12 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#080808">
-<title>Customer Dashboard | Handwriting Book Publication</title><style>
+<title>Customer Dashboard | Handwriting Book Publication</title>
+
+<style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
 body{background:#090909;color:#fff;min-height:100vh}
 header{background:#111;border-bottom:1px solid #b99335;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:15px}
@@ -40,56 +43,92 @@ main{max-width:1100px;margin:auto;padding:25px 18px}
 .work-card button{background:#c6a34a;color:#111;width:100%;margin-top:12px}
 .file-link{color:#e3c36d;display:inline-block;margin:5px 8px 5px 0;word-break:break-all}
 .instructions{white-space:pre-wrap;color:#ddd;background:#101010;border-radius:7px;padding:12px;margin:10px 0;line-height:1.6}
-@media(max-width:500px){header{align-items:flex-start;flex-direction:column}.welcome h1{font-size:22px}}
-</style></head><body><header>
+@media(max-width:500px){
+header{align-items:flex-start;flex-direction:column}
+.welcome h1{font-size:22px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
 <h2>Handwriting Book Publication</h2>
 <button class="logout" id="logoutBtn">Logout</button>
-</header><main><div id="message"></div><section class="welcome">
+</header>
+
+<main>
+
+<div id="message"></div>
+
+<section class="welcome">
 <h1>Welcome, <span id="customerName">Customer</span></h1>
 <p>Your personal customer dashboard</p>
-</section><div id="accountStatus" class="status">Loading account status...</div><section class="card">
+</section>
+
+<div id="accountStatus" class="status">Loading account status...</div>
+
+<section class="card">
 <h2>Available Projects</h2>
 <div id="projects" class="grid">
 <p class="loading">Loading projects...</p>
 </div>
-</section><section class="card">
+</section>
+
+<section class="card">
 <h2>My Registrations</h2>
 <div id="enrollments">
 <p class="loading">Loading registrations...</p>
 </div>
-</section><section class="card">
+</section>
+
+<section class="card">
 <h2>Registration Payment</h2>
 <p class="muted">Select your registered project below to submit its registration payment. Use only official company payment details.</p>
 <div id="paymentSection">
 <p class="loading">Loading payment information...</p>
 </div>
-</section><section class="card">
+</section>
+
+<section class="card">
 <h2>My Payment History</h2>
 <div id="payments">
 <p class="loading">Loading payment records...</p>
 </div>
-</section><section class="card">
+</section>
+
+<section class="card">
 <h2>My Work</h2>
 <p class="muted">View your assigned handwriting work, instructions, deadlines and submission status here.</p>
 <div id="workAssignments">
 <p class="loading">Loading assigned work...</p>
 </div>
-</section><section class="card">
+</section>
+
+<section class="card">
 <h2>My Salary</h2>
 <div id="salaries">
 <p class="loading">Loading salary records...</p>
 </div>
-</section><section class="card">
+</section>
+
+<section class="card">
 <h2>Notifications</h2>
 <div id="notifications">
 <p class="loading">Loading notifications...</p>
 </div>
-</section><section class="card">
+</section>
+
+<section class="card">
 <h2>Account Information</h2>
 <div id="profile">
 <p class="loading">Loading profile...</p>
 </div>
-</section></main><script>
+</section>
+
+</main>
+
+<script>
 const messageBox=document.getElementById("message");
 
 function showMessage(message,type="success"){
@@ -440,129 +479,111 @@ async function loadWorkAssignments(){
                             <input type="file" name="workFiles" accept="image/jpeg,image/png,image/webp,application/pdf" multiple required>
 
                             <label>Remarks (Optional)</label>
-                            <textarea name="customerRemarks" maxlength="2000" placeholder="Write a message for the admin"></textarea>                        <button type="submit">Submit Completed Work</button>
-                    </form>
-                `:""}
+                            <textarea name="customerRemarks" maxlength="2000" placeholder="Write a message for the admin"></textarea>
 
-                ${work.status==="submitted"||work.status==="under_review"?`
-                    <p class="muted">Your work has been submitted. Please wait for admin review.</p>
-                `:""}
+                            <button type="submit">Submit Completed Work</button>
+                        </form>
+                    `:""}
 
-                ${work.status==="approved"?`
-                    <p class="muted">Your work has been approved. Waiting for final completion.</p>
-                `:""}
+                    ${work.status==="submitted"||work.status==="under_review"?`
+                        <p class="muted">Your work has been submitted. Please wait for admin review.</p>
+                    `:""}
 
-                ${work.status==="completed"?`
-                    <p class="muted">This assignment has been completed.</p>
-                `:""}
-            </div>
-        `;
-    }).join("");
+                    ${work.status==="approved"?`
+                        <p class="muted">Your work has been approved. Waiting for final completion.</p>
+                    `:""}
 
-}catch(error){
-    box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
-}
+                    ${work.status==="completed"?`
+                        <p class="muted">This assignment has been completed.</p>
+                    `:""}
+                </div>
+            `;
+        }).join("");
 
+    }catch(error){
+        box.innerHTML='<p class="empty">'+escapeHTML(error.message)+'</p>';
+    }
 }
 
 async function submitWork(event,assignmentId){
-event.preventDefault();
+    event.preventDefault();
 
-const form=event.target;
-const button=form.querySelector("button");
-const files=Array.from(form.elements.workFiles.files||[]);
-const remarks=form.elements.customerRemarks.value.trim();
+    const form=event.target;
+    const button=form.querySelector("button");
+    const files=Array.from(form.elements.workFiles.files||[]);
+    const remarks=form.elements.customerRemarks.value.trim();
 
-if(files.length<1||files.length>20){
-    showMessage("Please select between 1 and 20 files.","error");
-    return;
-}
-
-const allowedTypes=[
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "application/pdf"
-];
-
-for(const file of files){
-    if(!allowedTypes.includes(file.type)){
-        showMessage("Only JPG, PNG, WEBP and PDF files are allowed.","error");
+    if(files.length<1||files.length>20){
+        showMessage("Please select between 1 and 20 files.","error");
         return;
     }
 
-    if(file.size>10*1024*1024){
-        showMessage("Each work file must be smaller than 10 MB.","error");
-        return;
+    const allowedTypes=[
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/pdf"
+    ];
+
+    for(const file of files){
+        if(!allowedTypes.includes(file.type)){
+            showMessage("Only JPG, PNG, WEBP and PDF files are allowed.","error");
+            return;
+        }
+
+        if(file.size>10*1024*1024){
+            showMessage("Each work file must be smaller than 10 MB.","error");
+            return;
+        }
     }
-}
 
-button.disabled=true;
-button.textContent="Uploading Work Files...";
+    button.disabled=true;
+    button.textContent="Uploading Work Files...";
 
-try{
-    const fileIds=[];
+    try{
+        const fileIds=[];
 
-    for(let i=0;i<files.length;i++){
-        const formData=new FormData();
-        formData.append("file",files[i]);
+        for(let i=0;i<files.length;i++){
+            const formData=new FormData();
+            formData.append("file",files[i]);
 
-        const response=await fetch("/api/uploads",{
+            const response=await fetch("/api/uploads",{
+                method:"POST",
+                credentials:"same-origin",
+                body:formData
+            });
+
+            let uploadData={};
+
+            try{
+                uploadData=await response.json();
+            }catch(error){
+                throw new Error("Invalid file upload response.");
+            }
+
+            if(!response.ok){
+                throw new Error(uploadData.message||"Unable to upload a work file.");
+            }
+
+            const fileId=uploadData.file&&uploadData.file.fileId;
+
+            if(!fileId){
+                throw new Error("The server did not return a work file ID.");
+            }
+
+            fileIds.push(String(fileId));
+            button.textContent=`Uploading ${i+1} of ${files.length}...`;
+        }
+
+        button.textContent="Submitting Work...";
+
+        const result=await api(`/api/work-assignments/${encodeURIComponent(assignmentId)}/submit`,{
             method:"POST",
-            credentials:"same-origin",
-            body:formData
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+                fileIds,
+                customerRemarks:remarks
+            })
         });
 
-        let uploadData={};
-
-        try{
-            uploadData=await response.json();
-        }catch(error){
-            throw new Error("Invalid file upload response.");
-        }
-
-        if(!response.ok){
-            throw new Error(uploadData.message||"Unable to upload a work file.");
-        }
-
-        const fileId=uploadData.file&&uploadData.file.fileId;
-
-        if(!fileId){
-            throw new Error("The server did not return a work file ID.");
-        }
-
-        fileIds.push(String(fileId));
-        button.textContent=`Uploading ${i+1} of ${files.length}...`;
-    }
-
-    button.textContent="Submitting Work...";
-
-    const result=await api(`/api/work-assignments/${encodeURIComponent(assignmentId)}/submit`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-            fileIds,
-            customerRemarks:remarks
-        })
-    });
-
-    showMessage(result.message||"Your work has been submitted successfully.");
-
-    form.reset();
-    await loadWorkAssignments();
-    await loadNotifications();
-
-}catch(error){
-    showMessage(error.message,"error");
-}finally{
-    button.disabled=false;
-    button.textContent="Submit Completed Work";
-}
-
-}
-
-async function loadSalaries(){
-const box=document.getElementById("salaries");
-
-try{
-    const data=await api("/api/s
+        showMessage(result.message||"Your work has been submitted
