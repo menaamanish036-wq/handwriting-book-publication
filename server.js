@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 
 const connectDB = require("./config/db");
+const User = require("./models/User");
 
 const app = express();
 
@@ -21,7 +22,6 @@ app.use(compression());
 
 // REQUEST BODY LIMITS
 app.use(express.json({ limit: "2mb" }));
-
 app.use(express.urlencoded({
 extended: true,
 limit: "2mb"
@@ -175,6 +175,8 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 
     // HEALTH CHECK
     app.get("/api/health", (req, res) => {
+        res.set("Cache-Control", "no-store");
+
         res.status(200).json({
             success: true,
             message: "Server is running.",
@@ -182,10 +184,115 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
         });
     });
 
-    // STATIC WEBSITE FILES
-    app.use(express.static(
-        path.join(__dirname, "public")
-    ));
+    // CUSTOMER SESSION CHECK FOR WEB PAGES
+    async function requireCustomerPage(req, res, next) {
+        try {
+            if (
+                !req.session ||
+                !req.session.userId ||
+                req.session.role !== "customer"
+            ) {
+                return res.redirect("/");
+            }
+
+            const user = await User.findById(
+                req.session.userId
+            );
+
+            if (
+                !user ||
+                user.isBlocked ||
+                user.role !== "customer"
+            ) {
+                return res.redirect("/");
+            }
+
+            req.user = user;
+
+            res.set("Cache-Control", "no-store");
+
+            next();
+
+        } catch (error) {
+            console.error(
+                "Customer page authentication error:",
+                error
+            );
+
+            return res.status(500).send(
+                "Unable to verify your account."
+            );
+        }
+    }
+
+    // PUBLIC LOGIN AND REGISTRATION PAGE
+    app.get("/", async (req, res) => {
+        try {
+            if (
+                req.session &&
+                req.session.userId &&
+                req.session.role === "customer"
+            ) {
+                const user = await User.findById(
+                    req.session.userId
+                );
+
+                if (
+                    user &&
+                    !user.isBlocked &&
+                    user.role === "customer"
+                ) {
+                    return res.redirect("/dashboard.html");
+                }
+            }
+
+            res.set("Cache-Control", "no-store");
+
+            return res.sendFile(
+                path.join(__dirname, "public", "index.html")
+            );
+
+        } catch (error) {
+            console.error("Homepage error:", error);
+
+            return res.status(500).send(
+                "Unable to load website."
+            );
+        }
+    });
+
+    // LOGIN PAGE
+    app.get("/index.html", (req, res) => {
+        res.set("Cache-Control", "no-store");
+
+        return res.sendFile(
+            path.join(__dirname, "public", "index.html")
+        );
+    });
+
+    // PROTECTED CUSTOMER DASHBOARD
+    app.get(
+        "/dashboard.html",
+        requireCustomerPage,
+        (req, res) => {
+            return res.sendFile(
+                path.join(__dirname, "public", "dashboard.html")
+            );
+        }
+    );
+
+    // UNKNOWN API ROUTES
+    app.use("/api", (req, res) => {
+        res.status(404).json({
+            success: false,
+            message: "API route not found."
+        });
+    });
+
+    // UNKNOWN WEBSITE PAGES
+    app.use((req, res) => {
+        res.status(404).send("Page not found.");
+    });
 
     // ERROR HANDLER
     app.use((err, req, res, next) => {
@@ -199,19 +306,6 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
             success: false,
             message: "Internal server error."
         });
-    });
-
-    // UNKNOWN API ROUTES
-    app.use("/api", (req, res) => {
-        res.status(404).json({
-            success: false,
-            message: "API route not found."
-        });
-    });
-
-    // UNKNOWN PAGES
-    app.use((req, res) => {
-        res.status(404).send("Page not found.");
     });
 
     // START SERVER
