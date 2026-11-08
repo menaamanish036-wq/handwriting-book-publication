@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const router = express.Router();
 
 const upload = require("../middleware/upload");
-const { requireLogin } = require("../middleware/auth");
+const User = require("../models/User");
 
 const {
-  saveFile,
-  getFileStream
+    saveFile,
+    getFileStream
 } = require("../services/fileStorage");
 
 const Showcase = require("../models/Showcase");
@@ -15,125 +15,194 @@ const CompanyCertificate = require("../models/CompanyCertificate");
 
 // UPLOAD FILE
 router.post(
-  "/",
-  requireLogin,
-  upload.single("file"),
-  async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({
-          success: false,
-          message: "Please select a file."
-        });
-      }
+    "/",
+    async (req, res, next) => {
+        const { requireLogin } = require("../middleware/auth");
+        return requireLogin(req, res, next);
+    },
+    upload.single("file"),
+    async (req, res) => {
+        try {
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please select a file."
+                });
+            }
 
-      const result = await saveFile(
-        req.file,
-        req.user._id
-      );
+            const result = await saveFile(
+                req.file,
+                req.user._id
+            );
 
-      res.status(201).json({
-        success: true,
-        message: "File uploaded successfully.",
-        file: result
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "File upload failed."
-      });
+            return res.status(201).json({
+                success: true,
+                message: "File uploaded successfully.",
+                file: result
+            });
+
+        } catch (error) {
+            console.error("File upload error:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: "File upload failed."
+            });
+        }
     }
-  }
 );
 
 // VIEW FILE
-router.get("/:id", requireLogin, async (req, res) => {
-  try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid file ID."
-      });
-    }
+router.get("/:id", async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid file ID."
+            });
+        }
 
-    const fileId = new mongoose.Types.ObjectId(req.params.id);
+        const fileId = new mongoose.Types.ObjectId(
+            req.params.id
+        );
 
-    const fileRecord = await mongoose.connection.db
-      .collection("uploads.files")
-      .findOne({ _id: fileId });
+        const fileRecord = await mongoose.connection.db
+            .collection("uploads.files")
+            .findOne({ _id: fileId });
 
-    if (!fileRecord) {
-      return res.status(404).json({
-        success: false,
-        message: "File not found."
-      });
-    }
+        if (!fileRecord) {
+            return res.status(404).json({
+                success: false,
+                message: "File not found."
+            });
+        }
 
-    const isAdmin = req.user.role === "admin";
+        // PUBLIC ACCESS:
+        // ONLY ACTIVE COMPANY CERTIFICATES CAN BE
+        // VIEWED WITHOUT LOGIN.
 
-    const isOwner =
-      fileRecord.metadata &&
-      fileRecord.metadata.uploadedBy === String(req.user._id);
+        const publicCertificate =
+            await CompanyCertificate.findOne({
+                fileId: fileId,
+                isActive: true
+            }).lean();
 
-    let isPublished = false;
+        let allowed = Boolean(publicCertificate);
 
-    if (!isAdmin && !isOwner) {
-      const showcase = await Showcase.findOne({
-        fileId,
-        isPublished: true
-      });
+        // PRIVATE ACCESS:
+        // OTHER FILES REQUIRE LOGIN.
 
-      const certificate = await CompanyCertificate.findOne({
-        fileId,
-        isActive: true
-      });
+        if (!allowed) {
+            if (!req.session || !req.session.userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Please login to view this file."
+                });
+            }
 
-      isPublished = Boolean(showcase || certificate);
-    }
+            const user = await User.findById(
+                req.session.userId
+            );
 
-    if (!isAdmin && !isOwner && !isPublished) {
-      return res.status(403).json({
-        success: false,
-        message: "You are not allowed to view this file."
-      });
-    }
+            if (!user || user.isBlocked) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Account not available. Please login again."
+                });
+            }
 
-    res.setHeader(
-      "Content-Type",
-      fileRecord.contentType || "application/octet-stream"
-    );
+            const isAdmin = user.role === "admin";
 
-    res.setHeader(
-      "X-Content-Type-Options",
-      "nosniff"
-    );
+            const isOwner =
+                fileRecord.metadata &&
+                fileRecord.metadata.uploadedBy ===
+                String(user._id);
 
-    res.setHeader(
-      "Content-Disposition",
-      "inline"
-    );
+            // Published showcase files are visible
+            // only to logged-in customers and admins.
 
-    const stream = getFileStream(req.params.id);
+            const publishedShowcase =
+                await Showcase.findOne({
+                    fileId: fileId,
+                    isPublished: true
+                }).lean();
 
-    stream.on("error", () => {
-      if (!res.headersSent) {
-        res.status(404).json({
-          success: false,
-          message: "Unable to read file."
+            allowed =
+                isAdmin ||
+                isOwner ||
+                Boolean(publishedShowcase);
+        }
+
+        if (!allowed) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not allowed to view this file."
+            });
+        }
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "application/pdf"
+        ];
+
+        const contentType =
+            fileRecord.contentType ||
+            "application/octet-stream";
+
+        if (!allowedTypes.includes(contentType)) {
+            return res.status(415).json({
+                success: false,
+                message: "Unsupported file format."
+            });
+        }
+
+        res.setHeader(
+            "Content-Type",
+            contentType
+        );
+
+        res.setHeader(
+            "X-Content-Type-Options",
+            "nosniff"
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            "inline"
+        );
+
+        res.setHeader(
+            "Cache-Control",
+            "private, no-store"
+        );
+
+        const stream = getFileStream(req.params.id);
+
+        stream.on("error", (error) => {
+            console.error("File stream error:", error);
+
+            if (!res.headersSent) {
+                res.status(404).json({
+                    success: false,
+                    message: "Unable to read file."
+                });
+            } else {
+                res.destroy();
+            }
         });
-      } else {
-        res.destroy();
-      }
-    });
 
-    stream.pipe(res);
+        stream.pipe(res);
 
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to load file."
-    });
-  }
+    } catch (error) {
+        console.error("View file error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load file."
+        });
+    }
 });
 
 module.exports = router;
