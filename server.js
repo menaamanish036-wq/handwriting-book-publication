@@ -97,6 +97,9 @@ async function startServer() {
         // ADMIN CUSTOMER CERTIFICATES
         app.use("/api/admin/certificates", require("./routes/adminCertificates"));
 
+        // CUSTOMER PARCEL TRACKING AND CERTIFICATES
+        app.use("/api/customer-records", require("./routes/customerRecords"));
+
         // CUSTOMER PROFILE
         app.use("/api/profile", require("./routes/profile"));
 
