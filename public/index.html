@@ -1,489 +1,744 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080808">
-    <title>Handwriting Book Publication</title><style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<title>Handwriting Book Publication</title>
 
-    body {
-        min-height: 100vh;
-        background: #080808;
-        color: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
 
+body {
+    min-height: 100vh;
+    background: #080808;
+    color: #fff;
+    padding: 28px 14px;
+}
+
+.container {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    background: #111;
+    border: 1px solid #b99335;
+    border-radius: 18px;
+    padding: 30px 24px;
+    box-shadow: 0 0 30px rgba(185, 147, 53, 0.12);
+}
+
+.brand {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.brand h1 {
+    color: #d8b45a;
+    font-size: 25px;
+    line-height: 1.4;
+}
+
+.brand p {
+    color: #aaa;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #555;
+    background: #191919;
+    color: #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.tab.active {
+    background: #c6a34a;
+    color: #080808;
+    border-color: #c6a34a;
+    font-weight: bold;
+}
+
+.form {
+    display: none;
+}
+
+.form.active {
+    display: block;
+}
+
+.form h2 {
+    color: #d8b45a;
+    margin-bottom: 20px;
+    font-size: 21px;
+}
+
+.input-group {
+    margin-bottom: 14px;
+}
+
+label {
+    display: block;
+    color: #ddd;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #444;
+    background: #1b1b1b;
+    color: white;
+    border-radius: 7px;
+    outline: none;
+    font-size: 14px;
+}
+
+input:focus, textarea:focus {
+    border-color: #d8b45a;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 75px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #e5c46b, #a77c24);
+    color: #080808;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.message {
+    display: none;
+    padding: 12px;
+    border-radius: 7px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.message.success {
+    display: block;
+    background: #12351f;
+    color: #8df0a8;
+}
+
+.message.error {
+    display: block;
+    background: #401919;
+    color: #ffaaaa;
+}
+
+.certificates-section {
+    margin-top: 30px;
+    padding-top: 22px;
+    border-top: 1px solid #4b3b20;
+}
+
+.certificates-section h2 {
+    color: #d8b45a;
+    font-size: 21px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.certificates-intro {
+    color: #aaa;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.certificate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.certificate-card {
+    background: #191919;
+    border: 1px solid #514126;
+    border-radius: 10px;
+    padding: 14px;
+    min-width: 0;
+}
+
+.certificate-card h3 {
+    color: #e2c36e;
+    font-size: 15px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.certificate-card p {
+    color: #aaa;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 7px 0 12px;
+    overflow-wrap: anywhere;
+}
+
+.certificate-link {
+    display: inline-block;
+    color: #080808;
+    background: #d8b45a;
+    padding: 9px 12px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.certificate-empty {
+    grid-column: 1 / -1;
+    color: #999;
+    text-align: center;
+    padding: 16px;
+    border: 1px dashed #514126;
+    border-radius: 9px;
+    font-size: 13px;
+}
+
+.footer {
+    text-align: center;
+    color: #777;
+    font-size: 12px;
+    margin-top: 25px;
+}
+
+@media (max-width: 480px) {
     .container {
-        width: 100%;
-        max-width: 480px;
-        background: #111;
-        border: 1px solid #b99335;
-        border-radius: 18px;
-        padding: 30px 24px;
-        box-shadow: 0 0 30px rgba(185, 147, 53, 0.12);
-    }
-
-    .brand {
-        text-align: center;
-        margin-bottom: 25px;
+        padding: 25px 18px;
     }
 
     .brand h1 {
-        color: #d8b45a;
-        font-size: 25px;
-        line-height: 1.4;
+        font-size: 22px;
     }
-
-    .brand p {
-        color: #aaa;
-        font-size: 13px;
-        margin-top: 8px;
-    }
-
-    .tabs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 25px;
-    }
-
-    .tab {
-        flex: 1;
-        padding: 12px;
-        border: 1px solid #555;
-        background: #191919;
-        color: #ddd;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 15px;
-    }
-
-    .tab.active {
-        background: #c6a34a;
-        color: #080808;
-        border-color: #c6a34a;
-        font-weight: bold;
-    }
-
-    .form {
-        display: none;
-    }
-
-    .form.active {
-        display: block;
-    }
-
-    .form h2 {
-        color: #d8b45a;
-        margin-bottom: 20px;
-        font-size: 21px;
-    }
-
-    .input-group {
-        margin-bottom: 14px;
-    }
-
-    label {
-        display: block;
-        color: #ddd;
-        font-size: 13px;
-        margin-bottom: 7px;
-    }
-
-    input, textarea {
-        width: 100%;
-        padding: 13px;
-        border: 1px solid #444;
-        background: #1b1b1b;
-        color: white;
-        border-radius: 7px;
-        outline: none;
-        font-size: 14px;
-    }
-
-    input:focus, textarea:focus {
-        border-color: #d8b45a;
-    }
-
-    textarea {
-        resize: vertical;
-        min-height: 75px;
-    }
-
-    .submit-btn {
-        width: 100%;
-        padding: 14px;
-        margin-top: 10px;
-        border: none;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #e5c46b, #a77c24);
-        color: #080808;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .submit-btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .message {
-        display: none;
-        padding: 12px;
-        border-radius: 7px;
-        margin-bottom: 15px;
-        font-size: 13px;
-        line-height: 1.5;
-    }
-
-    .message.success {
-        display: block;
-        background: #12351f;
-        color: #8df0a8;
-    }
-
-    .message.error {
-        display: block;
-        background: #401919;
-        color: #ffaaaa;
-    }
-
-    .footer {
-        text-align: center;
-        color: #777;
-        font-size: 12px;
-        margin-top: 25px;
-    }
-
-    @media (max-width: 480px) {
-        .container {
-            padding: 25px 18px;
-        }
-
-        .brand h1 {
-            font-size: 22px;
-        }
-    }
+}
 </style>
+</head>
 
-</head><body><div class="container"><div class="brand">
-    <h1>Handwriting Book Publication</h1>
-    <p>Customer Account Portal</p>
+<body>
+
+<div class="container">
+
+    <div class="brand">
+        <h1>Handwriting Book Publication</h1>
+        <p>Customer Account Portal</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" id="loginTab" type="button">
+            Login
+        </button>
+
+        <button class="tab" id="registerTab" type="button">
+            Register
+        </button>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <!-- LOGIN FORM -->
+
+    <form id="loginForm" class="form active">
+
+        <h2>Customer Login</h2>
+
+        <div class="input-group">
+            <label>Email or Mobile Number</label>
+            <input
+                type="text"
+                id="loginIdentifier"
+                required
+                autocomplete="username"
+                placeholder="Enter email or mobile number"
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input
+                type="password"
+                id="loginPassword"
+                required
+                autocomplete="current-password"
+                placeholder="Enter your password"
+            >
+        </div>
+
+        <button class="submit-btn" type="submit">
+            Login to Account
+        </button>
+
+    </form>
+
+    <!-- REGISTRATION FORM -->
+
+    <form id="registerForm" class="form">
+
+        <h2>Create Customer Account</h2>
+
+        <div class="input-group">
+            <label>Full Name *</label>
+            <input type="text" id="fullName" required maxlength="100">
+        </div>
+
+        <div class="input-group">
+            <label>Father's Name</label>
+            <input type="text" id="fatherName" maxlength="100">
+        </div>
+
+        <div class="input-group">
+            <label>Mobile Number *</label>
+            <input
+                type="tel"
+                id="mobile"
+                required
+                pattern="[0-9]{10}"
+                maxlength="10"
+                inputmode="numeric"
+                placeholder="10-digit mobile number"
+            >
+        </div>
+
+        <div class="input-group">
+            <label>WhatsApp Number</label>
+            <input
+                type="tel"
+                id="whatsapp"
+                maxlength="15"
+                placeholder="WhatsApp number"
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Email Address *</label>
+            <input
+                type="email"
+                id="email"
+                required
+                autocomplete="email"
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Password *</label>
+            <input
+                type="password"
+                id="registerPassword"
+                required
+                minlength="8"
+                autocomplete="new-password"
+                placeholder="Minimum 8 characters"
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Address</label>
+            <textarea id="address"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>State</label>
+            <input type="text" id="state">
+        </div>
+
+        <div class="input-group">
+            <label>District</label>
+            <input type="text" id="district">
+        </div>
+
+        <div class="input-group">
+            <label>City</label>
+            <input type="text" id="city">
+        </div>
+
+        <div class="input-group">
+            <label>PIN Code</label>
+            <input
+                type="text"
+                id="pinCode"
+                maxlength="6"
+                inputmode="numeric"
+            >
+        </div>
+
+        <button class="submit-btn" type="submit">
+            Create Account
+        </button>
+
+    </form>
+
+    <!-- PUBLIC COMPANY CERTIFICATES -->
+
+    <section class="certificates-section" aria-labelledby="companyCertificatesHeading">
+
+        <h2 id="companyCertificatesHeading">
+            Company Certificates & Documents
+        </h2>
+
+        <p class="certificates-intro">
+            View our published company certificates and supporting documents.
+            These documents are available to visitors without customer login.
+        </p>
+
+        <div id="publicCertificates" class="certificate-grid" aria-live="polite">
+            <div class="certificate-empty">
+                Loading company documents...
+            </div>
+        </div>
+
+    </section>
+
+    <div class="footer">
+        © 2026 Handwriting Book Publication. All Rights Reserved.
+    </div>
+
 </div>
 
-<div class="tabs">
-    <button class="tab active" id="loginTab" type="button">
-        Login
-    </button>
+<script>
 
-    <button class="tab" id="registerTab" type="button">
-        Register
-    </button>
-</div>
+"use strict";
 
-<div id="message" class="message"></div>
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
 
-<!-- LOGIN FORM -->
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
 
-<form id="loginForm" class="form active">
+const messageBox = document.getElementById("message");
 
-    <h2>Customer Login</h2>
+function showMessage(text, type) {
+    messageBox.textContent = text;
+    messageBox.className = "message " + type;
+}
 
-    <div class="input-group">
-        <label>Email or Mobile Number</label>
-        <input
-            type="text"
-            id="loginIdentifier"
-            required
-            autocomplete="username"
-            placeholder="Enter email or mobile number"
-        >
-    </div>
+function clearMessage() {
+    messageBox.textContent = "";
+    messageBox.className = "message";
+}
 
-    <div class="input-group">
-        <label>Password</label>
-        <input
-            type="password"
-            id="loginPassword"
-            required
-            autocomplete="current-password"
-            placeholder="Enter your password"
-        >
-    </div>
+function showLogin() {
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
 
-    <button class="submit-btn" type="submit">
-        Login to Account
-    </button>
+    loginForm.classList.add("active");
+    registerForm.classList.remove("active");
 
-</form>
+    clearMessage();
+}
 
-<!-- REGISTRATION FORM -->
+function showRegister() {
+    registerTab.classList.add("active");
+    loginTab.classList.remove("active");
 
-<form id="registerForm" class="form">
+    registerForm.classList.add("active");
+    loginForm.classList.remove("active");
 
-    <h2>Create Customer Account</h2>
+    clearMessage();
+}
 
-    <div class="input-group">
-        <label>Full Name *</label>
-        <input type="text" id="fullName" required maxlength="100">
-    </div>
+loginTab.addEventListener("click", showLogin);
+registerTab.addEventListener("click", showRegister);
 
-    <div class="input-group">
-        <label>Father's Name</label>
-        <input type="text" id="fatherName" maxlength="100">
-    </div>
+// PUBLIC COMPANY CERTIFICATES
 
-    <div class="input-group">
-        <label>Mobile Number *</label>
-        <input
-            type="tel"
-            id="mobile"
-            required
-            pattern="[0-9]{10}"
-            maxlength="10"
-            inputmode="numeric"
-            placeholder="10-digit mobile number"
-        >
-    </div>
+async function loadPublicCompanyCertificates() {
 
-    <div class="input-group">
-        <label>WhatsApp Number</label>
-        <input
-            type="tel"
-            id="whatsapp"
-            maxlength="15"
-            placeholder="WhatsApp number"
-        >
-    </div>
+    const container = document.getElementById("publicCertificates");
+    container.replaceChildren();
 
-    <div class="input-group">
-        <label>Email Address *</label>
-        <input
-            type="email"
-            id="email"
-            required
-            autocomplete="email"
-        >
-    </div>
+    try {
 
-    <div class="input-group">
-        <label>Password *</label>
-        <input
-            type="password"
-            id="registerPassword"
-            required
-            minlength="8"
-            autocomplete="new-password"
-            placeholder="Minimum 8 characters"
-        >
-    </div>
-
-    <div class="input-group">
-        <label>Address</label>
-        <textarea id="address"></textarea>
-    </div>
-
-    <div class="input-group">
-        <label>State</label>
-        <input type="text" id="state">
-    </div>
-
-    <div class="input-group">
-        <label>District</label>
-        <input type="text" id="district">
-    </div>
-
-    <div class="input-group">
-        <label>City</label>
-        <input type="text" id="city">
-    </div>
-
-    <div class="input-group">
-        <label>PIN Code</label>
-        <input
-            type="text"
-            id="pinCode"
-            maxlength="6"
-            inputmode="numeric"
-        >
-    </div>
-
-    <button class="submit-btn" type="submit">
-        Create Account
-    </button>
-
-</form>
-
-<div class="footer">
-    © 2026 Handwriting Book Publication. All Rights Reserved.
-</div>
-
-</div><script>
-    const loginTab = document.getElementById("loginTab");
-    const registerTab = document.getElementById("registerTab");
-
-    const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
-
-    const messageBox = document.getElementById("message");
-
-    function showMessage(text, type) {
-        messageBox.textContent = text;
-        messageBox.className = "message " + type;
-    }
-
-    function clearMessage() {
-        messageBox.textContent = "";
-        messageBox.className = "message";
-    }
-
-    function showLogin() {
-        loginTab.classList.add("active");
-        registerTab.classList.remove("active");
-
-        loginForm.classList.add("active");
-        registerForm.classList.remove("active");
-
-        clearMessage();
-    }
-
-    function showRegister() {
-        registerTab.classList.add("active");
-        loginTab.classList.remove("active");
-
-        registerForm.classList.add("active");
-        loginForm.classList.remove("active");
-
-        clearMessage();
-    }
-
-    loginTab.addEventListener("click", showLogin);
-    registerTab.addEventListener("click", showRegister);
-
-    // CUSTOMER LOGIN
-
-    loginForm.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const button = loginForm.querySelector("button");
-
-        button.disabled = true;
-        button.textContent = "Please wait...";
-
-        try {
-            const response = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "same-origin",
-                body: JSON.stringify({
-                    identifier: document.getElementById("loginIdentifier").value.trim(),
-                    password: document.getElementById("loginPassword").value
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Login failed.");
+        const response = await fetch("/api/company-certificate", {
+            method: "GET",
+            credentials: "same-origin",
+            headers: {
+                "Accept": "application/json"
             }
+        });
 
-            showMessage("Login successful. Opening your account...", "success");
+        const data = await response.json();
 
-            window.location.href = "/dashboard.html";
-
-        } catch (error) {
-            showMessage(error.message, "error");
-        } finally {
-            button.disabled = false;
-            button.textContent = "Login to Account";
+        if (!response.ok || data.success === false) {
+            throw new Error(
+                data.message || "Unable to load company documents."
+            );
         }
-    });
 
-    // CUSTOMER REGISTRATION
+        const certificates = Array.isArray(data.certificates)
+            ? data.certificates
+            : (data.certificate ? [data.certificate] : []);
 
-    registerForm.addEventListener("submit", async function(event) {
-        event.preventDefault();
+        if (!certificates.length) {
 
-        const button = registerForm.querySelector("button");
+            const empty = document.createElement("div");
+            empty.className = "certificate-empty";
+            empty.textContent = "No company documents have been published yet.";
 
-        button.disabled = true;
-        button.textContent = "Creating Account...";
+            container.appendChild(empty);
+            return;
+        }
 
-        try {
-            const response = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "same-origin",
-                body: JSON.stringify({
-                    fullName: document.getElementById("fullName").value.trim(),
-                    fatherName: document.getElementById("fatherName").value.trim(),
-                    mobile: document.getElementById("mobile").value.trim(),
-                    whatsapp: document.getElementById("whatsapp").value.trim(),
-                    email: document.getElementById("email").value.trim(),
-                    password: document.getElementById("registerPassword").value,
-                    address: document.getElementById("address").value.trim(),
-                    state: document.getElementById("state").value.trim(),
-                    district: document.getElementById("district").value.trim(),
-                    city: document.getElementById("city").value.trim(),
-                    pinCode: document.getElementById("pinCode").value.trim()
-                })
-            });
+        certificates.forEach((certificate) => {
 
-            const data = await response.json();
+            if (!certificate || !certificate.fileId) return;
 
-            if (!response.ok) {
-                const validationMessage = data.errors && data.errors.length
+            const card = document.createElement("article");
+            card.className = "certificate-card";
+
+            const title = document.createElement("h3");
+            title.textContent = certificate.title || "Company Document";
+            card.appendChild(title);
+
+            const description = document.createElement("p");
+            description.textContent =
+                certificate.description || "Official company document.";
+
+            card.appendChild(description);
+
+            const link = document.createElement("a");
+
+            link.className = "certificate-link";
+
+            link.href =
+                "/api/uploads/" +
+                encodeURIComponent(String(certificate.fileId));
+
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+
+            link.textContent =
+                certificate.fileType === "application/pdf"
+                    ? "View PDF Document"
+                    : "View Certificate";
+
+            card.appendChild(link);
+            container.appendChild(card);
+
+        });
+
+        if (!container.children.length) {
+
+            const empty = document.createElement("div");
+            empty.className = "certificate-empty";
+            empty.textContent = "No company documents are currently available.";
+
+            container.appendChild(empty);
+        }
+
+    } catch (error) {
+
+        console.error("Public company certificates error:", error);
+
+        const message = document.createElement("div");
+        message.className = "certificate-empty";
+        message.textContent =
+            "Company documents could not be loaded. Please refresh the page.";
+
+        container.appendChild(message);
+    }
+}
+
+loadPublicCompanyCertificates();
+
+// CUSTOMER LOGIN
+
+loginForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const button = loginForm.querySelector("button");
+
+    button.disabled = true;
+    button.textContent = "Please wait...";
+
+    try {
+
+        const response = await fetch("/api/auth/login", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            credentials: "same-origin",
+
+            body: JSON.stringify({
+
+                identifier: document
+                    .getElementById("loginIdentifier")
+                    .value.trim(),
+
+                password: document
+                    .getElementById("loginPassword")
+                    .value
+
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Login failed.");
+        }
+
+        showMessage(
+            "Login successful. Opening your account...",
+            "success"
+        );
+
+        window.location.href = "/dashboard.html";
+
+    } catch (error) {
+
+        showMessage(error.message, "error");
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Login to Account";
+    }
+});
+
+// CUSTOMER REGISTRATION
+
+registerForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const button = registerForm.querySelector("button");
+
+    button.disabled = true;
+    button.textContent = "Creating Account...";
+
+    try {
+
+        const response = await fetch("/api/auth/register", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            credentials: "same-origin",
+
+            body: JSON.stringify({
+
+                fullName: document.getElementById("fullName").value.trim(),
+
+                fatherName: document.getElementById("fatherName").value.trim(),
+
+                mobile: document.getElementById("mobile").value.trim(),
+
+                whatsapp: document.getElementById("whatsapp").value.trim(),
+
+                email: document.getElementById("email").value.trim(),
+
+                password: document.getElementById("registerPassword").value,
+
+                address: document.getElementById("address").value.trim(),
+
+                state: document.getElementById("state").value.trim(),
+
+                district: document.getElementById("district").value.trim(),
+
+                city: document.getElementById("city").value.trim(),
+
+                pinCode: document.getElementById("pinCode").value.trim()
+
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            const validationMessage =
+                data.errors && data.errors.length
                     ? data.errors[0].msg
                     : data.message;
 
-                throw new Error(validationMessage || "Registration failed.");
-            }
-
-            registerForm.reset();
-
-            showMessage(
-                "Registration successful. Your account is awaiting approval. You can now login.",
-                "success"
+            throw new Error(
+                validationMessage || "Registration failed."
             );
-
-            setTimeout(showLogin, 2500);
-
-        } catch (error) {
-            showMessage(error.message, "error");
-        } finally {
-            button.disabled = false;
-            button.textContent = "Create Account";
         }
-    });
 
-    // CHECK EXISTING CUSTOMER SESSION
+        registerForm.reset();
 
-    async function checkSession() {
-        try {
-            const response = await fetch("/api/auth/me", {
-                credentials: "same-origin"
-            });
+        showMessage(
+            "Registration successful. Your account is awaiting approval. You can now login.",
+            "success"
+        );
 
-            if (response.ok) {
-                window.location.href = "/dashboard.html";
-            }
-        } catch (error) {
-            console.error("Session check failed:", error);
-        }
+        setTimeout(showLogin, 2500);
+
+    } catch (error) {
+
+        showMessage(error.message, "error");
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Create Account";
     }
+});
 
-    checkSession();
-</script></body>
-      </html>
+// CHECK EXISTING CUSTOMER SESSION
+
+async function checkSession() {
+
+    try {
+
+        const response = await fetch("/api/auth/me", {
+            credentials: "same-origin"
+        });
+
+        if (response.ok) {
+            window.location.href = "/dashboard.html";
+        }
+
+    } catch (error) {
+
+        console.error("Session check failed:", error);
+    }
+}
+
+checkSession();
+
+</script>
+
+</body>
+</html>
