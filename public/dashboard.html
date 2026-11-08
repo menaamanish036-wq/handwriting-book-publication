@@ -5,51 +5,575 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080808">
 <title>Customer Dashboard | Handwriting Book Publication</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#090909;color:#fff;font-family:Arial,sans-serif}header{padding:18px 5%;background:#111;border-bottom:1px solid #b99335;display:flex;justify-content:space-between;align-items:center;gap:12px}header h2{margin:0;color:#d8b45a;font-size:19px}main{max-width:1100px;margin:auto;padding:24px 16px}.welcome{margin:0 0 20px}.welcome h1{color:#d8b45a}.welcome p,.muted{color:#aaa;font-size:14px}.card{background:#141414;border:1px solid #393024;border-radius:12px;padding:18px;margin:0 0 18px}.card h2{margin:0 0 14px;color:#d8b45a;font-size:19px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.project,.work{background:#1b1b1b;border:1px solid #514124;border-radius:9px;padding:15px;margin:10px 0}.project h3,.work h3{color:#e3c36d;margin:0 0 10px}.project p,.work p,.item p{font-size:14px;line-height:1.5;color:#ccc;margin:7px 0}.item{padding:12px 0;border-bottom:1px solid #333;line-height:1.5}.empty{color:#999;padding:8px 0}.status{background:#28220f;border:1px solid #8c702c;color:#f0d58d;padding:12px;border-radius:8px;margin-bottom:18px}.message{padding:12px;border-radius:8px;margin-bottom:15px}.error{background:#401919;color:#ffaaaa}.success{background:#12351f;color:#8df0a8}button{border:0;border-radius:7px;padding:11px 14px;background:#c6a34a;color:#111;font-weight:bold;cursor:pointer;margin-top:8px}button:disabled{opacity:.5;cursor:not-allowed}.logout{margin:0}.formbox{background:#1b1b1b;border:1px solid #514124;border-radius:9px;padding:14px;margin-top:12px}label{display:block;margin:12px 0 6px;color:#ddd}input,textarea{width:100%;padding:11px;border:1px solid #555;border-radius:6px;background:#101010;color:white}textarea{min-height:75px}.formbox button{width:100%}.badge{display:inline-block;padding:4px 8px;background:#28220f;color:#f0d58d;border-radius:5px;font-size:12px}.instructions{white-space:pre-wrap;background:#101010;padding:10px;border-radius:6px;color:#ddd}.filelink{display:inline-block;color:#e3c36d;margin:5px}.hidden{display:none}@media(max-width:500px){header{align-items:flex-start;flex-direction:column}.welcome h1{font-size:22px}}
+*{box-sizing:border-box}
+body{margin:0;background:#090909;color:#fff;font-family:Arial,sans-serif}
+header{padding:18px 5%;background:#111;border-bottom:1px solid #b99335;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header h2{margin:0;color:#d8b45a;font-size:19px}
+main{max-width:1100px;margin:auto;padding:24px 16px}
+.welcome{margin:0 0 20px}
+.welcome h1{color:#d8b45a}
+.welcome p,.muted{color:#aaa;font-size:14px}
+.card{background:#141414;border:1px solid #393024;border-radius:12px;padding:18px;margin:0 0 18px}
+.card h2{margin:0 0 14px;color:#d8b45a;font-size:19px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.project,.work{background:#1b1b1b;border:1px solid #514124;border-radius:9px;padding:15px;margin:10px 0}
+.project h3,.work h3{color:#e3c36d;margin:0 0 10px}
+.project p,.work p,.item p{font-size:14px;line-height:1.5;color:#ccc;margin:7px 0}
+.item{padding:12px 0;border-bottom:1px solid #333;line-height:1.5}
+.empty{color:#999;padding:8px 0}
+.status{background:#28220f;border:1px solid #8c702c;color:#f0d58d;padding:12px;border-radius:8px;margin-bottom:18px}
+.message{padding:12px;border-radius:8px;margin-bottom:15px}
+.error{background:#401919;color:#ffaaaa}
+.success{background:#12351f;color:#8df0a8}
+button{border:0;border-radius:7px;padding:11px 14px;background:#c6a34a;color:#111;font-weight:bold;cursor:pointer;margin-top:8px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.logout{margin:0}
+.formbox{background:#1b1b1b;border:1px solid #514124;border-radius:9px;padding:14px;margin-top:12px}
+label{display:block;margin:12px 0 6px;color:#ddd}
+input,textarea{width:100%;padding:11px;border:1px solid #555;border-radius:6px;background:#101010;color:white}
+textarea{min-height:75px}
+.formbox button{width:100%}
+.badge{display:inline-block;padding:4px 8px;background:#28220f;color:#f0d58d;border-radius:5px;font-size:12px}
+.instructions{white-space:pre-wrap;background:#101010;padding:10px;border-radius:6px;color:#ddd}
+.filelink{display:inline-block;color:#e3c36d;margin:5px}
+.hidden{display:none}
+@media(max-width:500px){
+header{align-items:flex-start;flex-direction:column}
+.welcome h1{font-size:22px}
+}
 </style>
 </head>
+
 <body>
-<header><h2>Handwriting Book Publication</h2><button class="logout" id="logoutBtn" type="button">Logout</button></header>
+
+<header>
+<h2>Handwriting Book Publication</h2>
+<button class="logout" id="logoutBtn" type="button">Logout</button>
+</header>
+
 <main>
+
 <div id="message" aria-live="polite"></div>
-<section class="welcome"><h1>Welcome, <span id="customerName">Customer</span></h1><p>Your personal customer dashboard</p></section>
+
+<section class="welcome">
+<h1>Welcome, <span id="customerName">Customer</span></h1>
+<p>Your personal customer dashboard</p>
+</section>
+
 <div id="accountStatus" class="status">Loading account status...</div>
-<section class="card"><h2>Available Projects</h2><div id="projects" class="grid">Loading projects...</div></section>
-<section class="card"><h2>My Registrations</h2><div id="enrollments">Loading registrations...</div></section>
-<section class="card"><h2>Registration Payment</h2><p class="muted">Submit your transaction ID and payment screenshot for verification.</p><div id="paymentSection">Loading payment information...</div></section>
-<section class="card"><h2>My Payment History</h2><div id="payments">Loading payment records...</div></section>
-<section class="card"><h2>My Work</h2><p class="muted">View assigned handwriting work and submit completed files here.</p><div id="workAssignments">Loading assigned work...</div></section>
-<section class="card"><h2>My Salary</h2><div id="salaries">Loading salary records...</div></section>
-<section class="card"><h2>Notifications</h2><div id="notifications">Loading notifications...</div></section>
-<section class="card"><h2>Account Information</h2><div id="profile">Loading profile...</div></section>
+
+<section class="card">
+<h2>Available Projects</h2>
+<div id="projects" class="grid">Loading projects...</div>
+</section>
+
+<section class="card">
+<h2>My Registrations</h2>
+<div id="enrollments">Loading registrations...</div>
+</section>
+
+<section class="card">
+<h2>Registration Payment</h2>
+<p class="muted">Submit your transaction ID and payment screenshot for verification.</p>
+<div id="paymentSection">Loading payment information...</div>
+</section>
+
+<section class="card">
+<h2>My Payment History</h2>
+<div id="payments">Loading payment records...</div>
+</section>
+
+<!-- CUSTOMER CHARGES SECTION -->
+<section class="card">
+<h2>My Charges</h2>
+<p class="muted">These charges are separate from your project registration fee and salary.</p>
+<div id="customerCharges">Loading your charges...</div>
+</section>
+
+<section class="card">
+<h2>My Work</h2>
+<p class="muted">View assigned handwriting work and submit completed files here.</p>
+<div id="workAssignments">Loading assigned work...</div>
+</section>
+
+<section class="card">
+<h2>My Salary</h2>
+<div id="salaries">Loading salary records...</div>
+</section>
+
+<section class="card">
+<h2>Notifications</h2>
+<div id="notifications">Loading notifications...</div>
+</section>
+
+<section class="card">
+<h2>Account Information</h2>
+<div id="profile">Loading profile...</div>
+</section>
+
 </main>
+
 <script>
 "use strict";
+
 const $=id=>document.getElementById(id);
 let enrollments=[];
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function money(v){return "₹"+Number(v||0).toLocaleString("en-IN");}
-function fmtDate(v){if(!v)return "Not available";const d=new Date(v);return Number.isNaN(d.getTime())?"Not available":d.toLocaleString("en-IN");}
-function message(t,type="success"){$("message").className="message "+type;$("message").textContent=t;window.scrollTo({top:0,behavior:"smooth"});}
-async function api(url,options={}){const r=await fetch(url,{credentials:"same-origin",...options,headers:{...(options.headers||{})}});let d;try{d=await r.json();}catch(e){throw new Error("Invalid server response.");}if(!r.ok)throw new Error(d.message||"Request failed.");return d;}
-async function loadAccount(){const d=await api("/api/auth/me");if(!d.customer)throw new Error("Customer account was not returned.");$("customerName").textContent=d.customer.fullName||"Customer";const s=d.customer.accountStatus;$ ("accountStatus").textContent=s==="approved"?"Your customer account is approved.":s==="pending"?"Your account is awaiting admin approval.":"Your account is not approved. Please contact customer support.";}
-async function loadProjects(){const b=$("projects");try{const d=await api("/api/projects");const list=d.projects||[];if(!list.length){b.innerHTML='<p class="empty">No projects are currently available.</p>';return;}b.innerHTML=list.map(p=>`<article class="project"><h3>${esc(p.projectName)}</h3><p>Pages: ${Number(p.pages)||0}</p><p>Sides: ${Number(p.sides)||0}</p><p>Duration: ${Number(p.durationDays)||0} days</p><p>Salary: ${money(p.salary)}</p><p>Registration Fee: ${money(p.registrationFee)}</p><p>${esc(p.description||"")}</p><button type="button" onclick="applyProject('${p._id}')">Select Project</button></article>`).join("");}catch(e){b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
-async function applyProject(id){if(!confirm("Do you want to register for this project?"))return;try{const d=await api("/api/enrollments",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({projectId:id})});message(d.message||"Project registration submitted.");await loadEnrollments();await loadPaymentSection();}catch(e){message(e.message,"error");}}
-async function loadEnrollments(){const b=$("enrollments");try{const d=await api("/api/enrollments/my");enrollments=d.enrollments||[];if(!enrollments.length){b.innerHTML='<p class="empty">You have not registered for any project yet.</p>';return;}b.innerHTML=enrollments.map(x=>{const p=x.projectSnapshot||{};return `<div class="item"><strong>${esc(p.projectName||"Project")}</strong><p>Registration: ${esc(x.registrationStatus)}</p><p>Payment: ${esc(x.paymentStatus)}</p><p>Salary: ${money(p.salary)}</p><p>Registration Fee: ${money(p.registrationFee)}</p><p>Registered: ${fmtDate(x.createdAt)}</p></div>`;}).join("");}catch(e){b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
-async function loadPaymentSection(){const b=$("paymentSection");try{if(!enrollments.length){b.innerHTML='<p class="empty">Register for a project first to see payment information.</p>';return;}const pd=await api("/api/payments/my");const pays=pd.payments||[];const pending=enrollments.filter(x=>x.registrationStatus==="pending"&&x.paymentStatus!=="approved"&&!pays.some(p=>String(p.enrollment?._id||p.enrollment)===String(x._id)&&p.status==="pending"));if(!pending.length){b.innerHTML='<p class="empty">No registration payment is waiting for submission. Check payment history for updates.</p>';return;}b.innerHTML=pending.map(x=>`<div class="formbox"><h3>${esc(x.projectSnapshot?.projectName||"Project")}</h3><p>Registration Fee: ${money(x.projectSnapshot?.registrationFee)}</p><form onsubmit="submitPayment(event,'${x._id}')"><label>Transaction ID</label><input name="transactionId" maxlength="120" required><label>Payment Screenshot</label><input name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required><button type="submit">Submit Payment</button></form></div>`).join("");}catch(e){b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
-async function submitPayment(ev,enrollmentId){ev.preventDefault();const f=ev.target,btn=f.querySelector("button"),tx=f.elements.transactionId.value.trim(),file=f.elements.screenshot.files[0];if(!tx||!file){message("Enter transaction ID and select screenshot.","error");return;}if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024){message("Choose a JPG, PNG or WEBP screenshot under 5 MB.","error");return;}btn.disabled=true;try{const fd=new FormData();fd.append("file",file);btn.textContent="Uploading screenshot...";const r=await fetch("/api/uploads",{method:"POST",credentials:"same-origin",body:fd});const up=await r.json();if(!r.ok)throw new Error(up.message||"Screenshot upload failed.");const fileId=up.file&&up.file.fileId;if(!fileId)throw new Error("Screenshot file ID was not returned.");btn.textContent="Submitting payment...";const d=await api("/api/payments",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({enrollmentId,transactionId:tx,paymentScreenshotId:fileId})});message(d.message||"Payment submitted for verification.");f.reset();await loadEnrollments();await loadPayments();await loadPaymentSection();}catch(e){message(e.message,"error");}finally{btn.disabled=false;btn.textContent="Submit Payment";}}
-async function loadPayments(){const b=$("payments");try{const d=await api("/api/payments/my");const list=d.payments||[];if(!list.length){b.innerHTML='<p class="empty">No payment records available.</p>';return;}b.innerHTML=list.map(p=>`<div class="item"><strong>${money(p.amount)}</strong><p>Type: ${esc(p.paymentType)}</p><p>Transaction ID: ${esc(p.transactionId)}</p><p>Status: <span class="badge">${esc(p.status)}</span></p><p>Submitted: ${fmtDate(p.createdAt)}</p>${p.adminRemarks?`<p>Admin Remarks: ${esc(p.adminRemarks)}</p>`:""}</div>`).join("");}catch(e){b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
-async function loadWorkAssignments(){const b=$("workAssignments");try{const d=await api("/api/work-assignments/my");const list=d.assignments||[];if(!list.length){b.innerHTML='<p class="empty">No work has been assigned to you yet.</p>';return;}b.innerHTML=list.map(w=>{const can=["assigned","in_progress","correction_required"].includes(w.status);const links=(w.submissionFileIds||[]).map(id=>`<a class="filelink" href="/api/uploads/${encodeURIComponent(id)}" target="_blank" rel="noopener">View submitted file</a>`).join("");return `<article class="work"><h3>${esc(w.title)}</h3><p>Assigned Pages: ${Number(w.totalPages)||0}</p><p>Assigned Date: ${fmtDate(w.assignedDate)}</p><p>Deadline: ${fmtDate(w.deadline)}</p><p>Status: <span class="badge">${esc(w.status)}</span></p><p>Instructions:</p><div class="instructions">${esc(w.instructions||"Write all assigned work in English uppercase letters A-Z.")}</div>${w.adminRemarks?`<p>Admin Remarks:</p><div class="instructions">${esc(w.adminRemarks)}</div>`:""}${links?`<p>Previously submitted files:</p>${links}`:""}${can?`<form class="formbox" onsubmit="submitWork(event,'${w._id}')"><label>Completed Work (1–20 images or PDFs, max 10 MB each)</label><input name="workFiles" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple required><label>Remarks (optional)</label><textarea name="customerRemarks" maxlength="2000"></textarea><button type="submit">Submit Completed Work</button></form>`:""}${["submitted","under_review"].includes(w.status)?"<p>Your work has been submitted. Please wait for admin review.</p>":""}${w.status==="approved"?"<p>Your work has been approved and is awaiting completion.</p>":""}${w.status==="completed"?"<p>This assignment has been completed.</p>":""}</article>`;}).join("");}catch(e){b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
-async function submitWork(ev,id){ev.preventDefault();const f=ev.target,btn=f.querySelector("button"),files=Array.from(f.elements.workFiles.files||[]),remarks=f.elements.customerRemarks.value.trim(),allowed=["image/jpeg","image/png","image/webp","application/pdf"];if(files.length<1||files.length>20){message("Select between 1 and 20 files.","error");return;}for(const x of files){if(!allowed.includes(x.type)||x.size>10*1024*1024){message("Each file must be JPG, PNG, WEBP or PDF and under 10 MB.","error");return;}}btn.disabled=true;try{const ids=[];for(let i=0;i<files.length;i++){const fd=new FormData();fd.append("file",files[i]);btn.textContent=`Uploading ${i+1} of ${files.length}...`;const r=await fetch("/api/uploads",{method:"POST",credentials:"same-origin",body:fd});let d;try{d=await r.json();}catch(e){throw new Error("Invalid file upload response.");}if(!r.ok)throw new Error(d.message||"Work file upload failed.");const fileId=d.file&&d.file.fileId;if(!fileId)throw new Error("Uploaded file ID was not returned.");ids.push(String(fileId));}btn.textContent="Submitting work...";const result=await api(`/api/work-assignments/${encodeURIComponent(id)}/submit`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({fileIds:ids,customerRemarks:remarks})});message(result.message||"Work submitted successfully.");f.reset();await loadWorkAssignments();await loadNotifications();}catch(e){message(e.message,"error");}finally{btn.disabled=false;btn.textContent="Submit Completed Work";}}
-async function loadSalaries(){const b=$("salaries");try{const d=await api("/api/salaries/my");const list=d.salaries||[];if(!list.length){b.innerHTML='<p class="empty">No salary records available yet. Details appear after registration approval.</p>';return;}b.innerHTML=list.map(s=>`<div class="item"><strong>Total Salary: ${money(s.totalSalary)}</strong><p>50% Advance: ${money(s.advanceAmount)} — ${esc(s.advanceStatus||"pending")}</p><p>Advance due: ${fmtDate(s.advanceDueAt)}</p><p>Remaining 50%: ${money(s.remainingAmount)} — ${esc(s.remainingStatus||"pending")}</p><p>Work completion: ${s.workCompletedAt?fmtDate(s.workCompletedAt):"Not completed yet"}</p></div>`).join("");}catch(e){b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
-async function loadNotifications(){const b=$("notifications");try{const d=await api("/api/notifications");const list=d.notifications||[];if(!list.length){b.innerHTML='<p class="empty">No notifications yet.</p>';return;}b.innerHTML=list.map(n=>`<div class="item"><strong>${esc(n.title||"Notification")}</strong><p>${esc(n.message||"")}</p><p class="muted">${fmtDate(n.createdAt)} · ${n.isRead?"Read":"Unread"}</p>${!n.isRead?`<button type="button" onclick="markNotificationRead('${n._id}')">Mark as read</button>`:""}</div>`).join("");}catch(e){b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
-async function markNotificationRead(id){try{await api(`/api/notifications/${encodeURIComponent(id)}/read`,{method:"PATCH"});await loadNotifications();}catch(e){message(e.message,"error");}}
-async function loadProfile(){const b=$("profile");try{const d=await api("/api/profile");const p=d.profile||{};const rows=[["Customer ID",p.customerId],["Full Name",p.fullName],["Father's Name",p.fatherName],["Email",p.email],["Mobile",p.mobile],["WhatsApp",p.whatsapp],["Address",p.address],["City / District",[p.city,p.district].filter(Boolean).join(" / ")],["State",p.state],["PIN Code",p.pinCode],["Account Status",p.accountStatus]];b.innerHTML='<div class="grid">'+rows.map(x=>`<div class="item"><strong>${esc(x[0])}</strong><p>${esc(x[1]||"Not available")}</p></div>`).join("")+'</div>';}catch(e){b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
-async function logout(){const btn=$("logoutBtn");btn.disabled=true;try{await api("/api/auth/logout",{method:"POST"});window.location.replace("/index.html");}catch(e){message(e.message,"error");btn.disabled=false;}}
+
+function esc(v){
+return String(v??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+function money(v){
+return "₹"+Number(v||0).toLocaleString("en-IN");
+}
+
+function fmtDate(v){
+if(!v)return "Not available";
+const d=new Date(v);
+return Number.isNaN(d.getTime())?"Not available":d.toLocaleString("en-IN");
+}
+
+function message(t,type="success"){
+$("message").className="message "+type;
+$("message").textContent=t;
+window.scrollTo({top:0,behavior:"smooth"});
+}
+
+async function api(url,options={}){
+const r=await fetch(url,{
+credentials:"same-origin",
+...options,
+headers:{...(options.headers||{})}
+});
+let d;
+try{d=await r.json();}
+catch(e){throw new Error("Invalid server response.");}
+if(!r.ok)throw new Error(d.message||"Request failed.");
+return d;
+}
+
+async function loadAccount(){
+const d=await api("/api/auth/me");
+if(!d.customer)throw new Error("Customer account was not returned.");
+$("customerName").textContent=d.customer.fullName||"Customer";
+const s=d.customer.accountStatus;
+$("accountStatus").textContent=
+s==="approved"?"Your customer account is approved.":
+s==="pending"?"Your account is awaiting admin approval.":
+"Your account is not approved. Please contact customer support.";
+}
+
+async function loadProjects(){
+const b=$("projects");
+try{
+const d=await api("/api/projects");
+const list=d.projects||[];
+if(!list.length){
+b.innerHTML='<p class="empty">No projects are currently available.</p>';
+return;
+}
+b.innerHTML=list.map(p=>`
+<article class="project">
+<h3>${esc(p.projectName)}</h3>
+<p>Pages: ${Number(p.pages)||0}</p>
+<p>Sides: ${Number(p.sides)||0}</p>
+<p>Duration: ${Number(p.durationDays)||0} days</p>
+<p>Salary: ${money(p.salary)}</p>
+<p>Registration Fee: ${money(p.registrationFee)}</p>
+<p>${esc(p.description||"")}</p>
+<button type="button" onclick="applyProject('${p._id}')">Select Project</button>
+</article>`).join("");
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;
+}
+}
+
+async function applyProject(id){
+if(!confirm("Do you want to register for this project?"))return;
+try{
+const d=await api("/api/enrollments",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({projectId:id})
+});
+message(d.message||"Project registration submitted.");
+await loadEnrollments();
+await loadPaymentSection();
+}catch(e){message(e.message,"error");}
+}
+
+async function loadEnrollments(){
+const b=$("enrollments");
+try{
+const d=await api("/api/enrollments/my");
+enrollments=d.enrollments||[];
+if(!enrollments.length){
+b.innerHTML='<p class="empty">You have not registered for any project yet.</p>';
+return;
+}
+b.innerHTML=enrollments.map(x=>{
+const p=x.projectSnapshot||{};
+return `<div class="item">
+<strong>${esc(p.projectName||"Project")}</strong>
+<p>Registration: ${esc(x.registrationStatus)}</p>
+<p>Payment: ${esc(x.paymentStatus)}</p>
+<p>Salary: ${money(p.salary)}</p>
+<p>Registration Fee: ${money(p.registrationFee)}</p>
+<p>Registered: ${fmtDate(x.createdAt)}</p>
+</div>`;
+}).join("");
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;
+}
+}
+
+async function loadPaymentSection(){
+const b=$("paymentSection");
+try{
+if(!enrollments.length){
+b.innerHTML='<p class="empty">Register for a project first to see payment information.</p>';
+return;
+}
+const pd=await api("/api/payments/my");
+const pays=pd.payments||[];
+const pending=enrollments.filter(x=>
+x.registrationStatus==="pending"&&
+x.paymentStatus!=="approved"&&
+!pays.some(p=>String(p.enrollment?._id||p.enrollment)===String(x._id)&&p.status==="pending")
+);
+if(!pending.length){
+b.innerHTML='<p class="empty">No registration payment is waiting for submission. Check payment history for updates.</p>';
+return;
+}
+b.innerHTML=pending.map(x=>`
+<div class="formbox">
+<h3>${esc(x.projectSnapshot?.projectName||"Project")}</h3>
+<p>Registration Fee: ${money(x.projectSnapshot?.registrationFee)}</p>
+<form onsubmit="submitPayment(event,'${x._id}')">
+<label>Transaction ID</label>
+<input name="transactionId" maxlength="120" required>
+<label>Payment Screenshot</label>
+<input name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required>
+<button type="submit">Submit Payment</button>
+</form>
+</div>`).join("");
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;
+}
+}
+
+async function submitPayment(ev,enrollmentId){
+ev.preventDefault();
+const f=ev.target,btn=f.querySelector("button");
+const tx=f.elements.transactionId.value.trim();
+const file=f.elements.screenshot.files[0];
+if(!tx||!file){message("Enter transaction ID and select screenshot.","error");return;}
+if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024){
+message("Choose a JPG, PNG or WEBP screenshot under 5 MB.","error");
+return;
+}
+btn.disabled=true;
+try{
+const fd=new FormData();
+fd.append("file",file);
+btn.textContent="Uploading screenshot...";
+const r=await fetch("/api/uploads",{method:"POST",credentials:"same-origin",body:fd});
+const up=await r.json();
+if(!r.ok)throw new Error(up.message||"Screenshot upload failed.");
+const fileId=up.file&&up.file.fileId;
+if(!fileId)throw new Error("Screenshot file ID was not returned.");
+btn.textContent="Submitting payment...";
+const d=await api("/api/payments",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({enrollmentId,transactionId:tx,paymentScreenshotId:fileId})
+});
+message(d.message||"Payment submitted for verification.");
+f.reset();
+await loadEnrollments();
+await loadPayments();
+await loadPaymentSection();
+}catch(e){message(e.message,"error");}
+finally{btn.disabled=false;btn.textContent="Submit Payment";}
+}
+
+async function loadPayments(){
+const b=$("payments");
+try{
+const d=await api("/api/payments/my");
+const list=d.payments||[];
+if(!list.length){
+b.innerHTML='<p class="empty">No payment records available.</p>';
+return;
+}
+b.innerHTML=list.map(p=>`
+<div class="item">
+<strong>${money(p.amount)}</strong>
+<p>Type: ${esc(p.paymentType)}</p>
+<p>Transaction ID: ${esc(p.transactionId)}</p>
+<p>Status: <span class="badge">${esc(p.status)}</span></p>
+<p>Submitted: ${fmtDate(p.createdAt)}</p>
+${p.adminRemarks?`<p>Admin Remarks: ${esc(p.adminRemarks)}</p>`:""}
+</div>`).join("");
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;
+}
+}
+
+/* CUSTOMER CHARGES */
+async function loadCustomerCharges(){
+const b=$("customerCharges");
+try{
+const d=await api("/api/customer-charges");
+const list=d.charges||[];
+
+if(!list.length){
+b.innerHTML='<p class="empty">You do not have any additional charges.</p>';
+return;
+}
+
+const totals=list.reduce((a,c)=>{
+const st=String(c.status||"unpaid").toLowerCase();
+if(st==="paid")a.paid+=Number(c.amount)||0;
+else if(st==="waived")a.waived+=Number(c.amount)||0;
+else a.unpaid+=Number(c.amount)||0;
+return a;
+},{paid:0,unpaid:0,waived:0});
+
+b.innerHTML=`
+<div class="grid">
+<div class="item"><strong>Unpaid Charges</strong><p>${money(totals.unpaid)}</p></div>
+<div class="item"><strong>Paid Charges</strong><p>${money(totals.paid)}</p></div>
+<div class="item"><strong>Waived Charges</strong><p>${money(totals.waived)}</p></div>
+</div>
+`+list.map(c=>{
+const st=String(c.status||"unpaid").toLowerCase();
+return `
+<div class="item">
+<strong>${money(c.amount)}</strong>
+<p>Reason: ${esc(c.reason||"Additional charge")}</p>
+<p>Status: <span class="badge">${esc(st.charAt(0).toUpperCase()+st.slice(1))}</span></p>
+${c.notes?`<p>Notes: ${esc(c.notes)}</p>`:""}
+<p class="muted">Added: ${fmtDate(c.createdAt)}</p>
+</div>`;
+}).join("");
+
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message||"Unable to load your charges.")}</p>`;
+}
+}
+
+async function loadWorkAssignments(){
+const b=$("workAssignments");
+try{
+const d=await api("/api/work-assignments/my");
+const list=d.assignments||[];
+if(!list.length){
+b.innerHTML='<p class="empty">No work has been assigned to you yet.</p>';
+return;
+}
+b.innerHTML=list.map(w=>{
+const can=["assigned","in_progress","correction_required"].includes(w.status);
+const links=(w.submissionFileIds||[]).map(id=>
+`<a class="filelink" href="/api/uploads/${encodeURIComponent(id)}" target="_blank" rel="noopener">View submitted file</a>`
+).join("");
+return `
+<article class="work">
+<h3>${esc(w.title)}</h3>
+<p>Assigned Pages: ${Number(w.totalPages)||0}</p>
+<p>Assigned Date: ${fmtDate(w.assignedDate)}</p>
+<p>Deadline: ${fmtDate(w.deadline)}</p>
+<p>Status: <span class="badge">${esc(w.status)}</span></p>
+<p>Instructions:</p>
+<div class="instructions">${esc(w.instructions||"Write all assigned work in English uppercase letters A-Z.")}</div>
+${w.adminRemarks?`<p>Admin Remarks:</p><div class="instructions">${esc(w.adminRemarks)}</div>`:""}
+${links?`<p>Previously submitted files:</p>${links}`:""}
+${can?`
+<form class="formbox" onsubmit="submitWork(event,'${w._id}')">
+<label>Completed Work (1–20 images or PDFs, max 10 MB each)</label>
+<input name="workFiles" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple required>
+<label>Remarks (optional)</label>
+<textarea name="customerRemarks" maxlength="2000"></textarea>
+<button type="submit">Submit Completed Work</button>
+</form>`:""}
+${["submitted","under_review"].includes(w.status)?"<p>Your work has been submitted. Please wait for admin review.</p>":""}
+${w.status==="approved"?"<p>Your work has been approved and is awaiting completion.</p>":""}
+${w.status==="completed"?"<p>This assignment has been completed.</p>":""}
+</article>`;
+}).join("");
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;
+}
+}
+
+async function submitWork(ev,id){
+ev.preventDefault();
+const f=ev.target,btn=f.querySelector("button");
+const files=Array.from(f.elements.workFiles.files||[]);
+const remarks=f.elements.customerRemarks.value.trim();
+const allowed=["image/jpeg","image/png","image/webp","application/pdf"];
+
+if(files.length<1||files.length>20){
+message("Select between 1 and 20 files.","error");
+return;
+}
+
+for(const x of files){
+if(!allowed.includes(x.type)||x.size>10*1024*1024){
+message("Each file must be JPG, PNG, WEBP or PDF and under 10 MB.","error");
+return;
+}
+}
+
+btn.disabled=true;
+try{
+const ids=[];
+for(let i=0;i<files.length;i++){
+const fd=new FormData();
+fd.append("file",files[i]);
+btn.textContent=`Uploading ${i+1} of ${files.length}...`;
+const r=await fetch("/api/uploads",{method:"POST",credentials:"same-origin",body:fd});
+let d;
+try{d=await r.json();}
+catch(e){throw new Error("Invalid file upload response.");}
+if(!r.ok)throw new Error(d.message||"Work file upload failed.");
+const fileId=d.file&&d.file.fileId;
+if(!fileId)throw new Error("Uploaded file ID was not returned.");
+ids.push(String(fileId));
+}
+btn.textContent="Submitting work...";
+const result=await api(`/api/work-assignments/${encodeURIComponent(id)}/submit`,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({fileIds:ids,customerRemarks:remarks})
+});
+message(result.message||"Work submitted successfully.");
+f.reset();
+await loadWorkAssignments();
+await loadNotifications();
+}catch(e){message(e.message,"error");}
+finally{btn.disabled=false;btn.textContent="Submit Completed Work";}
+}
+
+async function loadSalaries(){
+const b=$("salaries");
+try{
+const d=await api("/api/salaries/my");
+const list=d.salaries||[];
+if(!list.length){
+b.innerHTML='<p class="empty">No salary records available yet. Details appear after registration approval.</p>';
+return;
+}
+b.innerHTML=list.map(s=>`
+<div class="item">
+<strong>Total Salary: ${money(s.totalSalary)}</strong>
+<p>50% Advance: ${money(s.advanceAmount)} — ${esc(s.advanceStatus||"pending")}</p>
+<p>Advance due: ${fmtDate(s.advanceDueAt)}</p>
+<p>Remaining 50%: ${money(s.remainingAmount)} — ${esc(s.remainingStatus||"pending")}</p>
+<p>Work completion: ${s.workCompletedAt?fmtDate(s.workCompletedAt):"Not completed yet"}</p>
+</div>`).join("");
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;
+}
+}
+
+async function loadNotifications(){
+const b=$("notifications");
+try{
+const d=await api("/api/notifications");
+const list=d.notifications||[];
+if(!list.length){
+b.innerHTML='<p class="empty">No notifications yet.</p>';
+return;
+}
+b.innerHTML=list.map(n=>`
+<div class="item">
+<strong>${esc(n.title||"Notification")}</strong>
+<p>${esc(n.message||"")}</p>
+<p class="muted">${fmtDate(n.createdAt)} · ${n.isRead?"Read":"Unread"}</p>
+${!n.isRead?`<button type="button" onclick="markNotificationRead('${n._id}')">Mark as read</button>`:""}
+</div>`).join("");
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;
+}
+}
+
+async function markNotificationRead(id){
+try{
+await api(`/api/notifications/${encodeURIComponent(id)}/read`,{method:"PATCH"});
+await loadNotifications();
+}catch(e){message(e.message,"error");}
+}
+
+async function loadProfile(){
+const b=$("profile");
+try{
+const d=await api("/api/profile");
+const p=d.profile||{};
+const rows=[
+["Customer ID",p.customerId],
+["Full Name",p.fullName],
+["Father's Name",p.fatherName],
+["Email",p.email],
+["Mobile",p.mobile],
+["WhatsApp",p.whatsapp],
+["Address",p.address],
+["City / District",[p.city,p.district].filter(Boolean).join(" / ")],
+["State",p.state],
+["PIN Code",p.pinCode],
+["Account Status",p.accountStatus]
+];
+b.innerHTML='<div class="grid">'+rows.map(x=>
+`<div class="item"><strong>${esc(x[0])}</strong><p>${esc(x[1]||"Not available")}</p></div>`
+).join("")+'</div>';
+}catch(e){
+b.innerHTML=`<p class="empty">${esc(e.message)}</p>`;
+}
+}
+
+async function logout(){
+const btn=$("logoutBtn");
+btn.disabled=true;
+try{
+await api("/api/auth/logout",{method:"POST"});
+window.location.replace("/index.html");
+}catch(e){
+message(e.message,"error");
+btn.disabled=false;
+}
+}
+
 $("logoutBtn").addEventListener("click",logout);
-async function init(){try{await loadAccount();await Promise.all([loadProjects(),loadEnrollments(),loadPayments(),loadWorkAssignments(),loadSalaries(),loadNotifications(),loadProfile()]);await loadPaymentSection();}catch(e){message(e.message||"Unable to load dashboard.","error");const m=String(e.message||"").toLowerCase();if(m.includes("unauthorized")||m.includes("login")||m.includes("not authenticated"))window.location.replace("/index.html");}}
+
+async function init(){
+try{
+await loadAccount();
+await Promise.all([
+loadProjects(),
+loadEnrollments(),
+loadPayments(),
+loadCustomerCharges(),
+loadWorkAssignments(),
+loadSalaries(),
+loadNotifications(),
+loadProfile()
+]);
+await loadPaymentSection();
+}catch(e){
+message(e.message||"Unable to load dashboard.","error");
+const m=String(e.message||"").toLowerCase();
+if(m.includes("unauthorized")||m.includes("login")||m.includes("not authenticated")){
+window.location.replace("/index.html");
+}
+}
+}
+
 init();
 </script>
+
 </body>
 </html>
