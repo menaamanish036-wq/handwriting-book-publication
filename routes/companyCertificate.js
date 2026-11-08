@@ -9,7 +9,7 @@ const {
     requireAdmin
 } = require("../middleware/auth");
 
-// CHECK THAT THE UPLOADED FILE BELONGS TO ADMIN
+// VERIFY THAT FILE WAS UPLOADED BY THE ADMIN
 async function verifyAdminFile(fileId, userId) {
     if (!mongoose.isValidObjectId(fileId)) {
         return false;
@@ -25,17 +25,22 @@ async function verifyAdminFile(fileId, userId) {
             _id: new mongoose.Types.ObjectId(fileId)
         });
 
-    if (!file) {
+    if (!file || !file.metadata) {
         return false;
     }
 
-    return (
-        file.metadata &&
-        file.metadata.uploadedBy === String(userId)
-    );
+    return file.metadata.uploadedBy === String(userId);
 }
 
-// PUBLIC: VIEW ACTIVE COMPANY DOCUMENTS
+// ALLOWED DOCUMENT FORMATS
+const ALLOWED_FILE_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "application/pdf"
+];
+
+// PUBLIC: GET ACTIVE COMPANY CERTIFICATES
 router.get("/", async (req, res) => {
     try {
         const certificates = await CompanyCertificate.find({
@@ -60,7 +65,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-// ADMIN: VIEW ALL COMPANY DOCUMENTS
+// ADMIN: GET ALL COMPANY CERTIFICATES
 router.get(
     "/admin",
     requireLogin,
@@ -88,7 +93,7 @@ router.get(
     }
 );
 
-// ADMIN: ADD A NEW COMPANY DOCUMENT
+// ADMIN: ADD COMPANY CERTIFICATE
 router.post(
     "/",
     requireLogin,
@@ -123,14 +128,7 @@ router.post(
                 });
             }
 
-            const allowedTypes = [
-                "image/jpeg",
-                "image/png",
-                "image/webp",
-                "application/pdf"
-            ];
-
-            if (!allowedTypes.includes(fileType)) {
+            if (!ALLOWED_FILE_TYPES.includes(fileType)) {
                 return res.status(400).json({
                     success: false,
                     message: "Unsupported document format."
@@ -151,10 +149,12 @@ router.post(
 
             const certificate = await CompanyCertificate.create({
                 title: title.trim(),
+
                 description:
                     typeof description === "string"
                         ? description.trim()
                         : "",
+
                 fileId: new mongoose.Types.ObjectId(fileId),
                 fileName: fileName.trim(),
                 fileType,
@@ -179,7 +179,7 @@ router.post(
     }
 );
 
-// ADMIN: UPDATE A COMPANY DOCUMENT
+// ADMIN: UPDATE COMPANY CERTIFICATE
 router.patch(
     "/:id",
     requireLogin,
@@ -213,6 +213,7 @@ router.patch(
                 isActive
             } = req.body;
 
+            // UPDATE TITLE
             if (title !== undefined) {
                 if (
                     typeof title !== "string" ||
@@ -227,6 +228,7 @@ router.patch(
                 certificate.title = title.trim();
             }
 
+            // UPDATE DESCRIPTION
             if (description !== undefined) {
                 if (typeof description !== "string") {
                     return res.status(400).json({
@@ -238,6 +240,7 @@ router.patch(
                 certificate.description = description.trim();
             }
 
+            // UPDATE FILE
             if (fileId !== undefined) {
                 const validFile = await verifyAdminFile(
                     fileId,
@@ -255,6 +258,7 @@ router.patch(
                     new mongoose.Types.ObjectId(fileId);
             }
 
+            // UPDATE FILE NAME
             if (fileName !== undefined) {
                 if (
                     typeof fileName !== "string" ||
@@ -269,12 +273,92 @@ router.patch(
                 certificate.fileName = fileName.trim();
             }
 
+            // UPDATE FILE TYPE
             if (fileType !== undefined) {
-                const allowedTypes = [
-                    "image/jpeg",
-                    "image/png",
-                    "image/webp",
-                    "application/pdf"
-                ];
+                if (!ALLOWED_FILE_TYPES.includes(fileType)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Unsupported file format."
+                    });
+                }
 
-                if (!allowedTypes.includes(fileType
+                certificate.fileType = fileType;
+            }
+
+            // UPDATE VISIBILITY
+            if (isActive !== undefined) {
+                if (typeof isActive !== "boolean") {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid active status."
+                    });
+                }
+
+                certificate.isActive = isActive;
+            }
+
+            // RECORD LAST ADMIN WHO UPDATED THE DOCUMENT
+            certificate.updatedBy = req.user._id;
+
+            await certificate.save();
+
+            return res.json({
+                success: true,
+                message: "Company document updated successfully.",
+                certificate
+            });
+
+        } catch (error) {
+            console.error("Update certificate error:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: "Unable to update company document."
+            });
+        }
+    }
+);
+
+// ADMIN: DELETE COMPANY CERTIFICATE
+router.delete(
+    "/:id",
+    requireLogin,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            if (!mongoose.isValidObjectId(req.params.id)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid document ID."
+                });
+            }
+
+            const certificate =
+                await CompanyCertificate.findByIdAndDelete(
+                    req.params.id
+                );
+
+            if (!certificate) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Company document not found."
+                });
+            }
+
+            return res.json({
+                success: true,
+                message: "Company document deleted successfully."
+            });
+
+        } catch (error) {
+            console.error("Delete certificate error:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: "Unable to delete company document."
+            });
+        }
+    }
+);
+
+module.exports = router;
