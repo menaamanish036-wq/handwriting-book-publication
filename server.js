@@ -91,6 +91,9 @@ async function startServer() {
         // ADMIN CUSTOMER MANAGEMENT
         app.use("/api/admin/customers", require("./routes/adminCustomers"));
 
+        // ADMIN PARCEL MANAGEMENT
+        app.use("/api/admin/parcels", require("./routes/adminParcels"));
+
         // CUSTOMER PROFILE
         app.use("/api/profile", require("./routes/profile"));
 
@@ -109,7 +112,7 @@ async function startServer() {
         // WEBSITE SETTINGS
         app.use("/api/settings", require("./routes/settings"));
 
-        // COMPANY CERTIFICATE
+        // COMPANY CERTIFICATES
         app.use("/api/company-certificate", require("./routes/companyCertificate"));
 
         // ACTIVITY LOGS
