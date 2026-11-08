@@ -1,739 +1,266 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Admin Panel | Handwriting Book Publication</title>
 <style>
-:root{--bg:#090909;--panel:#151515;--line:#35302a;--gold:#d7ad58;--text:#f5f1e8;--muted:#aaa195;--red:#d66b62;--green:#6fc18b}
+:root{--bg:#090909;--panel:#151515;--gold:#d7ad58;--text:#f5f1e8;--muted:#aaa195;--line:#393229}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
-header{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-h1,h2,h3{margin:0 0 12px}
-h1{font-size:20px;color:var(--gold)}
-h2{font-size:19px;color:var(--gold)}
-main{max-width:1150px;margin:24px auto;padding:0 14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:0 0 18px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{background:#111;border-bottom:1px solid var(--line);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;color:var(--gold);font-size:21px}
+main{max-width:1250px;margin:25px auto;padding:0 14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:18px}
+h2{color:var(--gold);margin:0 0 14px;font-size:19px}
+h3{color:var(--gold);font-size:16px}
 label{display:block;color:var(--muted);font-size:13px;margin:10px 0 5px}
-input,select,textarea{width:100%;background:#0d0d0d;border:1px solid #494137;border-radius:8px;padding:11px;color:var(--text);font:inherit}
-textarea{min-height:70px;resize:vertical}
-button{background:var(--gold);color:#17120a;border:0;border-radius:8px;padding:10px 14px;font-weight:bold;cursor:pointer;margin:8px 6px 0 0}
-button.secondary{background:#302a20;color:var(--text);border:1px solid #685638}
-button.danger{background:#6d2825;color:white}
-button:disabled{opacity:.5}
+input,select,textarea{width:100%;background:#0c0c0c;color:white;border:1px solid #514638;border-radius:8px;padding:11px;font-size:14px}
+textarea{min-height:75px;resize:vertical}
+button{background:var(--gold);color:#17120a;border:0;border-radius:8px;padding:10px 14px;font-weight:bold;cursor:pointer;margin:7px 5px 0 0}
+button.secondary{background:#302a20;color:white;border:1px solid #685638}
+button.danger{background:#702b28;color:white}
+button.success{background:#225c3b;color:white}
 .hidden{display:none!important}
-.muted{color:var(--muted)}
-.status{padding:10px;border-radius:8px;margin:10px 0;background:#242018;color:var(--gold)}
-.row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-top:1px solid var(--line);padding:12px 0}
+.muted{color:var(--muted)} .small{font-size:12px}
+.status{background:#292319;color:var(--gold);padding:11px;border-radius:8px;margin:12px 0;line-height:1.5}
+.row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:13px 0;border-top:1px solid var(--line)}
 .row:first-child{border-top:0}
-.thumb{max-width:100px;max-height:100px;object-fit:contain;border:1px solid var(--line);border-radius:6px}
-.pill{font-size:12px;padding:4px 8px;border-radius:20px;background:#29251e;color:var(--gold)}
-.login{max-width:420px;margin:8vh auto}
-.small{font-size:12px}
 .actions{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.filehint{font-size:12px;color:var(--muted);margin-top:5px}
-a{color:var(--gold)}
-.section-note{margin:0 0 12px;color:var(--muted);line-height:1.5}
-.item-title{font-weight:bold}
-.empty{color:var(--muted);padding:12px 0}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:600px){.two{grid-template-columns:1fr}header{padding:14px}}
+.pill{display:inline-block;background:#30291d;color:var(--gold);padding:5px 9px;border-radius:20px;font-size:11px}
+.empty{color:var(--muted);padding:15px 0}
+.login{max-width:420px;margin:8vh auto}
+.section-note{color:var(--muted);line-height:1.5;font-size:13px}
+.nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.nav button{background:#252019;color:var(--gold);border:1px solid #59472c}
+.nav button.active{background:var(--gold);color:#111}
+.admin-section{display:none}.admin-section.active{display:block}
+a{color:var(--gold)} .item-title{font-weight:bold;margin-bottom:5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+@media(max-width:600px){header{padding:13px}header h1{font-size:17px}.card{padding:14px}button{padding:9px 11px}}
 </style>
 </head>
 <body>
-
 <header>
 <h1>Handwriting Book Publication — Admin</h1>
-<div id="topActions" class="hidden">
-<span id="adminName" class="muted"></span>
-<button class="secondary" onclick="logout()">Logout</button>
-</div>
+<div id="topActions" class="hidden"><span id="adminName" class="muted"></span><button class="secondary" onclick="logout()">Logout</button></div>
 </header>
-
 <main>
-
 <section id="loginBox" class="card login">
 <h2>Admin Login</h2>
-<p class="section-note">Sign in with your existing admin account.</p>
+<p class="section-note">Sign in using your existing administrator account.</p>
 <form id="loginForm">
-<label>Admin email</label>
-<input id="loginEmail" type="email" autocomplete="username" required>
-<label>Password</label>
-<input id="loginPassword" type="password" autocomplete="current-password" required>
+<label>Email Address</label><input id="loginEmail" type="email" required>
+<label>Password</label><input id="loginPassword" type="password" required>
 <button type="submit">Login</button>
 </form>
 <div id="loginMsg" class="status hidden"></div>
 </section>
-
 <section id="panel" class="hidden">
-
-<div id="notice" class="status hidden" role="status"></div>
-
-<section class="card">
-<h2>Customer Charges</h2>
-<p class="section-note">Add an individual charge to a customer and manage its amount, reason and status.</p>
-
-<div class="grid">
-<div>
-<label>Customer</label>
-<select id="chargeCustomer">
-<option value="">Loading customers…</option>
-</select>
-</div>
-<div>
-<label>Amount (INR)</label>
-<input id="chargeAmount" type="number" min="0.01" step="0.01" placeholder="e.g. 500">
-</div>
-<div>
-<label>Reason</label>
-<input id="chargeReason" maxlength="500" placeholder="Reason for charge">
-</div>
-<div>
-<label>Notes (optional)</label>
-<input id="chargeNotes" placeholder="Additional notes">
-</div>
+<div id="notice" class="status hidden"></div>
+<div class="nav">
+<button class="active" data-section="customers">Customers</button><button data-section="payments">Payments</button><button data-section="projects">Projects</button><button data-section="work">Work Assignment</button><button data-section="salary">Salary</button><button data-section="parcels">Parcel Tracking</button><button data-section="certificates">Customer Certificates</button><button data-section="charges">Customer Charges</button><button data-section="gallery">Work Gallery</button><button data-section="company">Company Certificates</button><button data-section="notifications">Notifications</button><button data-section="support">Support</button>
 </div>
 
-<button onclick="addCharge()">Add Customer Charge</button>
-<div id="chargesList" style="margin-top:14px"></div>
+<section id="customers" class="admin-section active card">
+<h2>Customer Management</h2><p class="section-note">View registered customers and manage their project registrations.</p>
+<button onclick="loadCustomers()">Refresh Customers</button><div id="customersList"></div>
+<hr style="border-color:var(--line);margin:20px 0"><h3>Project Registration Requests</h3>
+<button onclick="loadEnrollments()">Refresh Registrations</button><div id="enrollmentsList"></div>
 </section>
 
-<section class="card">
-<h2>Customer Work Showcase / Gallery</h2>
-<p class="section-note">Upload real customer handwriting work screenshots or photos. New items stay hidden until you publish them.</p>
-
-<div class="grid">
-<div>
-<label>Title</label>
-<input id="showTitle" maxlength="150" placeholder="Example: Handwriting Sample">
-</div>
-<div>
-<label>Customer name (optional)</label>
-<input id="showCustomer" placeholder="Customer name">
-</div>
-<div>
-<label>Work type</label>
-<input id="showType" value="Handwriting Work">
-</div>
-<div>
-<label>Display order</label>
-<input id="showOrder" type="number" value="0">
-</div>
-</div>
-
-<label>Description (optional)</label>
-<textarea id="showDescription" maxlength="1000" placeholder="Short description"></textarea>
-
-<label>Select screenshot / image / PDF (max 10 MB)</label>
-<input id="showFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf">
-
-<div class="filehint">Allowed: JPG, PNG, WEBP, PDF. Upload one file per gallery item.</div>
-
-<button onclick="addShowcase()">Upload and Add to Gallery</button>
-<div id="showcaseList" style="margin-top:14px"></div>
+<section id="payments" class="admin-section card">
+<h2>Payment Approval</h2><p class="section-note">Review registration payments, transaction IDs and payment screenshots.</p>
+<button onclick="loadPayments()">Refresh Payments</button><div id="paymentsList"></div>
 </section>
 
-<section class="card">
-<h2>Company Certificates & Documents</h2>
-<p class="section-note">Add each genuine company certificate or supporting document separately. You can add multiple documents, replace a file, edit its title, publish/hide it, or delete it. Only upload genuine documents you are authorized to display.</p>
-
-<div class="grid">
-<div>
-<label>Document title</label>
-<input id="certTitle" maxlength="200" placeholder="e.g. Udyam Registration Certificate">
+<section id="projects" class="admin-section card">
+<h2>Project Management</h2><p class="section-note">Add, edit and deactivate projects. Changes to projects do not alter existing customer enrollment snapshots.</p>
+<h3>Add New Project</h3>
+<form id="projectForm"><div class="grid">
+<div><label>Project Name</label><input id="projectName" required></div>
+<div><label>Project Number</label><input id="projectNumber" type="number" min="1" required></div>
+<div><label>Pages</label><input id="projectPages" type="number" min="1" required></div>
+<div><label>Sides</label><input id="projectSides" type="number" min="1" required></div>
+<div><label>Duration (Days)</label><input id="projectDuration" type="number" min="1" required></div>
+<div><label>Total Salary (INR)</label><input id="projectSalary" type="number" min="0" required></div>
+<div><label>Registration Fee (INR)</label><input id="projectFee" type="number" min="0" required></div>
 </div>
-<div>
-<label>Description (optional)</label>
-<input id="certDescription" placeholder="Issuing organization / details">
-</div>
-</div>
-
-<label>Select certificate / document (max 10 MB)</label>
-<input id="certFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf">
-
-<div class="filehint">Allowed: JPG, PNG, WEBP, PDF. Each document is stored as a separate entry.</div>
-
-<button onclick="addCertificate()">Upload New Document</button>
-<div id="certificatesList" style="margin-top:14px"></div>
+<label>Description</label><textarea id="projectDescription"></textarea>
+<label>Work Instructions</label><textarea id="projectInstructions"></textarea>
+<button type="submit">Add Project</button></form>
+<hr style="border-color:var(--line);margin:20px 0"><h3>Existing Projects</h3>
+<button onclick="loadProjects()">Refresh Projects</button><div id="projectsList"></div>
 </section>
 
+<section id="work" class="admin-section card">
+<h2>Work Assignment</h2><p class="section-note">Assign approved project work to customers and review submitted work. Handwriting instructions should use English uppercase letters A-Z.</p>
+<h3>Assign New Work</h3><div class="grid">
+<div><label>Approved Customer Enrollment</label><select id="workEnrollment"></select></div>
+<div><label>Work Title</label><input id="workTitle" placeholder="Project handwriting work"></div>
+<div><label>Total Pages</label><input id="workPages" type="number" min="1"></div>
+<div><label>Deadline</label><input id="workDeadline" type="date"></div>
+</div>
+<label>Instructions</label><textarea id="workInstructions">Write all assigned work in English uppercase letters A-Z.</textarea>
+<button onclick="assignWork()">Assign Work</button>
+<hr style="border-color:var(--line);margin:20px 0"><h3>Customer Work Submissions</h3>
+<button onclick="loadWork()">Refresh Work</button><div id="workList"></div>
+</section>
+
+<section id="salary" class="admin-section card">
+<h2>Salary Management</h2><p class="section-note">50% salary advance is due 15 minutes after registration approval. Remaining 50% is payable after work completion.</p>
+<button onclick="loadSalaries()">Refresh Salary Records</button><div id="salaryList"></div>
+</section>
+
+<section id="parcels" class="admin-section card">
+<h2>Parcel Tracking</h2><p class="section-note">Create parcel records and update courier and delivery information.</p><h3>Add Parcel</h3>
+<div class="grid">
+<div><label>Customer</label><select id="parcelCustomer"></select></div>
+<div><label>Enrollment (Optional)</label><select id="parcelEnrollment"></select></div>
+<div><label>Parcel Number</label><input id="parcelNumber"></div>
+<div><label>Courier Name</label><input id="courierName"></div>
+<div><label>Tracking Number</label><input id="trackingNumber"></div>
+<div><label>Tracking Website URL</label><input id="trackingUrl" type="url"></div>
+<div><label>Dispatch Date</label><input id="dispatchDate" type="date"></div>
+<div><label>Delivery Date</label><input id="deliveryDate" type="date"></div>
+<div><label>Parcel Status</label><select id="parcelStatus"><option value="preparing">Preparing</option><option value="dispatched">Dispatched</option><option value="in_transit">In Transit</option><option value="out_for_delivery">Out for Delivery</option><option value="delivered">Delivered</option><option value="returned">Returned</option></select></div>
+</div>
+<label>Admin Remarks</label><textarea id="parcelRemarks"></textarea><button onclick="addParcel()">Create Parcel</button>
+<hr style="border-color:var(--line);margin:20px 0"><h3>Existing Parcels</h3><button onclick="loadParcels()">Refresh Parcels</button><div id="parcelsList"></div>
+</section>
+
+<section id="certificates" class="admin-section card">
+<h2>Customer Completion Certificates</h2><p class="section-note">Issue genuine project completion certificates to approved customers.</p><h3>Issue Certificate</h3>
+<form id="customerCertificateForm"><div class="grid">
+<div><label>Approved Customer Enrollment</label><select id="certificateEnrollment" required></select></div>
+<div><label>Certificate Number</label><input id="certificateNumber" required></div>
+<div><label>Project Name</label><input id="certificateProjectName" required></div>
+<div><label>Issue Date</label><input id="certificateIssueDate" type="date"></div>
+<div><label>Completion Date</label><input id="certificateCompletionDate" type="date"></div>
+</div>
+<label>Certificate File (PDF, JPG, PNG or WEBP)</label><input id="certificateFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp">
+<label>Remarks</label><textarea id="certificateRemarks"></textarea><button type="submit">Issue Certificate</button></form>
+<hr style="border-color:var(--line);margin:20px 0"><h3>Issued Certificates</h3><button onclick="loadCustomerCertificates()">Refresh Certificates</button><div id="customerCertificatesList"></div>
+</section>
+
+<section id="charges" class="admin-section card">
+<h2>Customer Charges</h2><p class="section-note">Add and manage individual customer charges separately from registration fees and salary.</p>
+<div class="grid">
+<div><label>Customer</label><select id="chargeCustomer"></select></div>
+<div><label>Amount (INR)</label><input id="chargeAmount" type="number" min="0.01" step="0.01"></div>
+<div><label>Reason</label><input id="chargeReason"></div>
+<div><label>Notes</label><input id="chargeNotes"></div>
+</div>
+<button onclick="addCharge()">Add Customer Charge</button><hr style="border-color:var(--line);margin:20px 0"><div id="chargesList"></div>
+</section>
+
+<section id="gallery" class="admin-section card">
+<h2>Customer Work Showcase / Gallery</h2><p class="section-note">Upload real customer handwriting work. New uploads remain hidden until published.</p>
+<div class="grid">
+<div><label>Title</label><input id="showTitle"></div><div><label>Customer Name (Optional)</label><input id="showCustomer"></div>
+<div><label>Work Type</label><input id="showType" value="Handwriting Work"></div><div><label>Display Order</label><input id="showOrder" type="number" value="0"></div>
+</div>
+<label>Description</label><textarea id="showDescription"></textarea><label>Work Image or PDF</label><input id="showFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp">
+<button onclick="addShowcase()">Upload Work</button><hr style="border-color:var(--line);margin:20px 0"><div id="showcaseList"></div>
+</section>
+
+<section id="company" class="admin-section card">
+<h2>Company Certificates & Documents</h2><p class="section-note">Upload genuine company documents. Visitors can view active documents before customer login.</p>
+<label>Document Title</label><input id="certTitle"><label>Description</label><textarea id="certDescription"></textarea>
+<label>Document File</label><input id="certFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp">
+<button onclick="addCompanyCertificate()">Upload Document</button><hr style="border-color:var(--line);margin:20px 0"><div id="companyCertificatesList"></div>
+</section>
+
+<section id="notifications" class="admin-section card">
+<h2>Notifications</h2><p class="section-note">Send announcements to all customers or to one selected customer.</p>
+<label>Notification Title</label><input id="notificationTitle"><label>Message</label><textarea id="notificationMessage"></textarea>
+<div class="grid">
+<div><label>Send To</label><select id="notificationTarget"><option value="all">All Users</option><option value="customer">All Customers</option><option value="admin">Administrators</option></select></div>
+<div><label>Specific Customer (Optional)</label><select id="notificationCustomer"></select></div>
+<div><label>Notification Type</label><select id="notificationType"><option value="general">General</option><option value="payment">Payment</option><option value="work">Work</option><option value="salary">Salary</option><option value="registration">Registration</option></select></div>
+</div><button onclick="sendNotification()">Send Notification</button>
+</section>
+
+<section id="support" class="admin-section card">
+<h2>Customer Support</h2><p class="section-note">View customer support requests and send replies.</p><button onclick="loadSupport()">Refresh Support Requests</button><div id="supportList"></div>
+</section>
 </section>
 </main>
 
 <script>
-'use strict';
-
+"use strict";
 const $ = id => document.getElementById(id);
+const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+let customers = [], enrollments = [];
 
-const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({
-'&':'&amp;',
-'<':'&lt;',
-'>':'&gt;',
-'"':'&quot;',
-"'":'&#39;'
-}[c]));
+async function api(url, options = {}) {
+ const response = await fetch(url,{credentials:"same-origin",...options});
+ let data={}; try{data=await response.json()}catch{}
+ if(!response.ok||data.success===false) throw new Error(data.message||`Request failed (${response.status})`);
+ return data;
+}
+function json(method,body){return{method,headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}}
+function note(message,bad=false){$("notice").textContent=message;$("notice").classList.remove("hidden");$("notice").style.color=bad?"#ff9990":"var(--gold)";window.scrollTo({top:0,behavior:"smooth"})}
+function showError(error){note(error.message||"Something went wrong.",true)}
+function formatDate(value){if(!value)return"-";const date=new Date(value);return Number.isNaN(date.getTime())?"-":date.toLocaleDateString("en-IN")}
+function money(value){return"₹"+Number(value||0).toLocaleString("en-IN")}
 
-async function api(url,opts={}){
-const res=await fetch(url,{
-credentials:'same-origin',
-...opts
+function optionCustomers(){
+ const html='<option value="">Choose customer</option>'+customers.map(c=>`<option value="${esc(c._id)}">${esc(c.fullName)} — ${esc(c.mobile||c.email||"")}</option>`).join("");
+ ["chargeCustomer","parcelCustomer","notificationCustomer"].forEach(id=>{if($(id))$(id).innerHTML=html});
+}
+function optionEnrollments(){
+ const approved=enrollments.filter(e=>e.registrationStatus==="approved");
+ const html='<option value="">Choose approved enrollment</option>'+approved.map(e=>`<option value="${esc(e._id)}">${esc(e.customer?.fullName||"Customer")} — ${esc(e.projectSnapshot?.projectName||"Project")}</option>`).join("");
+ ["workEnrollment","certificateEnrollment"].forEach(id=>{if($(id))$(id).innerHTML=html});
+ $("parcelEnrollment").innerHTML='<option value="">No enrollment selected</option>'+enrollments.map(e=>`<option value="${esc(e._id)}">${esc(e.customer?.fullName||"Customer")} — ${esc(e.projectSnapshot?.projectName||"Project")}</option>`).join("");
+}
+async function loadBaseData(){
+ const [customerData,enrollmentData]=await Promise.all([api("/api/admin/customers"),api("/api/enrollments/admin/all")]);
+ customers=customerData.customers||[];enrollments=enrollmentData.enrollments||[];optionCustomers();optionEnrollments();
+}
+
+$("loginForm").addEventListener("submit",async event=>{
+ event.preventDefault();$("loginMsg").classList.add("hidden");
+ try{await api("/api/admin/auth/login",json("POST",{email:$("loginEmail").value.trim(),password:$("loginPassword").value}));await checkSession()}
+ catch(error){$("loginMsg").textContent=error.message;$("loginMsg").classList.remove("hidden")}
 });
-
-let data={};
-
-try{
-data=await res.json();
-}catch{}
-
-if(!res.ok||data.success===false){
-throw new Error(data.message||`Request failed (${res.status})`);
-}
-
-return data;
-}
-
-function note(msg,bad=false){
-$('notice').textContent=msg;
-$('notice').classList.remove('hidden');
-$('notice').style.color=bad?'#ff9b91':'var(--gold)';
-window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function jsonOpts(method,body){
-return{
-method,
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify(body)
-};
-}
-
 async function checkSession(){
-try{
-const d=await api('/api/admin/auth/me');
-
-$('loginBox').classList.add('hidden');
-$('panel').classList.remove('hidden');
-$('topActions').classList.remove('hidden');
-
-$('adminName').textContent=d.admin.fullName||d.admin.email;
-
-await Promise.all([
-loadCustomers(),
-loadCharges(),
-loadShowcase(),
-loadCertificates()
-]);
-
-}catch{
-$('loginBox').classList.remove('hidden');
-$('panel').classList.add('hidden');
-$('topActions').classList.add('hidden');
+ try{
+  const data=await api("/api/admin/auth/me");
+  $("loginBox").classList.add("hidden");$("panel").classList.remove("hidden");$("topActions").classList.remove("hidden");
+  $("adminName").textContent=data.admin.fullName||data.admin.email;
+  await loadBaseData();
+  await Promise.all([loadCustomers(),loadEnrollments(),loadPayments(),loadProjects(),loadWork(),loadSalaries(),loadParcels(),loadCustomerCertificates(),loadCharges(),loadShowcase(),loadCompanyCertificates(),loadSupport()]);
+ }catch(error){$("loginBox").classList.remove("hidden");$("panel").classList.add("hidden");$("topActions").classList.add("hidden")}
 }
-}
+async function logout(){try{await api("/api/admin/auth/logout",{method:"POST"})}finally{location.href="/admin.html"}}
 
-$('loginForm').addEventListener('submit',async e=>{
-e.preventDefault();
-
-$('loginMsg').classList.add('hidden');
-
-try{
-await api('/api/admin/auth/login',jsonOpts('POST',{
-email:$('loginEmail').value.trim(),
-password:$('loginPassword').value
+document.querySelectorAll("[data-section]").forEach(button=>button.addEventListener("click",()=>{
+ document.querySelectorAll(".nav button").forEach(item=>item.classList.remove("active"));
+ document.querySelectorAll(".admin-section").forEach(item=>item.classList.remove("active"));
+ button.classList.add("active");$(button.dataset.section).classList.add("active");
 }));
-
-await checkSession();
-
-}catch(err){
-$('loginMsg').textContent=err.message;
-$('loginMsg').classList.remove('hidden');
-}
-});
-
-async function logout(){
-try{
-await api('/api/admin/auth/logout',{method:'POST'});
-}finally{
-location.href='/admin.html';
-}
-}
 
 async function loadCustomers(){
-const d=await api('/api/admin/customers');
-
-$('chargeCustomer').innerHTML=
-'<option value="">Choose customer</option>'+
-(d.customers||[]).map(c=>
-`<option value="${esc(c._id)}">${esc(c.fullName)} — ${esc(c.mobile||c.email||'')}</option>`
-).join('');
+ try{
+  const data=await api("/api/admin/customers");customers=data.customers||[];optionCustomers();
+  $("customersList").innerHTML=customers.length?customers.map(c=>`<div class="row"><div><div class="item-title">${esc(c.fullName)} <span class="pill">${esc(c.accountStatus)}</span></div><div class="small muted">Customer ID: ${esc(c.customerId||"-")}</div><div class="small muted">${esc(c.email||"")} · ${esc(c.mobile||"")}</div><div class="small muted">Joined: ${formatDate(c.createdAt)} · ${c.isBlocked?"Blocked":"Active"}</div></div></div>`).join(""):'<div class="empty">No customers found.</div>';
+ }catch(error){showError(error)}
+}
+async function loadEnrollments(){
+ try{
+  const data=await api("/api/enrollments/admin/all");enrollments=data.enrollments||[];optionEnrollments();
+  $("enrollmentsList").innerHTML=enrollments.length?enrollments.map(e=>`<div class="row"><div><div class="item-title">${esc(e.customer?.fullName||"Customer")} <span class="pill">${esc(e.registrationStatus)}</span></div><div class="small muted">${esc(e.projectSnapshot?.projectName||"Project")} · ${money(e.projectSnapshot?.registrationFee)}</div><div class="small muted">Payment: ${esc(e.paymentStatus||"pending")}</div><div class="small muted">Enrollment: ${esc(e._id)}</div></div><div class="actions">${e.registrationStatus==="pending"?`<button class="success" onclick="reviewEnrollment('${esc(e._id)}','approved')">Approve</button><button class="danger" onclick="reviewEnrollment('${esc(e._id)}','rejected')">Reject</button>`:""}</div></div>`).join(""):'<div class="empty">No registrations found.</div>';
+ }catch(error){showError(error)}
+}
+async function reviewEnrollment(id,status){
+ if(!confirm(`Are you sure you want to ${status} this registration?`))return;
+ try{const data=await api(`/api/enrollments/admin/${id}/status`,json("PATCH",{status}));note(data.message||"Registration updated.");await loadEnrollments();await loadSalaries()}catch(error){showError(error)}
 }
 
-async function loadCharges(){
-const d=await api('/api/customer-charges/admin/all');
-const list=d.charges||[];
-
-$('chargesList').innerHTML=list.length?list.map(c=>`
-<div class="row">
-<div>
-<div class="item-title">
-${esc(c.customer?.fullName||'Customer')}
-<span class="pill">${esc(c.status)}</span>
-</div>
-<div>₹${Number(c.amount||0).toLocaleString('en-IN')} — ${esc(c.reason)}</div>
-<div class="small muted">
-${esc(c.customer?.mobile||c.customer?.email||'')}
-${esc(c.notes||'')}
-</div>
-</div>
-
-<div class="actions">
-<button class="secondary" onclick="editCharge('${esc(c._id)}','${Number(c.amount)||0}','${esc(c.reason)}','${esc(c.notes||'')}')">Edit</button>
-
-<select id="charge-status-${esc(c._id)}" aria-label="Charge status">
-<option value="unpaid" ${c.status==='unpaid'?'selected':''}>Unpaid</option>
-<option value="paid" ${c.status==='paid'?'selected':''}>Paid</option>
-<option value="waived" ${c.status==='waived'?'selected':''}>Waived</option>
-</select>
-
-<button class="secondary" onclick="changeCharge('${esc(c._id)}')">Save status</button>
-<button class="danger" onclick="removeCharge('${esc(c._id)}')">Delete</button>
-</div>
-</div>
-`).join(''):'<div class="empty">No customer charges yet.</div>';
-}
-
-async function addCharge(){
-try{
-const customerId=$('chargeCustomer').value;
-const amount=$('chargeAmount').value;
-const reason=$('chargeReason').value.trim();
-
-if(!customerId||!amount||!reason){
-throw new Error('Choose a customer and enter amount and reason.');
-}
-
-await api(
-'/api/customer-charges/admin/'+encodeURIComponent(customerId),
-jsonOpts('POST',{
-amount,
-reason,
-notes:$('chargeNotes').value
-})
-);
-
-$('chargeAmount').value='';
-$('chargeReason').value='';
-$('chargeNotes').value='';
-
-await loadCharges();
-
-note('Customer charge added successfully.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function editCharge(id,amount,reason,notes){
-const nextAmount=prompt('Enter charge amount (INR):',String(amount));
-if(nextAmount===null)return;
-
-const nextReason=prompt('Enter charge reason:',reason);
-if(nextReason===null)return;
-
-const nextNotes=prompt('Enter notes (optional):',notes);
-if(nextNotes===null)return;
-
-try{
-await api(
-'/api/customer-charges/admin/'+id,
-jsonOpts('PATCH',{
-amount:nextAmount,
-reason:nextReason,
-notes:nextNotes
-})
-);
-
-await loadCharges();
-note('Charge details updated.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function changeCharge(id){
-try{
-await api(
-'/api/customer-charges/admin/'+id,
-jsonOpts('PATCH',{
-status:$('charge-status-'+id).value
-})
-);
-
-await loadCharges();
-note('Charge status updated.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function removeCharge(id){
-if(!confirm('Delete this customer charge?'))return;
-
-try{
-await api('/api/customer-charges/admin/'+id,{method:'DELETE'});
-await loadCharges();
-note('Customer charge deleted.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function uploadFile(file){
-if(!file)throw new Error('Please select a file.');
-
-if(file.size>10*1024*1024){
-throw new Error('File size must be 10 MB or less.');
-}
-
-const allowed=[
-'image/jpeg',
-'image/png',
-'image/webp',
-'application/pdf'
-];
-
-if(!allowed.includes(file.type)){
-throw new Error('Only JPG, PNG, WEBP and PDF files are allowed.');
-}
-
-const fd=new FormData();
-fd.append('file',file);
-
-const d=await api('/api/uploads',{
-method:'POST',
-body:fd
-});
-
-if(!d.file?.fileId){
-throw new Error('Upload response did not contain a file ID.');
-}
-
-return d.file;
-}
-
-async function loadShowcase(){
-const d=await api('/api/showcase/admin/all');
-const items=d.items||[];
-
-$('showcaseList').innerHTML=items.length?items.map(x=>`
-<div class="row">
-<div>
-<div class="item-title">
-${esc(x.title)}
-<span class="pill">${x.isPublished?'Published':'Hidden'}</span>
-</div>
-
-<div class="small muted">
-${esc(x.customerName||'')} ·
-${esc(x.workType||'')} ·
-${esc(x.fileName||'No file')}
-</div>
-
-${x.fileId?`<a href="/api/uploads/${esc(x.fileId)}" target="_blank" rel="noopener">View uploaded file</a>`:''}
-</div>
-
-<div class="actions">
-<button class="secondary" onclick="editShowcase('${esc(x._id)}','${esc(x.title)}','${esc(x.customerName||'')}','${esc(x.workType||'')}','${esc(x.description||'')}','${Number(x.displayOrder)||0}')">Edit details</button>
-
-<button class="secondary" onclick="replaceShowcaseFile('${esc(x._id)}')">Replace file</button>
-
-<button class="secondary" onclick="toggleShowcase('${esc(x._id)}',${!x.isPublished})">
-${x.isPublished?'Hide':'Publish'}
-</button>
-
-<button class="danger" onclick="deleteShowcase('${esc(x._id)}')">Delete</button>
-</div>
-</div>
-`).join(''):'<div class="empty">No showcase items yet.</div>';
-}
-
-async function addShowcase(){
-try{
-const title=$('showTitle').value.trim();
-
-if(!title){
-throw new Error('Enter a gallery title.');
-}
-
-const file=await uploadFile($('showFile').files[0]);
-
-await api('/api/showcase',jsonOpts('POST',{
-title,
-customerName:$('showCustomer').value,
-workType:$('showType').value,
-description:$('showDescription').value,
-displayOrder:$('showOrder').value,
-fileId:file.fileId,
-fileName:file.fileName,
-fileType:file.fileType
-}));
-
-$('showTitle').value='';
-$('showCustomer').value='';
-$('showDescription').value='';
-$('showFile').value='';
-
-await loadShowcase();
-
-note('Customer work uploaded. It is hidden until you publish it.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function editShowcase(id,title,customerName,workType,description,displayOrder){
-const t=prompt('Gallery title:',title);
-if(t===null)return;
-
-const c=prompt('Customer name:',customerName);
-if(c===null)return;
-
-const w=prompt('Work type:',workType);
-if(w===null)return;
-
-const d=prompt('Description:',description);
-if(d===null)return;
-
-const o=prompt('Display order:',String(displayOrder));
-if(o===null)return;
-
-try{
-await api('/api/showcase/'+id,jsonOpts('PATCH',{
-title:t,
-customerName:c,
-workType:w,
-description:d,
-displayOrder:o
-}));
-
-await loadShowcase();
-note('Gallery details updated.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function replaceShowcaseFile(id){
-try{
-const file=await pickAndUpload();
-if(!file)return;
-
-await api('/api/showcase/'+id,jsonOpts('PATCH',{
-fileId:file.fileId,
-fileName:file.fileName,
-fileType:file.fileType
-}));
-
-await loadShowcase();
-note('Gallery file replaced.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-function pickAndUpload(){
-return new Promise(resolve=>{
-const input=document.createElement('input');
-
-input.type='file';
-input.accept='image/jpeg,image/png,image/webp,application/pdf';
-
-input.onchange=async()=>{
-if(!input.files[0])return resolve(null);
-
-try{
-resolve(await uploadFile(input.files[0]));
-}catch(e){
-note(e.message,true);
-resolve(null);
-}
-};
-
-input.click();
-});
-}
-
-async function toggleShowcase(id,publish){
-try{
-await api('/api/showcase/'+id,jsonOpts('PATCH',{
-isPublished:publish
-}));
-
-await loadShowcase();
-
-note(publish?'Work published.':'Work hidden.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function deleteShowcase(id){
-if(!confirm('Delete this gallery item?'))return;
-
-try{
-await api('/api/showcase/'+id,{method:'DELETE'});
-await loadShowcase();
-note('Gallery item deleted.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function loadCertificates(){
-const d=await api('/api/company-certificate/admin');
-const items=d.certificates||[];
-
-$('certificatesList').innerHTML=items.length?items.map(c=>`
-<div class="row">
-<div>
-<div class="item-title">
-${esc(c.title)}
-<span class="pill">${c.isActive?'Visible':'Hidden'}</span>
-</div>
-
-<div class="small muted">
-${esc(c.description||'')} · ${esc(c.fileName||'')}
-</div>
-
-${c.fileId?`<a href="/api/uploads/${esc(c.fileId)}" target="_blank" rel="noopener">View document</a>`:''}
-</div>
-
-<div class="actions">
-<button class="secondary" onclick="editCertificate('${esc(c._id)}','${esc(c.title)}','${esc(c.description||'')}')">Edit title/details</button>
-
-<button class="secondary" onclick="replaceCertificateFile('${esc(c._id)}')">Replace file</button>
-
-<button class="secondary" onclick="toggleCertificate('${esc(c._id)}',${!c.isActive})">
-${c.isActive?'Hide':'Show'}
-</button>
-
-<button class="danger" onclick="deleteCertificate('${esc(c._id)}')">Delete</button>
-</div>
-</div>
-`).join(''):'<div class="empty">No company documents uploaded yet. Add each genuine document separately.</div>';
-}
-
-async function addCertificate(){
-try{
-const title=$('certTitle').value.trim();
-
-if(!title){
-throw new Error('Enter the document title.');
-}
-
-const file=await uploadFile($('certFile').files[0]);
-
-await api('/api/company-certificate',jsonOpts('POST',{
-title,
-description:$('certDescription').value.trim(),
-fileId:file.fileId,
-fileName:file.fileName,
-fileType:file.fileType
-}));
-
-$('certTitle').value='';
-$('certDescription').value='';
-$('certFile').value='';
-
-await loadCertificates();
-
-note('Company document uploaded successfully.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function editCertificate(id,title,description){
-const t=prompt('Document title:',title);
-if(t===null)return;
-
-const d=prompt('Description:',description);
-if(d===null)return;
-
-try{
-await api('/api/company-certificate/'+id,jsonOpts('PATCH',{
-title:t,
-description:d
-}));
-
-await loadCertificates();
-note('Document details updated.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function replaceCertificateFile(id){
-try{
-const file=await pickAndUpload();
-if(!file)return;
-
-await api('/api/company-certificate/'+id,jsonOpts('PATCH',{
-fileId:file.fileId,
-fileName:file.fileName,
-fileType:file.fileType
-}));
-
-await loadCertificates();
-note('Company document file replaced.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function toggleCertificate(id,active){
-try{
-await api('/api/company-certificate/'+id,jsonOpts('PATCH',{
-isActive:active
-}));
-
-await loadCertificates();
-
-note(active?'Document is now visible.':'Document hidden.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-async function deleteCertificate(id){
-if(!confirm('Permanently remove this company document from the website?'))return;
-
-try{
-await api('/api/company-certificate/'+id,{method:'DELETE'});
-await loadCertificates();
-note('Company document deleted.');
-
-}catch(e){
-note(e.message,true);
-}
-}
-
-checkSession();
-</script>
-</body>
-</html>
+async function loadPayments(){
+ try{
+  const data=await api("/api/payments/admin/all");const payments=data.payments||[];
+  $("paymentsList").innerHTML=payments.length?payments.map(p=>`<div class="row"><div><div class="item-title">${esc(p.customer?.fullName||"Customer")} <span class="pill">${esc(p.status)}</span></div><div>Amount: ${money(p.amount)}</div><div class="small muted">Transaction ID: ${esc(p.transactionId)}</div><div class="small muted">Type: ${esc(p.paymentType)} · ${formatDate(p.createdAt)}</div>${p.paymentScreenshotId?`<p><a href="/api/uploads/${esc(p.paymentScreenshotId)
