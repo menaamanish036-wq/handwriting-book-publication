@@ -119,8 +119,7 @@ a{color:var(--gold)} .item-title{font-weight:bold;margin-bottom:5px}
 <div><label>Customer</label><select id="parcelCustomer"></select></div>
 <div><label>Enrollment (Optional)</label><select id="parcelEnrollment"></select></div>
 <div><label>Parcel Number</label><input id="parcelNumber"></div>
-<div><label>Courier Name</label><input id="courierName"></div>
-<div><label>Tracking Number</label><input id="trackingNumber"></div>
+<div><label>Courier Name</label><input id="courierName"></div><div><label>Tracking Number</label><input id="trackingNumber"></div>
 <div><label>Tracking Website URL</label><input id="trackingUrl" type="url"></div>
 <div><label>Dispatch Date</label><input id="dispatchDate" type="date"></div>
 <div><label>Delivery Date</label><input id="deliveryDate" type="date"></div>
@@ -242,7 +241,6 @@ document.querySelectorAll("[data-section]").forEach(button=>button.addEventListe
  document.querySelectorAll(".admin-section").forEach(item=>item.classList.remove("active"));
  button.classList.add("active");$(button.dataset.section).classList.add("active");
 }));
-
 async function loadCustomers(){
  try{
   const data=await api("/api/admin/customers");customers=data.customers||[];optionCustomers();
@@ -263,4 +261,225 @@ async function reviewEnrollment(id,status){
 async function loadPayments(){
  try{
   const data=await api("/api/payments/admin/all");const payments=data.payments||[];
-  $("paymentsList").innerHTML=payments.length?payments.map(p=>`<div class="row"><div><div class="item-title">${esc(p.customer?.fullName||"Customer")} <span class="pill">${esc(p.status)}</span></div><div>Amount: ${money(p.amount)}</div><div class="small muted">Transaction ID: ${esc(p.transactionId)}</div><div class="small muted">Type: ${esc(p.paymentType)} · ${formatDate(p.createdAt)}</div>${p.paymentScreenshotId?`<p><a href="/api/uploads/${esc(p.paymentScreenshotId)
+  $("paymentsList").innerHTML=payments.length?payments.map(p=>`<div class="row"><div><div class="item-title">${esc(p.customer?.fullName||"Customer")} <span class="pill">${esc(p.status)}</span></div><div>Amount: ${money(p.amount)}</div><div class="small muted">Transaction ID: ${esc(p.transactionId)}</div><div class="small muted">Type: ${esc(p.paymentType)} · ${formatDate(p.createdAt)}</div>${p.paymentScreenshotId?`<p><a href="/api/uploads/${esc(p.paymentScreenshotId)}" target="_blank" rel="noopener">View Payment Screenshot</a></p>`:""}</div><div class="actions">${p.status==="pending"?`<button class="success" onclick="reviewPayment('${esc(p._id)}','approved')">Approve</button><button class="danger" onclick="reviewPayment('${esc(p._id)}','rejected')">Reject</button>`:""}</div></div>`).join(""):'<div class="empty">No payments found.</div>';
+ }catch(error){showError(error)}
+}
+async function reviewPayment(id,status){
+ const remarks=prompt("Admin remarks (optional):")||"";
+ try{const data=await api(`/api/payments/admin/${id}/status`,json("PATCH",{status,adminRemarks:remarks}));note(data.message||"Payment reviewed.");await loadPayments();await loadEnrollments()}catch(error){showError(error)}
+}
+
+$("projectForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ try{
+  const body={projectName:$("projectName").value.trim(),projectNumber:$("projectNumber").value,pages:$("projectPages").value,sides:$("projectSides").value,durationDays:$("projectDuration").value,salary:$("projectSalary").value,registrationFee:$("projectFee").value,description:$("projectDescription").value,instructions:$("projectInstructions").value};
+  const data=await api("/api/admin/projects",json("POST",body));$("projectForm").reset();note(data.message||"Project added.");await loadProjects();
+ }catch(error){showError(error)}
+});
+async function loadProjects(){
+ try{
+  const data=await api("/api/admin/projects");const projects=data.projects||[];
+  $("projectsList").innerHTML=projects.length?projects.map(p=>`<div class="row"><div><div class="item-title">${esc(p.projectName)} <span class="pill">${p.isActive?"Active":"Inactive"}</span></div><div class="small muted">Project ${esc(p.projectNumber)} · ${esc(p.pages)} Pages · ${esc(p.sides)} Sides</div><div>Salary: ${money(p.salary)} · Registration: ${money(p.registrationFee)}</div><div class="small muted">Duration: ${esc(p.durationDays)} days</div></div><div class="actions"><button class="secondary" onclick="editProject('${esc(p._id)}')">Edit</button>${p.isActive?`<button class="danger" onclick="deactivateProject('${esc(p._id)}')">Deactivate</button>`:""}</div></div>`).join(""):'<div class="empty">No projects found.</div>';
+ }catch(error){showError(error)}
+}
+async function editProject(id){
+ try{
+  const data=await api("/api/admin/projects");const p=(data.projects||[]).find(x=>x._id===id);if(!p)throw new Error("Project not found.");
+  const name=prompt("Project name:",p.projectName);if(name===null)return;
+  const pages=prompt("Pages:",p.pages);if(pages===null)return;
+  const sides=prompt("Sides:",p.sides);if(sides===null)return;
+  const duration=prompt("Duration in days:",p.durationDays);if(duration===null)return;
+  const salary=prompt("Total salary:",p.salary);if(salary===null)return;
+  const fee=prompt("Registration fee:",p.registrationFee);if(fee===null)return;
+  const description=prompt("Description:",p.description||"");if(description===null)return;
+  const instructions=prompt("Instructions:",p.instructions||"");if(instructions===null)return;
+  await api(`/api/admin/projects/${id}`,json("PUT",{projectName:name,pages,sides,durationDays:duration,salary,registrationFee:fee,description,instructions}));note("Project updated.");await loadProjects();
+ }catch(error){showError(error)}
+}
+async function deactivateProject(id){
+ if(!confirm("Deactivate this project?"))return;
+ try{await api(`/api/admin/projects/${id}`,{method:"DELETE"});note("Project deactivated.");await loadProjects()}catch(error){showError(error)}
+}
+
+async function assignWork(){
+ try{
+  const enrollmentId=$("workEnrollment").value;if(!enrollmentId)throw new Error("Select an approved enrollment.");
+  const body={enrollmentId,title:$("workTitle").value.trim(),totalPages:$("workPages").value,instructions:$("workInstructions").value,deadline:$("workDeadline").value||null};
+  const data=await api("/api/work-assignments/admin",json("POST",body));note(data.message||"Work assigned.");["workTitle","workPages","workDeadline"].forEach(id=>$(id).value="");await loadWork();
+ }catch(error){showError(error)}
+}
+async function loadWork(){
+ try{
+  const data=await api("/api/work-assignments/admin/all");const assignments=data.assignments||[];
+  $("workList").innerHTML=assignments.length?assignments.map(w=>`<div class="row"><div><div class="item-title">${esc(w.title)} <span class="pill">${esc(w.status)}</span></div><div>${esc(w.customer?.fullName||"Customer")} · ${esc(w.totalPages)} pages</div><div class="small muted">${esc(w.enrollment?.projectSnapshot?.projectName||"")}</div><div class="small muted">Deadline: ${formatDate(w.deadline)}</div>${(w.submissionFileIds||[]).map(fileId=>`<p><a href="/api/uploads/${esc(fileId)}" target="_blank" rel="noopener">View submitted work</a></p>`).join("")}${w.customerRemarks?`<div class="small muted">Customer: ${esc(w.customerRemarks)}</div>`:""}</div><div class="actions">${["submitted","under_review"].includes(w.status)?`<button class="secondary" onclick="reviewWork('${esc(w._id)}','under_review')">Under Review</button><button class="danger" onclick="reviewWork('${esc(w._id)}','correction_required')">Request Correction</button><button class="success" onclick="reviewWork('${esc(w._id)}','approved')">Approve Work</button>`:""}${w.status==="approved"?`<button class="success" onclick="reviewWork('${esc(w._id)}','completed')">Mark Completed</button>`:""}</div></div>`).join(""):'<div class="empty">No work assignments found.</div>';
+ }catch(error){showError(error)}
+}
+async function reviewWork(id,status){
+ const adminRemarks=prompt("Admin remarks (optional):")||"";
+ try{const data=await api(`/api/work-assignments/admin/${id}/review`,json("PATCH",{status,adminRemarks}));note(data.message||"Work status updated.");await loadWork();await loadSalaries()}catch(error){showError(error)}
+}
+
+async function loadSalaries(){
+ try{
+  const data=await api("/api/salaries/admin/all");const salaries=data.salaries||[];
+  $("salaryList").innerHTML=salaries.length?salaries.map(s=>`<div class="row"><div><div class="item-title">${esc(s.customer?.fullName||"Customer")}</div><div>Total Salary: ${money(s.totalSalary)}</div><div class="small muted">50% Advance: ${money(s.advanceAmount)} · ${esc(s.advanceStatus)}</div><div class="small muted">Advance Due: ${formatDate(s.advanceDueAt)}</div><div class="small muted">Remaining 50%: ${money(s.remainingAmount)} · ${esc(s.remainingStatus)}</div><div class="small muted">Work Completed: ${formatDate(s.workCompletedAt)}</div></div><div class="actions">${s.advanceStatus==="pending"?`<button class="success" onclick="markSalaryPaid('${esc(s._id)}','advance-paid')">Mark Advance Paid</button>`:""}${s.remainingStatus==="pending"?`<button class="success" onclick="markSalaryPaid('${esc(s._id)}','remaining-paid')">Mark Remaining Paid</button>`:""}</div></div>`).join(""):'<div class="empty">No salary records found.</div>';
+ }catch(error){showError(error)}
+}
+async function markSalaryPaid(id,type){
+ const label=type==="advance-paid"?"50% advance salary":"remaining 50% salary";if(!confirm(`Mark ${label} as paid?`))return;
+ try{const data=await api(`/api/salaries/admin/${id}/${type}`,json("PATCH",{}));note(data.message||"Salary updated.");await loadSalaries()}catch(error){showError(error)}
+}
+
+async function addParcel(){
+ try{
+  const customerId=$("parcelCustomer").value;if(!customerId)throw new Error("Select a customer.");
+  const body={customerId,enrollmentId:$("parcelEnrollment").value||null,parcelNumber:$("parcelNumber").value.trim(),courierName:$("courierName").value.trim(),trackingNumber:$("trackingNumber").value.trim(),trackingUrl:$("trackingUrl").value.trim(),dispatchDate:$("dispatchDate").value||null,deliveryDate:$("deliveryDate").value||null,status:$("parcelStatus").value,adminRemarks:$("parcelRemarks").value.trim()};
+  const data=await api("/api/admin/parcels",json("POST",body));note(data.message||"Parcel created.");
+  ["parcelNumber","courierName","trackingNumber","trackingUrl","dispatchDate","deliveryDate","parcelRemarks"].forEach(id=>$(id).value="");await loadParcels();
+ }catch(error){showError(error)}
+}
+async function loadParcels(){
+ try{
+  const data=await api("/api/admin/parcels");const parcels=data.parcels||[];
+  $("parcelsList").innerHTML=parcels.length?parcels.map(p=>`<div class="row"><div><div class="item-title">${esc(p.customer?.fullName||"Customer")} <span class="pill">${esc(p.status)}</span></div><div>Parcel: ${esc(p.parcelNumber||"-")}</div><div class="small muted">Courier: ${esc(p.courierName||"-")}</div><div class="small muted">Tracking: ${esc(p.trackingNumber||"-")}</div>${p.trackingUrl?`<p><a href="${esc(p.trackingUrl)}" target="_blank" rel="noopener">Open Tracking Website</a></p>`:""}<div class="small muted">Dispatch: ${formatDate(p.dispatchDate)} · Delivery: ${formatDate(p.deliveryDate)}</div></div><div class="actions"><button class="secondary" onclick="editParcel('${esc(p._id)}','${esc(p.status)}','${esc(p.courierName||"")}','${esc(p.trackingNumber||"")}','${esc(p.trackingUrl||"")}')">Update</button><button class="danger" onclick="deleteParcel('${esc(p._id)}')">Delete</button></div></div>`).join(""):'<div class="empty">No parcel records found.</div>';
+ }catch(error){showError(error)}
+}
+async function editParcel(id,status,courier,tracking,url){
+ const nextStatus=prompt("Status: preparing, dispatched, in_transit, out_for_delivery, delivered, returned",status);if(nextStatus===null)return;
+ const nextCourier=prompt("Courier name:",courier);if(nextCourier===null)return;
+ const nextTracking=prompt("Tracking number:",tracking);if(nextTracking===null)return;
+ const nextUrl=prompt("Tracking URL:",url);if(nextUrl===null)return;
+ try{const data=await api(`/api/admin/parcels/${id}`,json("PATCH",{status:nextStatus,courierName:nextCourier,trackingNumber:nextTracking,trackingUrl:nextUrl}));note(data.message||"Parcel updated.");await loadParcels()}catch(error){showError(error)}
+}
+async function deleteParcel(id){
+ if(!confirm("Delete this parcel record?"))return;
+ try{await api(`/api/admin/parcels/${id}`,{method:"DELETE"});note("Parcel deleted.");await loadParcels()}catch(error){showError(error)}
+}
+
+$("customerCertificateForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ try{
+  const enrollmentId=$("certificateEnrollment").value;if(!enrollmentId)throw new Error("Select an approved customer enrollment.");
+  const enrollment=enrollments.find(e=>e._id===enrollmentId);if(!enrollment)throw new Error("Enrollment not found.");
+  const form=new FormData();form.append("customerId",enrollment.customer?._id||enrollment.customer);form.append("enrollmentId",enrollmentId);form.append("certificateNumber",$("certificateNumber").value.trim());form.append("projectName",$("certificateProjectName").value.trim());form.append("issueDate",$("certificateIssueDate").value);form.append("completionDate",$("certificateCompletionDate").value);form.append("remarks",$("certificateRemarks").value);  const file=$("certificateFile").files[0];if(file)form.append("file",file);
+  const data=await api("/api/admin/certificates",{method:"POST",body:form});$("customerCertificateForm").reset();note(data.message||"Certificate issued.");await loadCustomerCertificates();
+ }catch(error){showError(error)}
+});
+async function loadCustomerCertificates(){
+ try{
+  const data=await api("/api/admin/certificates");const certificates=data.certificates||[];
+  $("customerCertificatesList").innerHTML=certificates.length?certificates.map(c=>`<div class="row"><div><div class="item-title">${esc(c.projectName)} <span class="pill">${esc(c.status)}</span></div><div>Customer: ${esc(c.customer?.fullName||"Customer")}</div><div class="small muted">Certificate: ${esc(c.certificateNumber)}</div><div class="small muted">Issued: ${formatDate(c.issueDate)}</div>${c.certificateFileId?`<p><a href="/api/uploads/${esc(c.certificateFileId)}" target="_blank" rel="noopener">View Certificate File</a></p>`:""}</div><div class="actions">${c.status==="issued"?`<button class="danger" onclick="changeCustomerCertificate('${esc(c._id)}','revoked')">Revoke</button>`:`<button class="success" onclick="changeCustomerCertificate('${esc(c._id)}','issued')">Restore</button>`}<button class="danger" onclick="deleteCustomerCertificate('${esc(c._id)}')">Delete</button></div></div>`).join(""):'<div class="empty">No customer certificates found.</div>';
+ }catch(error){showError(error)}
+}
+async function changeCustomerCertificate(id,status){
+ try{const data=await api(`/api/admin/certificates/${id}`,json("PATCH",{status}));note(data.message||"Certificate status updated.");await loadCustomerCertificates()}catch(error){showError(error)}
+}
+async function deleteCustomerCertificate(id){
+ if(!confirm("Permanently delete this certificate?"))return;
+ try{const data=await api(`/api/admin/certificates/${id}`,{method:"DELETE"});note(data.message||"Certificate deleted.");await loadCustomerCertificates()}catch(error){showError(error)}
+}
+
+async function loadCharges(){
+ try{
+  const data=await api("/api/customer-charges/admin/all");const charges=data.charges||[];
+  $("chargesList").innerHTML=charges.length?charges.map(c=>`<div class="row"><div><div class="item-title">${esc(c.customer?.fullName||"Customer")} <span class="pill">${esc(c.status)}</span></div><div>${money(c.amount)} — ${esc(c.reason)}</div><div class="small muted">${esc(c.notes||"")}</div></div><div class="actions"><button class="secondary" onclick="editCharge('${esc(c._id)}','${Number(c.amount)||0}')">Edit</button><select id="chargeStatus${esc(c._id)}"><option value="unpaid" ${c.status==="unpaid"?"selected":""}>Unpaid</option><option value="paid" ${c.status==="paid"?"selected":""}>Paid</option><option value="waived" ${c.status==="waived"?"selected":""}>Waived</option></select><button class="secondary" onclick="changeCharge('${esc(c._id)}')">Save Status</button><button class="danger" onclick="deleteCharge('${esc(c._id)}')">Delete</button></div></div>`).join(""):'<div class="empty">No customer charges found.</div>';
+ }catch(error){showError(error)}
+}
+async function addCharge(){
+ try{
+  const customerId=$("chargeCustomer").value,amount=$("chargeAmount").value,reason=$("chargeReason").value.trim();
+  if(!customerId||!amount||!reason)throw new Error("Choose a customer and enter amount and reason.");
+  const data=await api(`/api/customer-charges/admin/${customerId}`,json("POST",{amount,reason,notes:$("chargeNotes").value}));
+  $("chargeAmount").value="";$("chargeReason").value="";$("chargeNotes").value="";note(data.message||"Customer charge added.");await loadCharges();
+ }catch(error){showError(error)}
+}
+async function editCharge(id,amount){
+ const nextAmount=prompt("Enter new amount:",amount);if(nextAmount===null)return;
+ const reason=prompt("Enter updated reason:");if(reason===null)return;
+ try{await api(`/api/customer-charges/admin/${id}`,json("PATCH",{amount:nextAmount,reason}));note("Customer charge updated.");await loadCharges()}catch(error){showError(error)}
+}
+async function changeCharge(id){
+ try{const status=$("chargeStatus"+id).value;await api(`/api/customer-charges/admin/${id}`,json("PATCH",{status}));note("Charge status updated.");await loadCharges()}catch(error){showError(error)}
+}
+async function deleteCharge(id){
+ if(!confirm("Delete this customer charge?"))return;
+ try{await api(`/api/customer-charges/admin/${id}`,{method:"DELETE"});note("Customer charge deleted.");await loadCharges()}catch(error){showError(error)}
+}
+
+async function uploadFile(file){
+ if(!file)throw new Error("Please select a file.");
+ if(file.size>10*1024*1024)throw new Error("File size must not exceed 10 MB.");
+ const allowed=["image/jpeg","image/png","image/webp","application/pdf"];if(!allowed.includes(file.type))throw new Error("Only JPG, PNG, WEBP and PDF files are allowed.");
+ const form=new FormData();form.append("file",file);const data=await api("/api/uploads",{method:"POST",body:form});
+ if(!data.file?.fileId)throw new Error("File upload failed.");return data.file;
+}
+
+async function loadShowcase(){
+ try{
+  const data=await api("/api/showcase/admin/all");const items=data.items||[];
+  $("showcaseList").innerHTML=items.length?items.map(x=>`<div class="row"><div><div class="item-title">${esc(x.title)} <span class="pill">${x.isPublished?"Published":"Hidden"}</span></div><div class="small muted">${esc(x.customerName||"")} · ${esc(x.workType||"")}</div>${x.fileId?`<p><a href="/api/uploads/${esc(x.fileId)}" target="_blank" rel="noopener">View File</a></p>`:""}</div><div class="actions"><button class="secondary" onclick="toggleShowcase('${esc(x._id)}',${!x.isPublished})">${x.isPublished?"Hide":"Publish"}</button><button class="danger" onclick="deleteShowcase('${esc(x._id)}')">Delete</button></div></div>`).join(""):'<div class="empty">No gallery items found.</div>';
+ }catch(error){showError(error)}
+}
+async function addShowcase(){
+ try{
+  const title=$("showTitle").value.trim();if(!title)throw new Error("Enter a gallery title.");
+  const file=await uploadFile($("showFile").files[0]);
+  const data=await api("/api/showcase",json("POST",{title,customerName:$("showCustomer").value,workType:$("showType").value,description:$("showDescription").value,displayOrder:$("showOrder").value,fileId:file.fileId,fileName:file.fileName,fileType:file.fileType}));
+  $("showTitle").value="";$("showCustomer").value="";$("showDescription").value="";$("showFile").value="";note(data.message||"Work uploaded.");await loadShowcase();
+ }catch(error){showError(error)}
+}
+async function toggleShowcase(id,publish){
+ try{await api(`/api/showcase/${id}`,json("PATCH",{isPublished:publish}));note(publish?"Work published.":"Work hidden.");await loadShowcase()}catch(error){showError(error)}
+}
+async function deleteShowcase(id){
+ if(!confirm("Delete this gallery item?"))return;
+ try{await api(`/api/showcase/${id}`,{method:"DELETE"});note("Gallery item deleted.");await loadShowcase()}catch(error){showError(error)}
+}
+
+async function loadCompanyCertificates(){
+ try{
+  const data=await api("/api/company-certificate/admin");const certificates=data.certificates||[];
+  $("companyCertificatesList").innerHTML=certificates.length?certificates.map(c=>`<div class="row"><div><div class="item-title">${esc(c.title)} <span class="pill">${c.isActive?"Visible":"Hidden"}</span></div><div class="small muted">${esc(c.description||"")}</div>${c.fileId?`<p><a href="/api/uploads/${esc(c.fileId)}" target="_blank" rel="noopener">View Document</a></p>`:""}</div><div class="actions"><button class="secondary" onclick="toggleCompanyCertificate('${esc(c._id)}',${!c.isActive})">${c.isActive?"Hide":"Show"}</button><button class="danger" onclick="deleteCompanyCertificate('${esc(c._id)}')">Delete</button></div></div>`).join(""):'<div class="empty">No company documents found.</div>';
+ }catch(error){showError(error)}
+}
+async function addCompanyCertificate(){
+ try{
+  const title=$("certTitle").value.trim();if(!title)throw new Error("Enter the document title.");
+  const file=await uploadFile($("certFile").files[0]);
+  const data=await api("/api/company-certificate",json("POST",{title,description:$("certDescription").value.trim(),fileId:file.fileId,fileName:file.fileName,fileType:file.fileType}));
+  $("certTitle").value="";$("certDescription").value="";$("certFile").value="";note(data.message||"Company document uploaded.");await loadCompanyCertificates();
+ }catch(error){showError(error)}
+}
+async function toggleCompanyCertificate(id,active){
+ try{await api(`/api/company-certificate/${id}`,json("PATCH",{isActive:active}));note(active?"Document is visible.":"Document hidden.");await loadCompanyCertificates()}catch(error){showError(error)}
+}
+async function deleteCompanyCertificate(id){
+ if(!confirm("Permanently delete this company document?"))return;
+ try{await api(`/api/company-certificate/${id}`,{method:"DELETE"});note("Company document deleted.");await loadCompanyCertificates()}catch(error){showError(error)}
+}
+
+async function sendNotification(){
+ try{
+  const title=$("notificationTitle").value.trim(),message=$("notificationMessage").value.trim();if(!title||!message)throw new Error("Enter notification title and message.");
+  const recipient=$("notificationCustomer").value;
+  const body={title,message,target:$("notificationTarget").value,recipient:recipient||null,type:$("notificationType").value};
+  const data=await api("/api/notifications",json("POST",body));$("notificationTitle").value="";$("notificationMessage").value="";note(data.message||"Notification sent.");
+ }catch(error){showError(error)}
+}
+
+async function loadSupport(){
+ try{
+  const data=await api("/api/support/admin/all");const tickets=data.tickets||[];
+  $("supportList").innerHTML=tickets.length?tickets.map(t=>`<div class="row"><div><div class="item-title">${esc(t.subject)} <span class="pill">${esc(t.status)}</span></div><div>Customer: ${esc(t.customer?.fullName||"Customer")}</div><div class="small muted">Category: ${esc(t.category||"-")}</div><p>${esc(t.message)}</p>${t.adminReply?`<div class="status">Previous Reply: ${esc(t.adminReply)}</div>`:""}</div><div class="actions"><button class="secondary" onclick="replySupport('${esc(t._id)}')">Reply</button></div></div>`).join(""):'<div class="empty">No support requests found.</div>';
+ }catch(error){showError(error)}
+}
+async function replySupport(id){
+ const adminReply=prompt("Enter your reply:");if(adminReply===null||!adminReply.trim())return;
+ const status=prompt("Ticket status: open, in_progress, resolved, closed","in_progress");if(status===null)return;
+ try{const data=await api(`/api/support/admin/${id}/reply`,json("PATCH",{adminReply,status}));note(data.message||"Reply sent.");await loadSupport()}catch(error){showError(error)}
+}
+
+checkSession();
+</script>
+</body>
+</html>
