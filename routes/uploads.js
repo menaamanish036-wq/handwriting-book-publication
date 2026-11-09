@@ -12,8 +12,12 @@ const {
 
 const Showcase = require("../models/Showcase");
 const CompanyCertificate = require("../models/CompanyCertificate");
+const Certificate = require("../models/Certificate");
 
+// =====================================
 // UPLOAD FILE
+// =====================================
+
 router.post(
     "/",
     async (req, res, next) => {
@@ -52,7 +56,10 @@ router.post(
     }
 );
 
+// =====================================
 // VIEW FILE
+// =====================================
+
 router.get("/:id", async (req, res) => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
@@ -68,7 +75,9 @@ router.get("/:id", async (req, res) => {
 
         const fileRecord = await mongoose.connection.db
             .collection("uploads.files")
-            .findOne({ _id: fileId });
+            .findOne({
+                _id: fileId
+            });
 
         if (!fileRecord) {
             return res.status(404).json({
@@ -77,9 +86,9 @@ router.get("/:id", async (req, res) => {
             });
         }
 
-        // PUBLIC ACCESS:
-        // ONLY ACTIVE COMPANY CERTIFICATES CAN BE
-        // VIEWED WITHOUT LOGIN.
+        // =====================================
+        // PUBLIC COMPANY CERTIFICATE ACCESS
+        // =====================================
 
         const publicCertificate =
             await CompanyCertificate.findOne({
@@ -89,10 +98,12 @@ router.get("/:id", async (req, res) => {
 
         let allowed = Boolean(publicCertificate);
 
-        // PRIVATE ACCESS:
-        // OTHER FILES REQUIRE LOGIN.
+        // =====================================
+        // PRIVATE FILE ACCESS
+        // =====================================
 
         if (!allowed) {
+
             if (!req.session || !req.session.userId) {
                 return res.status(401).json({
                     success: false,
@@ -113,13 +124,31 @@ router.get("/:id", async (req, res) => {
 
             const isAdmin = user.role === "admin";
 
+            // =====================================
+            // FILE OWNER ACCESS
+            // =====================================
+
             const isOwner =
                 fileRecord.metadata &&
                 fileRecord.metadata.uploadedBy ===
                 String(user._id);
 
-            // Published showcase files are visible
-            // only to logged-in customers and admins.
+            // =====================================
+            // CUSTOMER OWN CERTIFICATE ACCESS
+            // =====================================
+
+            const ownCertificate =
+                user.role === "customer"
+                    ? await Certificate.findOne({
+                        customer: user._id,
+                        certificateFileId: String(fileId),
+                        status: "issued"
+                    }).lean()
+                    : null;
+
+            // =====================================
+            // PUBLISHED SHOWCASE ACCESS
+            // =====================================
 
             const publishedShowcase =
                 await Showcase.findOne({
@@ -130,8 +159,13 @@ router.get("/:id", async (req, res) => {
             allowed =
                 isAdmin ||
                 isOwner ||
+                Boolean(ownCertificate) ||
                 Boolean(publishedShowcase);
         }
+
+        // =====================================
+        // ACCESS DENIED
+        // =====================================
 
         if (!allowed) {
             return res.status(403).json({
@@ -139,6 +173,10 @@ router.get("/:id", async (req, res) => {
                 message: "You are not allowed to view this file."
             });
         }
+
+        // =====================================
+        // ALLOWED FILE TYPES
+        // =====================================
 
         const allowedTypes = [
             "image/jpeg",
@@ -157,6 +195,10 @@ router.get("/:id", async (req, res) => {
                 message: "Unsupported file format."
             });
         }
+
+        // =====================================
+        // FILE RESPONSE
+        // =====================================
 
         res.setHeader(
             "Content-Type",
