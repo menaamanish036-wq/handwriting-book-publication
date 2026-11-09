@@ -251,6 +251,45 @@ a{
     padding:14px;
   }
 }
+
+.payment-details{
+  background:#1b1b1b;
+  border:1px solid #8c702c;
+  border-radius:10px;
+  padding:16px;
+  margin:14px 0 18px;
+  text-align:center;
+}
+
+.payment-details h3{
+  color:#e3c36d;
+  margin:0 0 10px;
+}
+
+.payment-qr{
+  display:block;
+  width:210px;
+  max-width:100%;
+  height:auto;
+  margin:12px auto;
+  padding:8px;
+  background:#fff;
+  border-radius:8px;
+}
+
+.payment-upi{
+  display:inline-block;
+  color:#f0d58d;
+  font-weight:bold;
+  overflow-wrap:anywhere;
+  margin:6px 0;
+}
+
+.payment-note{
+  color:#aaa;
+  font-size:13px;
+  line-height:1.5;
+}
 </style>
 </head>
 
@@ -312,9 +351,35 @@ a{
     <h2>Registration Payment</h2>
 
     <p class="muted">
-      Submit your transaction ID and payment screenshot
-      for admin verification.
+      Pay the registration fee using the UPI QR code below, then submit your transaction ID and payment screenshot for admin verification.
     </p>
+
+    <div class="payment-details">
+      <h3>Pay Registration Fee</h3>
+
+      <p class="muted">
+        Scan this QR code with any UPI payment app.
+      </p>
+
+      <img
+        class="payment-qr"
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATgAAAE4AQAAAADnBNLHAAAB/klEQVR4nO1a7W4DMQizp73/K3s/+Aib1GunTYWTSNX22li6w4JgSCi8ND5egy1ucYt7I+4TAO1SoADat33lzHg7OvmDAIAg4BQCEKWcmW9HK3+gMSX6NRGu5zPj7RiEEygRIN9739vjRMFWQFJ6jPvv+94ZZ/GbZAkU5asfy8x0O1r5i7VO8bJfZ2a+HV04ljglRGXGAFHmptvRyV/429GBkHtf0jndjlb+XLHILhAqujA53o4B+jnUnwUy0ve4/vd4WP51pgRjS8jwjVVwuh3N+deimIdCygth/5xuRyd/ApEVm4oahBB/T7ej1/90VjymeHb9p13/LkaqZO+0yLmMxot8brodvf0/JYeEcVZbget/1ziJ0cCqKZj2Nhe8gx0dOKZEyUqOmTRc/m3+fTxcP2eegF+4/ssaeLodrfELb1yBIEgP3ShLtv59grO6Td5AkCRF/QufvoUdHbiz/0FvXsFzRkZw6/NNx3mtppNDsmkQ1dzqv4tR8+/pO9fd360/robVv0DxNdMvdFnt7+l29NYfAADPGilfEJpw/e8JTpJMxCD7qPkH9/zBxfh2/oCibL2jQNkGulqfbzru88dv38EE5VtI23/5Bc66L+aFRbyMeb55uLp/GR+pZbIjPd+O1vg9Z63O+bXSTN38+3jU8wfvvO/iFre4v+O+APFR83b3Q765AAAAAElFTkSuQmCC"
+        alt="UPI payment QR code for Ankur Meena">
+
+      <p>
+        UPI ID:
+        <span class="payment-upi">8504823316@thecardco</span>
+      </p>
+
+      <p>
+        Payee Name:
+        <strong>Ankur Meena</strong>
+      </p>
+
+      <p class="payment-note">
+        Enter the exact registration fee shown for your selected project. After payment, enter the transaction ID and upload the payment screenshot below. Payment is subject to admin verification.
+      </p>
+    </div>
 
     <div id="paymentSection">
       Loading payment information...
@@ -998,10 +1063,7 @@ async function loadPayments(){
   }catch(error){
     showError("payments",error);
   }
-}
-
-
-/*
+}/*
   CUSTOMER CHARGES
 */
 
@@ -1300,7 +1362,10 @@ async function submitWork(event,assignmentId){
     button.disabled = false;
     button.textContent = "Submit Completed Work";
   }
-  }/*
+}
+
+
+/*
   CUSTOMER WORK GALLERY
 */
 
@@ -1496,10 +1561,7 @@ async function loadCertificates(){
   }catch(error){
     showError("certificates",error);
   }
-}
-
-
-/*
+  }/*
   SALARY RECORDS
 */
 
