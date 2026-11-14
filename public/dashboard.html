@@ -9,6 +9,7 @@
 
 <style>
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 
 body{
   margin:0;
@@ -146,6 +147,21 @@ button:disabled{
 
 .logout{margin:0}
 
+.project-apply-form{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #514124;
+}
+
+.project-apply-form h4{
+  color:#e3c36d;
+  margin:0 0 8px;
+}
+
+.project-apply-form .formbox{
+  margin-top:10px;
+}
+
 .formbox{
   background:#1b1b1b;
   border:1px solid #514124;
@@ -266,47 +282,644 @@ a{color:#e3c36d}
   font-size:13px;
   line-height:1.5;
 }
+
+/* PREMIUM CUSTOMER DASHBOARD REFRESH */
+:root{
+  --gold:#d8b45a;
+  --gold2:#f0d58d;
+  --bg:#08090b;
+  --panel:#111317;
+  --panel2:#171a20;
+  --line:rgba(216,180,90,.25);
+  --muted:#a9adb6;
+  --text:#f4f1e8;
+  --green:#76d69a;
+  --red:#ff9999
+}
+
+html{
+  scroll-behavior:smooth;
+  scroll-padding-top:112px
+}
+
+body{
+  background:radial-gradient(ellipse at 50% -15%,rgba(190,147,49,.13),transparent 42%),var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  line-height:1.55
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:rgba(10,11,13,.94);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  padding:14px clamp(16px,4vw,56px);
+  box-shadow:0 8px 28px rgba(0,0,0,.22)
+}
+
+header h2{
+  font-size:clamp(16px,2vw,21px);
+  letter-spacing:.2px;
+  color:var(--gold2)
+}
+
+header .logout{
+  border:1px solid var(--line);
+  background:linear-gradient(135deg,#e4c36c,#b58b31);
+  padding:10px 18px;
+  border-radius:999px;
+  transition:.2s
+}
+
+header .logout:hover,button:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px)
+}
+
+main{
+  max-width:1220px;
+  padding:30px clamp(14px,3vw,30px) 70px
+}
+
+.welcome{
+  padding:28px clamp(18px,4vw,34px);
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:linear-gradient(120deg,rgba(216,180,90,.12),rgba(19,21,26,.94) 55%),var(--panel);
+  box-shadow:0 18px 48px rgba(0,0,0,.2);
+  margin:12px 0 18px
+}
+
+.welcome h1{
+  font-size:clamp(25px,4vw,36px);
+  line-height:1.2;
+  margin:0 0 8px;
+  color:var(--gold2)
+}
+
+.welcome .muted{
+  font-size:15px;
+  margin:0
+}
+
+.status{
+  border:1px solid var(--line);
+  background:rgba(216,180,90,.08);
+  color:#ead9aa;
+  border-radius:12px;
+  padding:13px 16px
+}
+
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,.025),transparent 55%),var(--panel);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:clamp(16px,2.5vw,24px);
+  margin:18px 0;
+  box-shadow:0 12px 32px rgba(0,0,0,.16)
+}
+
+.card>h2{
+  font-size:clamp(18px,2.4vw,22px);
+  letter-spacing:.1px;
+  margin:0 0 18px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(216,180,90,.16);
+  color:var(--gold2)
+}
+
+.card>h2:before{
+  content:"";
+  display:inline-block;
+  width:4px;
+  height:19px;
+  border-radius:8px;
+  background:var(--gold);
+  margin-right:10px;
+  vertical-align:-3px
+}
+
+#projects{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr));
+  gap:16px
+}
+
+.project,.work,.item{
+  background:linear-gradient(155deg,rgba(216,180,90,.045),transparent 45%),var(--panel2);
+  border:1px solid rgba(216,180,90,.2);
+  border-radius:14px;
+  padding:17px;
+  margin:0;
+  box-shadow:0 8px 22px rgba(0,0,0,.12)
+}
+
+.project{
+  display:flex;
+  flex-direction:column;
+  min-width:0
+}
+
+.project h3,.work h3,.item h4{
+  font-size:17px;
+  color:var(--gold2);
+  line-height:1.35
+}
+
+.project p,.work p,.item p{
+  color:#c9cbd0;
+  line-height:1.55
+}
+
+.project>button{
+  margin-top:auto;
+  align-self:flex-start;
+  min-width:125px
+}
+
+button{
+  background:linear-gradient(135deg,#f0d58d,#bd963f);
+  color:#17130a;
+  border-radius:9px;
+  padding:11px 17px;
+  font-size:14px;
+  box-shadow:0 5px 15px rgba(0,0,0,.16);
+  transition:.18s
+}
+
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:2px solid var(--gold2);
+  outline-offset:2px
+}
+
+.project-apply-form{
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px solid var(--line)
+}
+
+.project-apply-form .formbox,.formbox{
+  background:#0e1014;
+  border:1px solid rgba(216,180,90,.18);
+  border-radius:12px;
+  padding:16px
+}
+
+.project-apply-form h4{
+  font-size:16px;
+  color:var(--gold2)
+}
+
+label{
+  font-weight:600;
+  color:#e6e1d5;
+  margin:13px 0 7px
+}
+
+input,textarea,select{
+  background:#090b0e;
+  border:1px solid #3b3e45;
+  border-radius:8px;
+  color:#fff;
+  padding:12px 13px;
+  min-height:44px
+}
+
+input::placeholder,textarea::placeholder{color:#777d87}
+
+input:focus,textarea:focus,select:focus{
+  border-color:var(--gold);
+  outline:none;
+  box-shadow:0 0 0 3px rgba(216,180,90,.1)
+}
+
+.formbox button{margin-top:16px}
+
+.badge{
+  background:rgba(216,180,90,.12);
+  border:1px solid rgba(216,180,90,.28);
+  color:var(--gold2);
+  border-radius:999px;
+  padding:4px 10px;
+  font-weight:600
+}
+
+.empty{color:var(--muted);padding:14px 0}
+
+.message{
+  position:sticky;
+  top:76px;
+  z-index:40;
+  box-shadow:0 8px 25px rgba(0,0,0,.25)
+}
+
+.message.success,.message.error{
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:11px
+}
+
+.payment-details{
+  background:linear-gradient(145deg,rgba(216,180,90,.09),transparent),#0d0f13;
+  border:1px solid var(--line)
+}
+
+.payment-qr{width:220px;border:5px solid white}
+.payment-upi{font-size:16px}
+.gallery-image{border-radius:12px;border:1px solid var(--line);background:#08090b}
+.instructions{border:1px solid rgba(216,180,90,.12);border-radius:9px}
+.filelink{font-weight:600}
+
+.dashboard-nav{
+  position:sticky;
+  top:65px;
+  z-index:40;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:10px clamp(12px,4vw,52px);
+  background:rgba(13,14,17,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(216,180,90,.14);
+  scrollbar-width:thin
+}
+
+.dashboard-nav a{
+  white-space:nowrap;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:650;
+  color:#d8d3c7;
+  padding:8px 12px;
+  border:1px solid rgba(216,180,90,.18);
+  border-radius:999px;
+  background:#17191e
+}
+
+.dashboard-nav a:hover{
+  color:#17130a;
+  background:var(--gold2)
+}
+
+.grid{gap:12px}
+
+@media(max-width:600px){
+  header{padding:12px 15px;flex-direction:row;align-items:center}
+  header h2{font-size:15px}
+  .dashboard-nav{top:57px;padding:8px 12px}
+  main{padding:18px 12px 50px}
+  .welcome{padding:22px 17px;border-radius:15px}
+  .card{padding:15px;margin:13px 0}
+  .project{padding:15px}
+  .project>button{width:100%}
+  .formbox{padding:13px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*:before,*:after{transition:none!important}
+}
+
+/* SINGLE-VIEW CUSTOMER DASHBOARD LAYOUT */
+html{scroll-behavior:auto}
+
+header{
+  position:sticky;
+  top:0;
+  display:flex;
+  min-height:66px;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:13px
+}
+
+.menu-toggle{
+  display:none;
+  margin:0;
+  padding:9px 12px;
+  border:1px solid var(--line);
+  background:#191b20;
+  color:var(--gold2);
+  font-size:19px
+}
+
+.app-shell{
+  display:grid;
+  grid-template-columns:250px minmax(0,1fr);
+  min-height:calc(100vh - 66px);
+  max-width:1500px;
+  margin:0 auto
+}
+
+.sidebar{
+  position:sticky;
+  top:66px;
+  align-self:start;
+  height:calc(100vh - 66px);
+  overflow-y:auto;
+  padding:22px 14px;
+  background:rgba(13,14,17,.96);
+  border-right:1px solid var(--line)
+}
+
+.sidebar-title{
+  padding:0 12px 14px;
+  color:var(--gold2);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase
+}
+
+.sidebar-nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px
+}
+
+.sidebar-nav a{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:11px 12px;
+  border:1px solid transparent;
+  border-radius:9px;
+  color:#d6d2c8;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:650;
+  transition:.18s
+}
+
+.sidebar-nav a:hover{
+  background:#1a1c21;
+  border-color:var(--line);
+  color:var(--gold2)
+}
+
+.sidebar-nav a.active{
+  background:linear-gradient(100deg,rgba(216,180,90,.19),rgba(216,180,90,.05));
+  border-color:rgba(216,180,90,.38);
+  color:var(--gold2)
+}
+
+.sidebar-nav .nav-icon{
+  width:20px;
+  text-align:center;
+  font-size:15px
+}
+
+main{
+  width:100%;
+  min-width:0;
+  max-width:1100px;
+  margin:0 auto;
+  padding:26px clamp(14px,3vw,32px) 60px
+}
+
+.view-card{margin-top:18px}
+
+.view-card[hidden],#dashboardHome[hidden]{
+  display:none!important
+}
+
+#dashboardHome .welcome{margin-top:0}
+
+#dashboardHome .home-shortcuts{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  margin-top:18px
+}
+
+.home-shortcuts button{
+  width:100%;
+  min-height:58px;
+  text-align:left;
+  background:#171a20;
+  color:var(--gold2);
+  border:1px solid var(--line)
+}
+
+.message:empty{display:none}
+
+@media(max-width:760px){
+  .menu-toggle{display:inline-block}
+  .app-shell{display:block}
+
+  .sidebar{
+    position:fixed;
+    z-index:100;
+    left:0;
+    top:66px;
+    bottom:0;
+    width:min(290px,84vw);
+    height:auto;
+    transform:translateX(-105%);
+    transition:transform .22s ease;
+    box-shadow:18px 0 40px #0008
+  }
+
+  body.sidebar-open .sidebar{
+    transform:translateX(0)
+  }
+
+  body.sidebar-open:after{
+    content:"";
+    position:fixed;
+    z-index:90;
+    inset:66px 0 0;
+    background:rgba(0,0,0,.58)
+  }
+
+  main{padding:18px 12px 45px}
+}
+
+@media(min-width:761px){
+  .sidebar{transform:none!important}
+}
+
+/* PROFESSIONAL CUSTOMER HOME HERO - ORIGINAL BLACK AND GOLD THEME */
+.home-hero{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:24px;
+  align-items:center;
+  padding:clamp(18px,3vw,30px);
+  margin:0 0 20px;
+  border:1px solid rgba(216,180,90,.28);
+  border-radius:18px;
+  background:linear-gradient(120deg,rgba(216,180,90,.10),rgba(20,20,20,.96) 58%),#141414;
+  box-shadow:0 14px 34px rgba(0,0,0,.22);
+  overflow:hidden
+}
+
+.home-hero-copy{min-width:0}
+
+.home-hero-kicker{
+  display:inline-block;
+  color:#e3c36d;
+  border:1px solid rgba(216,180,90,.35);
+  background:rgba(216,180,90,.09);
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1.1px;
+  text-transform:uppercase
+}
+
+.home-hero h1{
+  color:#e3c36d;
+  font-size:clamp(25px,3.5vw,39px);
+  line-height:1.18;
+  margin:15px 0 10px
+}
+
+.home-hero p{
+  color:#c9cbd0;
+  font-size:14px;
+  line-height:1.75;
+  margin:0 0 18px;
+  max-width:560px
+}
+
+.home-hero-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px
+}
+
+.home-hero-actions button{min-width:145px}
+
+.home-hero-image-wrap{
+  min-width:0;
+  position:relative
+}
+
+.home-hero-image{
+  display:block;
+  width:100%;
+  height:clamp(210px,28vw,330px);
+  object-fit:cover;
+  object-position:center 42%;
+  border:1px solid rgba(216,180,90,.38);
+  border-radius:14px;
+  box-shadow:0 12px 28px rgba(0,0,0,.28)
+}
+
+.home-hero-image-wrap:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)
+}
+
+#dashboardHome .welcome{margin-top:0}
+
+@media(max-width:760px){
+  .home-hero{
+    grid-template-columns:1fr;
+    gap:18px;
+    padding:17px
+  }
+
+  .home-hero-image{height:230px}
+  .home-hero h1{font-size:28px}
+  .home-hero-actions button{flex:1 1 145px}
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-  <h2>Handwriting Book Publication</h2>
-
-  <button class="logout" id="logoutBtn" type="button">
-    Logout
-  </button>
+  <div class="header-left">
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open dashboard menu" aria-expanded="false">☰</button>
+    <h2>Handwriting Book Publication</h2>
+  </div>
+  <button class="logout" id="logoutBtn" type="button">Logout</button>
 </header>
+
+<div class="app-shell">
+<aside class="sidebar" id="dashboardSidebar">
+  <div class="sidebar-title">Customer Menu</div>
+  <nav class="sidebar-nav" id="sidebarNav" aria-label="Dashboard sections">
+    <a href="#dashboardHome" data-view="dashboardHome" class="active"><span class="nav-icon">⌂</span>Dashboard Home</a>
+    <a href="#projectsCard" data-view="projectsCard"><span class="nav-icon">▦</span>Available Projects</a>
+    <a href="#registrationsCard" data-view="registrationsCard"><span class="nav-icon">▤</span>My Registrations</a>
+    <a href="#registrationPaymentCard" data-view="registrationPaymentCard"><span class="nav-icon">₹</span>Registration Payment</a>
+    <a href="#paymentHistoryCard" data-view="paymentHistoryCard"><span class="nav-icon">◷</span>My Payment History</a>
+    <a href="#chargesCard" data-view="chargesCard"><span class="nav-icon">＋</span>My Charges</a>
+    <a href="#workCard" data-view="workCard"><span class="nav-icon">✎</span>My Work</a>
+    <a href="#salaryCard" data-view="salaryCard"><span class="nav-icon">₹</span>My Salary</a>
+    <a href="#galleryCard" data-view="galleryCard"><span class="nav-icon">▧</span>Customer Work Gallery</a>
+    <a href="#companyCertificatesCard" data-view="companyCertificatesCard"><span class="nav-icon">▣</span>Company Certificates</a>
+    <a href="#parcelCard" data-view="parcelCard"><span class="nav-icon">▰</span>My Parcel Tracking</a>
+    <a href="#completionCertificatesCard" data-view="completionCertificatesCard"><span class="nav-icon">◇</span>My Completion Certificates</a>
+    <a href="#notificationsCard" data-view="notificationsCard"><span class="nav-icon">♢</span>Notifications</a>
+    <a href="#supportCard" data-view="supportCard"><span class="nav-icon">☏</span>Customer Support</a>
+    <a href="#profileCard" data-view="profileCard"><span class="nav-icon">◎</span>Account Information</a>
+  </nav>
+</aside>
 
 <main>
 
   <div id="message" class="message" aria-live="polite"></div>
 
-  <section class="welcome">
-    <h1>
-      Welcome,
-      <span id="customerName">Customer</span>
-    </h1>
+  <section class="view-card" id="dashboardHome">
+    <section class="home-hero" aria-label="Welcome to Handwriting Book Publication">
+      <div class="home-hero-copy">
+        <span class="home-hero-kicker">Handwriting Book Publication</span>
+        <h1>Welcome, <span id="customerName">Customer</span></h1>
+        <p>Manage your projects, registration, payments and handwriting work from one convenient place. We are here to make your work journey simple and organised.</p>
+        <div class="home-hero-actions">
+          <button type="button" onclick="showDashboardView('projectsCard')">Explore Projects</button>
+          <button type="button" onclick="showDashboardView('workCard')">View My Work</button>
+        </div>
+      </div>
+      <div class="home-hero-image-wrap">
+        <img class="home-hero-image" src="/assets/writing-at-home.png" alt="A woman working carefully on handwriting in a notebook" loading="eager">
+      </div>
+    </section>
 
-    <p class="muted">Your personal customer dashboard</p>
+    <section class="welcome">
+      <h1>Your Customer Dashboard</h1>
+      <p class="muted">Your personal workspace for projects, payments and work updates.</p>
+    </section>
+
+    <div id="accountStatus" class="status">Loading account status...</div>
+
+    <div class="home-shortcuts">
+      <button type="button" onclick="showDashboardView('projectsCard')">▦ &nbsp; Available Projects</button>
+      <button type="button" onclick="showDashboardView('registrationPaymentCard')">₹ &nbsp; Registration Payment</button>
+      <button type="button" onclick="showDashboardView('workCard')">✎ &nbsp; My Work</button>
+      <button type="button" onclick="showDashboardView('salaryCard')">₹ &nbsp; My Salary</button>
+    </div>
   </section>
 
-  <div id="accountStatus" class="status">
-    Loading account status...
-  </div>
-
-  <section class="card">
+  <section class="card view-card" id="projectsCard" hidden>
     <h2>Available Projects</h2>
     <div id="projects">Loading projects...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="registrationsCard" hidden>
     <h2>My Registrations</h2>
     <div id="enrollments">Loading registrations...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="registrationPaymentCard" hidden>
     <h2>Registration Payment</h2>
 
     <p class="muted">
@@ -322,19 +935,7 @@ a{color:#e3c36d}
 
       <img
         class="payment-qr"
-        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATgAAAE4AQAAAADnBNLHAAAB/klEQVR4nO1a7W4DMQizp73/K3s/+Aib1GunTYWTSNX22li6w4JgSCi8ND5egy1ucYt7I+4TAO1SoADat33lzHg7OvmDAIAg4BQCEKWcmW9HK3+gMSX6NRGu5zPj7RiEEygRIN9739vjRMFWQFJ6jPvv+94ZZ/GbZAkU5asfy8x0O1r5i7VO8bJfZ2a+HV04ljglRGXGAFHmptvRyV/429GBkHtf0jndjlb+XLHILhAqujA53o4B+jnUnwUy0ve4/vd4WP51pgRjS8jwjVVwuh3N+deimIdCygth/5xuRyd/ApEVm4oahBB/T7ej1/90VjymeHb9p13/LkaqZO+0yLmMxot8brodvf0/JYeEcVZbget/1ziJ0cCqKZj2Nhe8gx0dOKZEyUqOmTRc/m3+fTxcP2eegF+4/ssaeLodrfELb1yBIEgP3ShLtv59grO6Td5AkCRF/QufvoUdHbiz/0FvXsFzRkZw6/NNx3mtppNDsmkQ1dzqv4tR8+/pO9fd360/robVv0DxNdMvdFnt7+l29NYfAADPGilfEJpw/e8JTpJMxCD7qPkH9/zBxfh2/oCibL2jQNkGulqfbzru88dv38EE5VtI23/5Bc66L+aFRbyMeb55uLp/GR+pZbIjPd+O1vg9Z63O+bXSTN38+3jU8wfvvO/iFre4v+O+APFR83b3Q765AAAAAElFTkSuQmCC"
-        alt="UPI payment QR code for Ankur Meena">
-
-      <p>
-        UPI ID:
-        <span class="payment-upi">8504823316@thecardco</span>
-      </p>
-
-      <p>Payee Name: <strong>Ankur Meena</strong></p>
-
-      <p class="payment-note">
-        Enter the exact registration fee shown for your selected project. After payment, enter the transaction ID and upload the payment screenshot below. Payment is subject to admin verification.
-      </p>
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATgAAAE4AQAAAADnBNLHAAAB/klEQVR4nO1a7W4DMQizp73/K3s/+Aib1GunTYWTSNX22li6w4JgSCi8ND5egy1ucYt7I+4TAO1SoADat33lzHg7OvmDAIAg4BQCEKWcmW9HK3+gMSX6NRGu5zPj7RiEEygRIN9739vjRMFWQFJ6jPvv+94ZZ/GbZAkU5asfy8x0O1r5i7VO8bJfZ2a+HV04ljglRGXGAFHmptvRyV/429GBkHtf0jndjlb+XLHILhAqujA53o4B+jnUnwUy0ve4/vd4WP51pgRjS8jwjVVwuh3N+deimIdCygth/5xuRyd/ApEVm4oahBB/T7ej1/90VjymeHb9p13/LkaqZO+0yLmMxot8brodvf0/JYeEcVZbget/1ziJ0cCqKZj2Nhe8gx0dOKZEyUqOmTRc/m3+fTxcP2eegF+4/ssaeLodrfELb1yBIEgP3ShLtv59grO6Td5AkCRF/QufvoUd      </p>
     </div>
 
     <div id="paymentSection">
@@ -342,12 +943,12 @@ a{color:#e3c36d}
     </div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="paymentHistoryCard" hidden>
     <h2>My Payment History</h2>
     <div id="payments">Loading payment records...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="chargesCard" hidden>
     <h2>My Charges</h2>
 
     <p class="muted">
@@ -359,7 +960,7 @@ a{color:#e3c36d}
     <div id="customerCharges">Loading your charges...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="workCard" hidden>
     <h2>My Work</h2>
 
     <p class="muted">
@@ -370,12 +971,12 @@ a{color:#e3c36d}
     <div id="workAssignments">Loading assigned work...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="salaryCard" hidden>
     <h2>My Salary</h2>
     <div id="salaries">Loading salary records...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="galleryCard" hidden>
     <h2>Customer Work Gallery</h2>
 
     <p class="muted">View published handwriting work.</p>
@@ -383,7 +984,7 @@ a{color:#e3c36d}
     <div id="gallery">Loading customer work gallery...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="companyCertificatesCard" hidden>
     <h2>Company Certificates</h2>
 
     <p class="muted">
@@ -395,22 +996,22 @@ a{color:#e3c36d}
     </div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="parcelCard" hidden>
     <h2>My Parcel Tracking</h2>
     <div id="parcels">Loading parcel information...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="completionCertificatesCard" hidden>
     <h2>My Completion Certificates</h2>
     <div id="certificates">Loading certificates...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="notificationsCard" hidden>
     <h2>Notifications</h2>
     <div id="notifications">Loading notifications...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="supportCard" hidden>
     <h2>Customer Support</h2>
 
     <form id="supportForm" class="formbox">
@@ -452,12 +1053,13 @@ a{color:#e3c36d}
     <div id="supportTickets">Loading support requests...</div>
   </section>
 
-  <section class="card">
+  <section class="card view-card" id="profileCard" hidden>
     <h2>Account Information</h2>
     <div id="profile">Loading profile...</div>
   </section>
 
 </main>
+</div><!-- /.app-shell -->
 
 <script>
 "use strict";
@@ -466,6 +1068,7 @@ const API_BASE = "/api";
 const $ = id => document.getElementById(id);
 
 let enrollments = [];
+let selectedEnrollmentId = null;
 
 /*
   COMMON HELPERS
@@ -571,7 +1174,7 @@ async function loadAccount(){
 }
 
 /*
-  AVAILABLE PROJECTS
+  AVAILABLE PROJECTS AND INLINE APPLICATION FORM
 */
 
 async function loadProjects(){
@@ -587,56 +1190,130 @@ async function loadProjects(){
       return;
     }
 
-    box.innerHTML = projects.map(project=>`
-      <article class="project">
-        <h3>${esc(project.projectName)}</h3>
-        <p>Project Number: ${esc(project.projectNumber ?? "-")}</p>
-        <p>Pages: ${esc(project.pages ?? "-")}</p>
-        <p>Sides: ${esc(project.sides ?? "-")}</p>
-        <p>Duration: ${esc(project.durationDays ?? "-")} days</p>
-        <p>Salary: ${money(project.salary)}</p>
-        <p>Registration Fee: ${money(project.registrationFee)}</p>
-        <p>${esc(project.description || "")}</p>
+    box.innerHTML = projects.map(project=>{
+      const projectId = String(project._id || "");
+      const projectNo = project.projectNumber ?? "";
 
-        <button
-          type="button"
-          onclick="applyProject('${esc(project._id)}')">
-          Select Project
-        </button>
-      </article>
-    `).join("");
+      return `
+        <article class="project">
+          <h3>${esc(project.projectName || "Project")}</h3>
+          <p><strong>Project No.:</strong> ${esc(projectNo || "-")}</p>
+          <p><strong>Pages (front/back):</strong> ${esc(project.pages ?? "-")}</p>
+          <p><strong>Total sides:</strong> ${esc(project.sides ?? "-")}</p>
+          <p><strong>Completion time:</strong> ${esc(project.durationDays ?? "-")} days</p>
+          <p><strong>Project salary:</strong> ${money(project.salary)}</p>
+          <p><strong>Registration fee:</strong> ${money(project.registrationFee)}</p>
+          ${project.description ? `<p>${esc(project.description)}</p>` : ""}
+          ${project.instructions ? `<div class="instructions">${esc(project.instructions)}</div>` : ""}
+
+          <button
+            type="button"
+            onclick="applyProject('${esc(projectId)}')">
+            Apply Now
+          </button>
+
+          <div id="applicationForm-${esc(projectId)}" class="project-apply-form" hidden>
+            <h4>Project Registration Form</h4>
+            <p class="muted">Complete these six details to continue to payment.</p>
+
+            <form class="formbox" onsubmit="submitEnrollment(event,'${esc(projectId)}')">
+              <label>NAME</label>
+              <input name="name" type="text" maxlength="100" autocomplete="name" required>
+
+              <label>ADDRESS</label>
+              <input name="address" type="text" maxlength="300" autocomplete="street-address" required>
+
+              <label>MOBILE NUMBER</label>
+              <input name="mobile" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" autocomplete="tel" required>
+
+              <label>PIN CODE</label>
+              <input name="pinCode" type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="postal-code" required>
+
+              <label>DISTRICT</label>
+              <input name="district" type="text" maxlength="100" autocomplete="address-level2" required>
+
+              <label>PROJECT NO.</label>
+              <input name="projectNo" type="text" value="${esc(projectNo)}" readonly>
+
+              <button type="submit">Submit &amp; Continue to Payment</button>
+            </form>
+          </div>
+        </article>
+      `;
+    }).join("");
 
   }catch(error){
     showError("projects",error);
   }
 }
 
-/*
-  APPLY FOR PROJECT
-*/
+function applyProject(projectId){
+  const formBox = $("applicationForm-" + projectId);
 
-async function applyProject(projectId){
-  if(!confirm("Do you want to apply for this project?")){
+  if(!formBox){
+    message("Unable to open this project form. Please refresh the page.","error");
     return;
   }
+
+  const willOpen = formBox.hidden;
+
+  document.querySelectorAll(".project-apply-form").forEach(box=>{
+    box.hidden = true;
+  });
+
+  if(willOpen){
+    formBox.hidden = false;
+    formBox.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+
+async function submitEnrollment(event,projectId){
+  event.preventDefault();
+
+  const form = event.target;
+  const button = form.querySelector('button[type="submit"]');
+  const formData = new FormData(form);
+
+  const payload = {
+    projectId,
+    name: String(formData.get("name") || "").trim(),
+    address: String(formData.get("address") || "").trim(),
+    mobile: String(formData.get("mobile") || "").trim(),
+    pinCode: String(formData.get("pinCode") || "").trim(),
+    district: String(formData.get("district") || "").trim()
+  };
+
+  if(!/^[0-9]{10}$/.test(payload.mobile)){
+    message("Please enter a valid 10-digit mobile number.","error");
+    return;
+  }
+
+  if(!/^[0-9]{6}$/.test(payload.pinCode)){
+    message("Please enter a valid 6-digit PIN code.","error");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Submitting details...";
 
   try{
     const data = await api("/enrollments",{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({projectId})
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
     });
 
-    message(
-      data.message || "Project enrollment created successfully."
-    );
+    selectedEnrollmentId = data.enrollment?._id || null;
+    message(data.message || "Registration details submitted. Continue to payment.");
 
     await loadEnrollments();
+    showDashboardView("registrationPaymentCard");
 
   }catch(error){
-    message(error.message,"error");
+    message(error.message || "Unable to submit registration details.","error");
+  }finally{
+    button.disabled = false;
+    button.textContent = "Submit & Continue to Payment";
   }
 }
 
@@ -744,21 +1421,31 @@ async function loadPaymentSection(){
   const box = $("paymentSection");
 
   try{
-    if(!enrollments.length){
-      box.innerHTML =
-        '<p class="empty">Register for a project first.</p>';
+    const completedRegistrations = enrollments.filter(item=>{
+      const details = item.registrationDetails || {};
+      return Boolean(
+        details.name &&
+        details.address &&
+        details.mobile &&
+        details.pinCode &&
+        details.district
+      );
+    });
+
+    // Do not expose the QR code or payment form before the six-field
+    // project registration form has been submitted successfully.
+    if(!completedRegistrations.length){
+      box.innerHTML = '<p class="empty">Complete a project registration form first. Payment information will appear here after you submit the form.</p>';
       return;
     }
 
     const paymentData = await api("/payments/my");
     const payments = paymentData.payments || [];
 
-    const eligible = enrollments.filter(item=>{
-
+    const eligible = completedRegistrations.filter(item=>{
       const alreadyPending = payments.some(payment=>{
         const paymentEnrollment =
-          payment.enrollment?._id ||
-          payment.enrollment;
+          payment.enrollment?._id || payment.enrollment;
 
         return (
           String(paymentEnrollment) === String(item._id) &&
@@ -774,6 +1461,12 @@ async function loadPaymentSection(){
       );
     });
 
+    eligible.sort((a,b)=>{
+      if(String(a._id) === String(selectedEnrollmentId)) return -1;
+      if(String(b._id) === String(selectedEnrollmentId)) return 1;
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+
     if(!eligible.length){
       box.innerHTML =
         '<p class="empty">No registration payment is currently waiting for submission. Check your payment history for updates.</p>';
@@ -782,33 +1475,20 @@ async function loadPaymentSection(){
 
     box.innerHTML = eligible.map(item=>{
       const project = item.projectSnapshot || {};
+      const details = item.registrationDetails || {};
 
       return `
         <div class="formbox">
           <h3>${esc(project.projectName || "Project")}</h3>
-
-          <p>
-            Registration Fee:
-            <strong>${money(project.registrationFee)}</strong>
-          </p>
+          <p>Project Number: ${esc(project.projectNumber ?? details.projectNo ?? "-")}</p>
+          <p>Registration Fee: <strong>${money(project.registrationFee)}</strong></p>
 
           <form onsubmit="submitPayment(event,'${esc(item._id)}')">
-
             <label>Transaction ID</label>
-
-            <input
-              name="transactionId"
-              type="text"
-              maxlength="120"
-              required>
+            <input name="transactionId" type="text" maxlength="120" required>
 
             <label>Payment Screenshot</label>
-
-            <input
-              name="screenshot"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              required>
+            <input name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required>
 
             <button type="submit">Submit Payment</button>
           </form>
@@ -819,7 +1499,9 @@ async function loadPaymentSection(){
   }catch(error){
     showError("paymentSection",error);
   }
-}/*
+}
+
+/*
   SUBMIT REGISTRATION PAYMENT
 */
 
@@ -899,7 +1581,6 @@ async function submitPayment(event,enrollmentId){
     button.textContent = "Submit Payment";
   }
 }
-
 
 /*
   PAYMENT HISTORY
@@ -1012,9 +1693,7 @@ async function loadCustomerCharges(){
 
         <p>Payment Reference: ${esc(item.paymentReference || "-")}</p>
 
-        <p>Notes: ${esc(item.notes || "-")}</p>
-
-        <p>Date: ${fmtDate(item.createdAt)}</p>
+        <p>Notes: ${esc(item.notes || "-")}</p>        <p>Date: ${fmtDate(item.createdAt)}</p>
 
       </div>
     `).join("");
@@ -1781,6 +2460,60 @@ async function logout(){
 
 
 /*
+  SINGLE-VIEW NAVIGATION: only one dashboard section is visible at a time.
+*/
+const dashboardViewIds = [
+  "dashboardHome","projectsCard","registrationsCard","registrationPaymentCard",
+  "paymentHistoryCard","chargesCard","workCard","salaryCard","galleryCard",
+  "companyCertificatesCard","parcelCard","completionCertificatesCard",
+  "notificationsCard","supportCard","profileCard"
+];
+
+function showDashboardView(viewId, updateHash=true){
+  if(!dashboardViewIds.includes(viewId)) viewId = "dashboardHome";
+  dashboardViewIds.forEach(id=>{
+    const section = $(id);
+    if(section) section.hidden = id !== viewId;
+  });
+  document.querySelectorAll("#sidebarNav a[data-view]").forEach(link=>{
+    const active = link.dataset.view === viewId;
+    link.classList.toggle("active",active);
+    if(active) link.setAttribute("aria-current","page");
+    else link.removeAttribute("aria-current");
+  });
+  if(updateHash){
+    try{history.replaceState(null,"","#"+viewId);}catch(error){}
+  }
+  document.body.classList.remove("sidebar-open");
+  const toggle = $("menuToggle");
+  if(toggle) toggle.setAttribute("aria-expanded","false");
+  window.scrollTo({top:0,behavior:"auto"});
+}
+
+function setupDashboardNavigation(){
+  const nav = $("sidebarNav");
+  nav.addEventListener("click",event=>{
+    const link = event.target.closest("a[data-view]");
+    if(!link) return;
+    event.preventDefault();
+    showDashboardView(link.dataset.view);
+  });
+  const toggle = $("menuToggle");
+  toggle.addEventListener("click",()=>{
+    const open = document.body.classList.toggle("sidebar-open");
+    toggle.setAttribute("aria-expanded",String(open));
+  });
+  document.addEventListener("click",event=>{
+    if(!document.body.classList.contains("sidebar-open")) return;
+    if(event.target.closest("#dashboardSidebar") || event.target.closest("#menuToggle")) return;
+    document.body.classList.remove("sidebar-open");
+    toggle.setAttribute("aria-expanded","false");
+  });
+  const requested = location.hash.slice(1);
+  showDashboardView(dashboardViewIds.includes(requested)?requested:"dashboardHome",false);
+}
+
+/*
   DASHBOARD INITIALIZATION
 */
 
@@ -1829,7 +2562,7 @@ async function initDashboard(){
 */
 
 $("logoutBtn").addEventListener("click",logout);
-
+setupDashboardNavigation();
 initDashboard();
 
 </script>
