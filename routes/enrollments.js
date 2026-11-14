@@ -13,10 +13,23 @@ const {
     requireAdmin
 } = require("../middleware/auth");
 
+
+// ==========================================
 // CUSTOMER: CREATE PROJECT ENROLLMENT
+// ==========================================
+
 router.post("/", requireLogin, async (req, res) => {
     try {
-        const { projectId } = req.body;
+        const {
+            projectId,
+            name,
+            address,
+            mobile,
+            pinCode,
+            district
+        } = req.body;
+
+        // CHECK PROJECT ID
 
         if (!mongoose.isValidObjectId(projectId)) {
             return res.status(400).json({
@@ -24,6 +37,43 @@ router.post("/", requireLogin, async (req, res) => {
                 message: "Invalid project ID."
             });
         }
+
+        // VALIDATE CUSTOMER DETAILS
+
+        const customerName = String(name || "").trim();
+        const customerAddress = String(address || "").trim();
+        const customerMobile = String(mobile || "").trim();
+        const customerPinCode = String(pinCode || "").trim();
+        const customerDistrict = String(district || "").trim();
+
+        if (
+            !customerName ||
+            !customerAddress ||
+            !customerMobile ||
+            !customerPinCode ||
+            !customerDistrict
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Please fill all registration details."
+            });
+        }
+
+        if (!/^[0-9]{10}$/.test(customerMobile)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid 10-digit mobile number."
+            });
+        }
+
+        if (!/^[0-9]{6}$/.test(customerPinCode)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid 6-digit PIN code."
+            });
+        }
+
+        // FIND ACTIVE PROJECT
 
         const project = await Project.findOne({
             _id: projectId,
@@ -36,6 +86,8 @@ router.post("/", requireLogin, async (req, res) => {
                 message: "Project not found or inactive."
             });
         }
+
+        // CHECK DUPLICATE ENROLLMENT
 
         const existing = await Enrollment.findOne({
             customer: req.user._id,
@@ -52,9 +104,21 @@ router.post("/", requireLogin, async (req, res) => {
             });
         }
 
+        // CREATE ENROLLMENT
+
         const enrollment = await Enrollment.create({
             customer: req.user._id,
+
             project: project._id,
+
+            registrationDetails: {
+                name: customerName,
+                address: customerAddress,
+                mobile: customerMobile,
+                pinCode: customerPinCode,
+                district: customerDistrict,
+                projectNo: project.projectNumber
+            },
 
             projectSnapshot: {
                 projectName: project.projectName,
@@ -64,46 +128,62 @@ router.post("/", requireLogin, async (req, res) => {
                 durationDays: project.durationDays,
                 salary: project.salary,
                 registrationFee: project.registrationFee
-            }
+            },
+
+            registrationStatus: "pending",
+            paymentStatus: "unpaid"
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
-            message: "Project enrollment created successfully.",
+            message: "Project registration details submitted successfully. Please continue to payment.",
             enrollment
         });
 
     } catch (error) {
-        console.error("Enrollment error:", error);
+        console.error("Enrollment creation error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Unable to create enrollment."
+            message: "Unable to create project enrollment."
         });
     }
 });
 
+
+// ==========================================
 // CUSTOMER: VIEW OWN ENROLLMENTS
+// ==========================================
+
 router.get("/my", requireLogin, async (req, res) => {
     try {
         const enrollments = await Enrollment.find({
             customer: req.user._id
-        }).sort({ createdAt: -1 });
+        })
+        .sort({
+            createdAt: -1
+        });
 
-        res.json({
+        return res.json({
             success: true,
             enrollments
         });
 
     } catch (error) {
-        res.status(500).json({
+        console.error("Customer enrollment error:", error);
+
+        return res.status(500).json({
             success: false,
             message: "Unable to load enrollments."
         });
     }
 });
 
+
+// ==========================================
 // ADMIN: VIEW ALL ENROLLMENTS
+// ==========================================
+
 router.get(
     "/admin/all",
     requireLogin,
@@ -111,16 +191,23 @@ router.get(
     async (req, res) => {
         try {
             const enrollments = await Enrollment.find()
-                .populate("customer", "fullName email mobile")
-                .sort({ createdAt: -1 });
+                .populate(
+                    "customer",
+                    "fullName email mobile"
+                )
+                .sort({
+                    createdAt: -1
+                });
 
-            res.json({
+            return res.json({
                 success: true,
                 enrollments
             });
 
         } catch (error) {
-            res.status(500).json({
+            console.error("Admin enrollment error:", error);
+
+            return res.status(500).json({
                 success: false,
                 message: "Unable to load enrollments."
             });
@@ -128,7 +215,11 @@ router.get(
     }
 );
 
+
+// ==========================================
 // ADMIN: APPROVE OR REJECT ENROLLMENT
+// ==========================================
+
 router.patch(
     "/admin/:id/status",
     requireLogin,
@@ -137,12 +228,16 @@ router.patch(
         try {
             const { status } = req.body;
 
+            // VALIDATE ENROLLMENT ID
+
             if (!mongoose.isValidObjectId(req.params.id)) {
                 return res.status(400).json({
                     success: false,
                     message: "Invalid enrollment ID."
                 });
             }
+
+            // VALIDATE STATUS
 
             if (!["approved", "rejected"].includes(status)) {
                 return res.status(400).json({
@@ -169,7 +264,12 @@ router.patch(
                 });
             }
 
+            // APPROVE ENROLLMENT
+
             if (status === "approved") {
+
+                // PAYMENT MUST BE APPROVED FIRST
+
                 if (enrollment.paymentStatus !== "approved") {
                     return res.status(400).json({
                         success: false,
@@ -178,8 +278,16 @@ router.patch(
                 }
 
                 const approvedAt = new Date();
+
                 const totalSalary =
-                    enrollment.projectSnapshot.salary;
+                    Number(enrollment.projectSnapshot.salary);
+
+                if (!Number.isFinite(totalSalary) || totalSalary < 0) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid project salary."
+                    });
+                }
 
                 const advanceAmount =
                     Math.floor(totalSalary / 2);
@@ -191,8 +299,12 @@ router.patch(
                     approvedAt.getTime() + 15 * 60 * 1000
                 );
 
+                // CREATE OR UPDATE SALARY RECORD
+
                 await Salary.findOneAndUpdate(
-                    { enrollment: enrollment._id },
+                    {
+                        enrollment: enrollment._id
+                    },
                     {
                         $setOnInsert: {
                             customer: enrollment.customer,
@@ -219,10 +331,15 @@ router.patch(
                 enrollment.advanceDueAt = advanceDueAt;
 
             } else {
+
+                // REJECT ENROLLMENT
+
                 enrollment.registrationStatus = "rejected";
             }
 
             await enrollment.save();
+
+            // CUSTOMER NOTIFICATION
 
             await Notification.create({
                 title: status === "approved"
@@ -239,7 +356,7 @@ router.patch(
                 createdBy: req.user._id
             });
 
-            res.json({
+            return res.json({
                 success: true,
                 message: `Enrollment ${status} successfully.`,
                 enrollment
@@ -248,12 +365,13 @@ router.patch(
         } catch (error) {
             console.error("Enrollment review error:", error);
 
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 message: "Unable to update enrollment."
             });
         }
     }
 );
+
 
 module.exports = router;
