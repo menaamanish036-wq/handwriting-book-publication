@@ -1,65 +1,74 @@
 const mongoose = require("mongoose");
 
 const companyCertificateSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 200
-    },
+    {
+        // Uploaded certificate image
+        fileId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true
+        },
 
-    description: {
-      type: String,
-      default: "",
-      trim: true
-    },
+        fileName: {
+            type: String,
+            required: true,
+            trim: true
+        },
 
-    fileId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true
-    },
+        fileType: {
+            type: String,
+            enum: [
+                "image/jpeg",
+                "image/png",
+                "image/webp",
+                "application/pdf"
+            ],
+            required: true
+        },
 
-    fileName: {
-      type: String,
-      required: true,
-      trim: true
-    },
+        // Legacy fields retained for existing records
+        title: {
+            type: String,
+            default: "",
+            trim: true,
+            maxlength: 200
+        },
 
-    fileType: {
-      type: String,
-      enum: [
-        "image/jpeg",
-        "image/png",
-        "image/webp",
-        "application/pdf"
-      ],
-      required: true
-    },
+        description: {
+            type: String,
+            default: "",
+            trim: true
+        },
 
-    isActive: {
-      type: Boolean,
-      default: true
-    },
+        // Certificate visibility
+        isActive: {
+            type: Boolean,
+            default: true
+        },
 
-    uploadedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true
-    },
+        // Admin information
+        uploadedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
 
-    updatedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        }
+    },
+    {
+        timestamps: true
     }
-  },
-  {
-    timestamps: true
-  }
 );
 
+companyCertificateSchema.index({
+    isActive: 1,
+    createdAt: -1
+});
+
 module.exports = mongoose.model(
-  "CompanyCertificate",
-  companyCertificateSchema
+    "CompanyCertificate",
+    companyCertificateSchema
 );
