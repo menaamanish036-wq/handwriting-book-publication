@@ -8,9 +8,7 @@
 <title>Customer Dashboard | Handwriting Book Publication</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -41,9 +39,7 @@ main{
   padding:22px 16px;
 }
 
-.welcome{
-  margin-bottom:20px;
-}
+.welcome{margin-bottom:20px}
 
 .welcome h1{
   color:#d8b45a;
@@ -72,14 +68,11 @@ main{
 
 .grid{
   display:grid;
-  grid-template-columns:
-    repeat(auto-fit,minmax(220px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:14px;
 }
 
-.project,
-.work,
-.item{
+.project,.work,.item{
   background:#1b1b1b;
   border:1px solid #514124;
   border-radius:9px;
@@ -88,16 +81,12 @@ main{
   overflow-wrap:anywhere;
 }
 
-.project h3,
-.work h3,
-.item h4{
+.project h3,.work h3,.item h4{
   color:#e3c36d;
   margin:0 0 10px;
 }
 
-.project p,
-.work p,
-.item p{
+.project p,.work p,.item p{
   color:#ccc;
   font-size:14px;
   line-height:1.6;
@@ -155,9 +144,7 @@ button:disabled{
   cursor:not-allowed;
 }
 
-.logout{
-  margin:0;
-}
+.logout{margin:0}
 
 .formbox{
   background:#1b1b1b;
@@ -174,9 +161,7 @@ label{
   font-size:14px;
 }
 
-input,
-textarea,
-select{
+input,textarea,select{
   width:100%;
   padding:11px;
   border:1px solid #555;
@@ -191,9 +176,7 @@ textarea{
   resize:vertical;
 }
 
-.formbox button{
-  width:100%;
-}
+.formbox button{width:100%}
 
 .badge{
   display:inline-block;
@@ -233,9 +216,7 @@ textarea{
   overflow-wrap:anywhere;
 }
 
-a{
-  color:#e3c36d;
-}
+a{color:#e3c36d}
 
 @media(max-width:500px){
   header{
@@ -243,13 +224,8 @@ a{
     flex-direction:column;
   }
 
-  .welcome h1{
-    font-size:22px;
-  }
-
-  .card{
-    padding:14px;
-  }
+  .welcome h1{font-size:22px}
+  .card{padding:14px}
 }
 
 .payment-details{
@@ -298,21 +274,14 @@ a{
 <header>
   <h2>Handwriting Book Publication</h2>
 
-  <button
-    class="logout"
-    id="logoutBtn"
-    type="button">
+  <button class="logout" id="logoutBtn" type="button">
     Logout
   </button>
 </header>
 
 <main>
 
-  <div
-    id="message"
-    class="message"
-    aria-live="polite">
-  </div>
+  <div id="message" class="message" aria-live="polite"></div>
 
   <section class="welcome">
     <h1>
@@ -320,31 +289,21 @@ a{
       <span id="customerName">Customer</span>
     </h1>
 
-    <p class="muted">
-      Your personal customer dashboard
-    </p>
+    <p class="muted">Your personal customer dashboard</p>
   </section>
 
-  <div
-    id="accountStatus"
-    class="status">
+  <div id="accountStatus" class="status">
     Loading account status...
   </div>
 
   <section class="card">
     <h2>Available Projects</h2>
-
-    <div id="projects">
-      Loading projects...
-    </div>
+    <div id="projects">Loading projects...</div>
   </section>
 
   <section class="card">
     <h2>My Registrations</h2>
-
-    <div id="enrollments">
-      Loading registrations...
-    </div>
+    <div id="enrollments">Loading registrations...</div>
   </section>
 
   <section class="card">
@@ -371,10 +330,7 @@ a{
         <span class="payment-upi">8504823316@thecardco</span>
       </p>
 
-      <p>
-        Payee Name:
-        <strong>Ankur Meena</strong>
-      </p>
+      <p>Payee Name: <strong>Ankur Meena</strong></p>
 
       <p class="payment-note">
         Enter the exact registration fee shown for your selected project. After payment, enter the transaction ID and upload the payment screenshot below. Payment is subject to admin verification.
@@ -388,10 +344,7 @@ a{
 
   <section class="card">
     <h2>My Payment History</h2>
-
-    <div id="payments">
-      Loading payment records...
-    </div>
+    <div id="payments">Loading payment records...</div>
   </section>
 
   <section class="card">
@@ -403,9 +356,7 @@ a{
       and project salary.
     </p>
 
-    <div id="customerCharges">
-      Loading your charges...
-    </div>
+    <div id="customerCharges">Loading your charges...</div>
   </section>
 
   <section class="card">
@@ -416,66 +367,55 @@ a{
       submit completed files here.
     </p>
 
-    <div id="workAssignments">
-      Loading assigned work...
-    </div>
+    <div id="workAssignments">Loading assigned work...</div>
   </section>
 
   <section class="card">
     <h2>My Salary</h2>
-
-    <div id="salaries">
-      Loading salary records...
-    </div>
+    <div id="salaries">Loading salary records...</div>
   </section>
 
   <section class="card">
     <h2>Customer Work Gallery</h2>
 
+    <p class="muted">View published handwriting work.</p>
+
+    <div id="gallery">Loading customer work gallery...</div>
+  </section>
+
+  <section class="card">
+    <h2>Company Certificates</h2>
+
     <p class="muted">
-      View published handwriting work.
+      View our company certificates and documents.
     </p>
 
-    <div id="gallery">
-      Loading customer work gallery...
+    <div id="companyCertificates">
+      Loading company certificates...
     </div>
   </section>
 
   <section class="card">
     <h2>My Parcel Tracking</h2>
-
-    <div id="parcels">
-      Loading parcel information...
-    </div>
+    <div id="parcels">Loading parcel information...</div>
   </section>
 
   <section class="card">
     <h2>My Completion Certificates</h2>
-
-    <div id="certificates">
-      Loading certificates...
-    </div>
+    <div id="certificates">Loading certificates...</div>
   </section>
 
   <section class="card">
     <h2>Notifications</h2>
-
-    <div id="notifications">
-      Loading notifications...
-    </div>
+    <div id="notifications">Loading notifications...</div>
   </section>
 
   <section class="card">
     <h2>Customer Support</h2>
 
-    <form
-      id="supportForm"
-      class="formbox">
+    <form id="supportForm" class="formbox">
 
-      <label for="supportSubject">
-        Subject
-      </label>
-
+      <label for="supportSubject">Subject</label>
       <input
         id="supportSubject"
         name="subject"
@@ -483,15 +423,9 @@ a{
         maxlength="150"
         required>
 
-      <label for="supportCategory">
-        Category
-      </label>
+      <label for="supportCategory">Category</label>
 
-      <select
-        id="supportCategory"
-        name="category"
-        required>
-
+      <select id="supportCategory" name="category" required>
         <option value="registration">Registration</option>
         <option value="payment">Payment</option>
         <option value="project">Project</option>
@@ -501,39 +435,26 @@ a{
         <option value="certificate">Certificate</option>
         <option value="account">Account</option>
         <option value="other">Other</option>
-
       </select>
 
-      <label for="supportMessage">
-        Message
-      </label>
+      <label for="supportMessage">Message</label>
 
       <textarea
         id="supportMessage"
         name="message"
         maxlength="3000"
-        required>
-      </textarea>
+        required></textarea>
 
-      <button type="submit">
-        Submit Support Request
-      </button>
-
+      <button type="submit">Submit Support Request</button>
     </form>
 
     <h3>My Support Requests</h3>
-
-    <div id="supportTickets">
-      Loading support requests...
-    </div>
+    <div id="supportTickets">Loading support requests...</div>
   </section>
 
   <section class="card">
     <h2>Account Information</h2>
-
-    <div id="profile">
-      Loading profile...
-    </div>
+    <div id="profile">Loading profile...</div>
   </section>
 
 </main>
@@ -542,10 +463,11 @@ a{
 "use strict";
 
 const API_BASE = "/api";
-
 const $ = id => document.getElementById(id);
 
-let enrollments = [];/*
+let enrollments = [];
+
+/*
   COMMON HELPERS
 */
 
@@ -605,9 +527,7 @@ async function api(url,options={}){
   }
 
   if(!response.ok){
-    throw new Error(
-      data.message || "Request failed."
-    );
+    throw new Error(data.message || "Request failed.");
   }
 
   return data;
@@ -621,7 +541,6 @@ function showError(elementId,error){
       `<p class="empty">${esc(error.message || "Unable to load information.")}</p>`;
   }
 }
-
 
 /*
   ACCOUNT INFORMATION
@@ -651,7 +570,6 @@ async function loadAccount(){
   }
 }
 
-
 /*
   AVAILABLE PROJECTS
 */
@@ -671,21 +589,13 @@ async function loadProjects(){
 
     box.innerHTML = projects.map(project=>`
       <article class="project">
-
         <h3>${esc(project.projectName)}</h3>
-
         <p>Project Number: ${esc(project.projectNumber ?? "-")}</p>
-
         <p>Pages: ${esc(project.pages ?? "-")}</p>
-
         <p>Sides: ${esc(project.sides ?? "-")}</p>
-
         <p>Duration: ${esc(project.durationDays ?? "-")} days</p>
-
         <p>Salary: ${money(project.salary)}</p>
-
         <p>Registration Fee: ${money(project.registrationFee)}</p>
-
         <p>${esc(project.description || "")}</p>
 
         <button
@@ -693,7 +603,6 @@ async function loadProjects(){
           onclick="applyProject('${esc(project._id)}')">
           Select Project
         </button>
-
       </article>
     `).join("");
 
@@ -701,7 +610,6 @@ async function loadProjects(){
     showError("projects",error);
   }
 }
-
 
 /*
   APPLY FOR PROJECT
@@ -718,9 +626,7 @@ async function applyProject(projectId){
       headers:{
         "Content-Type":"application/json"
       },
-      body:JSON.stringify({
-        projectId
-      })
+      body:JSON.stringify({projectId})
     });
 
     message(
@@ -733,7 +639,6 @@ async function applyProject(projectId){
     message(error.message,"error");
   }
 }
-
 
 /*
   CUSTOMER REGISTRATIONS
@@ -760,19 +665,12 @@ async function loadEnrollments(){
 
       return `
         <div class="item">
-
           <h4>${esc(project.projectName || "Project")}</h4>
-
           <p>Project Number: ${esc(project.projectNumber ?? "-")}</p>
-
           <p>Pages: ${esc(project.pages ?? "-")}</p>
-
           <p>Sides: ${esc(project.sides ?? "-")}</p>
-
           <p>Duration: ${esc(project.durationDays ?? "-")} days</p>
-
           <p>Salary: ${money(project.salary)}</p>
-
           <p>Registration Fee: ${money(project.registrationFee)}</p>
 
           <p>
@@ -790,7 +688,6 @@ async function loadEnrollments(){
           </p>
 
           <p>Registration Date: ${fmtDate(item.createdAt)}</p>
-
         </div>
       `;
     }).join("");
@@ -802,7 +699,6 @@ async function loadEnrollments(){
   }
 }
 
-
 /*
   FILE UPLOAD
 */
@@ -813,7 +709,6 @@ async function uploadFile(file){
   }
 
   const formData = new FormData();
-
   formData.append("file",file);
 
   const response = await fetch(API_BASE + "/uploads",{
@@ -831,9 +726,7 @@ async function uploadFile(file){
   }
 
   if(!response.ok){
-    throw new Error(
-      data.message || "File upload failed."
-    );
+    throw new Error(data.message || "File upload failed.");
   }
 
   if(!data.file || !data.file.fileId){
@@ -842,7 +735,6 @@ async function uploadFile(file){
 
   return String(data.file.fileId);
 }
-
 
 /*
   REGISTRATION PAYMENT SECTION
@@ -859,7 +751,6 @@ async function loadPaymentSection(){
     }
 
     const paymentData = await api("/payments/my");
-
     const payments = paymentData.payments || [];
 
     const eligible = enrollments.filter(item=>{
@@ -886,7 +777,6 @@ async function loadPaymentSection(){
     if(!eligible.length){
       box.innerHTML =
         '<p class="empty">No registration payment is currently waiting for submission. Check your payment history for updates.</p>';
-
       return;
     }
 
@@ -895,7 +785,6 @@ async function loadPaymentSection(){
 
       return `
         <div class="formbox">
-
           <h3>${esc(project.projectName || "Project")}</h3>
 
           <p>
@@ -903,8 +792,7 @@ async function loadPaymentSection(){
             <strong>${money(project.registrationFee)}</strong>
           </p>
 
-          <form
-            onsubmit="submitPayment(event,'${esc(item._id)}')">
+          <form onsubmit="submitPayment(event,'${esc(item._id)}')">
 
             <label>Transaction ID</label>
 
@@ -922,12 +810,8 @@ async function loadPaymentSection(){
               accept="image/jpeg,image/png,image/webp"
               required>
 
-            <button type="submit">
-              Submit Payment
-            </button>
-
+            <button type="submit">Submit Payment</button>
           </form>
-
         </div>
       `;
     }).join("");
@@ -935,10 +819,7 @@ async function loadPaymentSection(){
   }catch(error){
     showError("paymentSection",error);
   }
-}
-
-
-/*
+}/*
   SUBMIT REGISTRATION PAYMENT
 */
 
@@ -1063,7 +944,10 @@ async function loadPayments(){
   }catch(error){
     showError("payments",error);
   }
-}/*
+}
+
+
+/*
   CUSTOMER CHARGES
 */
 
@@ -1440,11 +1324,53 @@ async function loadGallery(){
   }catch(error){
     showError("gallery",error);
   }
+  }/*
+  COMPANY CERTIFICATES
+*/
+
+async function loadCompanyCertificates(){
+  const box = $("companyCertificates");
+
+  try{
+    const data = await api("/company-certificate");
+    const certificates = data.certificates || [];
+
+    if(!certificates.length){
+      box.innerHTML =
+        '<p class="empty">No company certificates available yet.</p>';
+      return;
+    }
+
+    box.innerHTML = certificates.map(item=>{
+      if(!item.fileId){
+        return "";
+      }
+
+      const fileUrl =
+        `${API_BASE}/uploads/${encodeURIComponent(item.fileId)}`;
+
+      return `
+        <div class="item">
+          <a href="${fileUrl}" target="_blank" rel="noopener">
+            <img
+              class="gallery-image"
+              src="${fileUrl}"
+              alt="Company Certificate"
+              loading="lazy">
+          </a>
+        </div>
+      `;
+    }).join("");
+
+  }catch(error){
+    showError("companyCertificates",error);
+  }
 }
 
 
 /*
   PARCEL TRACKING
+  Customer view does not show tracking number or tracking link.
 */
 
 async function loadParcels(){
@@ -1467,8 +1393,6 @@ async function loadParcels(){
 
         <p>Courier: ${esc(item.courierName || "-")}</p>
 
-        <p>Tracking Number: ${esc(item.trackingNumber || "-")}</p>
-
         <p>
           Status:
           <span class="badge">${esc(item.status || "-")}</span>
@@ -1479,19 +1403,6 @@ async function loadParcels(){
         <p>Delivery Date: ${fmtDate(item.deliveryDate)}</p>
 
         <p>Admin Remarks: ${esc(item.adminRemarks || "-")}</p>
-
-        ${
-          item.trackingUrl
-            ? `
-              <a
-                href="${esc(item.trackingUrl)}"
-                target="_blank"
-                rel="noopener">
-                Track Parcel
-              </a>
-            `
-            : ""
-        }
 
       </div>
     `).join("");
@@ -1561,7 +1472,10 @@ async function loadCertificates(){
   }catch(error){
     showError("certificates",error);
   }
-  }/*
+}
+
+
+/*
   SALARY RECORDS
 */
 
@@ -1883,6 +1797,7 @@ async function initDashboard(){
       loadWorkAssignments(),
       loadSalaries(),
       loadGallery(),
+      loadCompanyCertificates(),
       loadParcels(),
       loadCertificates(),
       loadNotifications(),
