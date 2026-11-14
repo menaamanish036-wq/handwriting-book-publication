@@ -9,7 +9,13 @@ const {
     requireAdmin
 } = require("../middleware/auth");
 
-// VERIFY THAT FILE WAS UPLOADED BY THE ADMIN
+const ALLOWED_FILE_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+];
+
+// VERIFY ADMIN UPLOADED FILE
 async function verifyAdminFile(fileId, userId) {
     if (!mongoose.isValidObjectId(fileId)) {
         return false;
@@ -25,34 +31,28 @@ async function verifyAdminFile(fileId, userId) {
             _id: new mongoose.Types.ObjectId(fileId)
         });
 
-    if (!file || !file.metadata) {
-        return false;
-    }
-
-    return file.metadata.uploadedBy === String(userId);
+    return Boolean(
+        file &&
+        file.metadata &&
+        file.metadata.uploadedBy === String(userId) &&
+        ALLOWED_FILE_TYPES.includes(file.contentType)
+    );
 }
 
-// ALLOWED DOCUMENT FORMATS
-const ALLOWED_FILE_TYPES = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "application/pdf"
-];
-
-// PUBLIC: GET ACTIVE COMPANY CERTIFICATES
+// CUSTOMER: VIEW ACTIVE COMPANY CERTIFICATES
 router.get("/", async (req, res) => {
     try {
         const certificates = await CompanyCertificate.find({
-            isActive: true
+            isActive: true,
+            fileType: { $in: ALLOWED_FILE_TYPES }
         })
             .sort({ createdAt: -1 })
+            .select("fileId fileName fileType createdAt")
             .lean();
 
         return res.json({
             success: true,
-            certificates,
-            certificate: certificates[0] || null
+            certificates
         });
 
     } catch (error) {
@@ -60,12 +60,12 @@ router.get("/", async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Unable to load company documents."
+            message: "Unable to load company certificates."
         });
     }
 });
 
-// ADMIN: GET ALL COMPANY CERTIFICATES
+// ADMIN: VIEW ALL CERTIFICATES
 router.get(
     "/admin",
     requireLogin,
@@ -74,12 +74,12 @@ router.get(
         try {
             const certificates = await CompanyCertificate.find()
                 .sort({ createdAt: -1 })
+                .select("fileId fileName fileType isActive createdAt")
                 .lean();
 
             return res.json({
                 success: true,
-                certificates,
-                certificate: certificates[0] || null
+                certificates
             });
 
         } catch (error) {
@@ -87,13 +87,13 @@ router.get(
 
             return res.status(500).json({
                 success: false,
-                message: "Unable to load company documents."
+                message: "Unable to load company certificates."
             });
         }
     }
 );
 
-// ADMIN: ADD COMPANY CERTIFICATE
+// ADMIN: UPLOAD CERTIFICATE PHOTO
 router.post(
     "/",
     requireLogin,
@@ -101,22 +101,10 @@ router.post(
     async (req, res) => {
         try {
             const {
-                title,
-                description,
                 fileId,
                 fileName,
                 fileType
             } = req.body;
-
-            if (
-                typeof title !== "string" ||
-                !title.trim()
-            ) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Document title is required."
-                });
-            }
 
             if (
                 typeof fileName !== "string" ||
@@ -124,14 +112,14 @@ router.post(
             ) {
                 return res.status(400).json({
                     success: false,
-                    message: "Document file name is required."
+                    message: "Certificate photo is required."
                 });
             }
 
             if (!ALLOWED_FILE_TYPES.includes(fileType)) {
                 return res.status(400).json({
                     success: false,
-                    message: "Unsupported document format."
+                    message: "Only JPG, PNG and WEBP photos are allowed."
                 });
             }
 
@@ -143,18 +131,11 @@ router.post(
             if (!validFile) {
                 return res.status(400).json({
                     success: false,
-                    message: "Uploaded file not found or not owned by admin."
+                    message: "Uploaded photo is invalid or not owned by admin."
                 });
             }
 
             const certificate = await CompanyCertificate.create({
-                title: title.trim(),
-
-                description:
-                    typeof description === "string"
-                        ? description.trim()
-                        : "",
-
                 fileId: new mongoose.Types.ObjectId(fileId),
                 fileName: fileName.trim(),
                 fileType,
@@ -164,22 +145,22 @@ router.post(
 
             return res.status(201).json({
                 success: true,
-                message: "Company document added successfully.",
+                message: "Certificate photo uploaded successfully.",
                 certificate
             });
 
         } catch (error) {
-            console.error("Add certificate error:", error);
+            console.error("Certificate upload error:", error);
 
             return res.status(500).json({
                 success: false,
-                message: "Unable to add company document."
+                message: "Unable to upload certificate photo."
             });
         }
     }
 );
 
-// ADMIN: UPDATE COMPANY CERTIFICATE
+// ADMIN: HIDE OR SHOW CERTIFICATE
 router.patch(
     "/:id",
     requireLogin,
@@ -189,7 +170,14 @@ router.patch(
             if (!mongoose.isValidObjectId(req.params.id)) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalid document ID."
+                    message: "Invalid certificate ID."
+                });
+            }
+
+            if (typeof req.body.isActive !== "boolean") {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid visibility status."
                 });
             }
 
@@ -200,126 +188,35 @@ router.patch(
             if (!certificate) {
                 return res.status(404).json({
                     success: false,
-                    message: "Company document not found."
+                    message: "Certificate not found."
                 });
             }
 
-            const {
-                title,
-                description,
-                fileId,
-                fileName,
-                fileType,
-                isActive
-            } = req.body;
-
-            // UPDATE TITLE
-            if (title !== undefined) {
-                if (
-                    typeof title !== "string" ||
-                    !title.trim()
-                ) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid document title."
-                    });
-                }
-
-                certificate.title = title.trim();
-            }
-
-            // UPDATE DESCRIPTION
-            if (description !== undefined) {
-                if (typeof description !== "string") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid document description."
-                    });
-                }
-
-                certificate.description = description.trim();
-            }
-
-            // UPDATE FILE
-            if (fileId !== undefined) {
-                const validFile = await verifyAdminFile(
-                    fileId,
-                    req.user._id
-                );
-
-                if (!validFile) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Uploaded file is invalid."
-                    });
-                }
-
-                certificate.fileId =
-                    new mongoose.Types.ObjectId(fileId);
-            }
-
-            // UPDATE FILE NAME
-            if (fileName !== undefined) {
-                if (
-                    typeof fileName !== "string" ||
-                    !fileName.trim()
-                ) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid document file name."
-                    });
-                }
-
-                certificate.fileName = fileName.trim();
-            }
-
-            // UPDATE FILE TYPE
-            if (fileType !== undefined) {
-                if (!ALLOWED_FILE_TYPES.includes(fileType)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Unsupported file format."
-                    });
-                }
-
-                certificate.fileType = fileType;
-            }
-
-            // UPDATE VISIBILITY
-            if (isActive !== undefined) {
-                if (typeof isActive !== "boolean") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid active status."
-                    });
-                }
-
-                certificate.isActive = isActive;
-            }
-
-            // RECORD LAST ADMIN WHO UPDATED THE DOCUMENT
+            certificate.isActive = req.body.isActive;
             certificate.updatedBy = req.user._id;
 
             await certificate.save();
 
             return res.json({
                 success: true,
-                message: "Company document updated successfully.",
+                message: certificate.isActive
+                    ? "Certificate is now visible."
+                    : "Certificate has been hidden.",
                 certificate
             });
 
         } catch (error) {
-            console.error("Update certificate error:", error);
+            console.error("Certificate update error:", error);
 
             return res.status(500).json({
                 success: false,
-                message: "Unable to update company document."
+                message: "Unable to update certificate."
             });
         }
     }
 );
 
-// ADMIN: DELETE COMPANY CERTIFICATE
+// ADMIN: DELETE CERTIFICATE
 router.delete(
     "/:id",
     requireLogin,
@@ -329,7 +226,7 @@ router.delete(
             if (!mongoose.isValidObjectId(req.params.id)) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalid document ID."
+                    message: "Invalid certificate ID."
                 });
             }
 
@@ -341,21 +238,21 @@ router.delete(
             if (!certificate) {
                 return res.status(404).json({
                     success: false,
-                    message: "Company document not found."
+                    message: "Certificate not found."
                 });
             }
 
             return res.json({
                 success: true,
-                message: "Company document deleted successfully."
+                message: "Certificate deleted successfully."
             });
 
         } catch (error) {
-            console.error("Delete certificate error:", error);
+            console.error("Certificate delete error:", error);
 
             return res.status(500).json({
                 success: false,
-                message: "Unable to delete company document."
+                message: "Unable to delete certificate."
             });
         }
     }
