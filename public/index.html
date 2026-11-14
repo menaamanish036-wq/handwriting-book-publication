@@ -2,742 +2,745 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080808">
-<title>Handwriting Book Publication</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090909">
+
+<title>Customer Access | Handwriting Book Publication</title>
 
 <style>
+:root {
+  --gold:#d8b45f;
+  --gold2:#f3d995;
+  --ink:#090909;
+  --panel:#121212;
+  --muted:#a9a39a;
+  --line:rgba(216,180,95,.24);
+}
+
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
+  box-sizing:border-box;
 }
 
 body {
-    min-height: 100vh;
-    background: #080808;
-    color: #fff;
-    padding: 28px 14px;
+  margin:0;
+  min-height:100vh;
+  color:#f7f3e9;
+  background:
+    radial-gradient(ellipse at 15% 15%,rgba(163,119,39,.19),transparent 35%),
+    radial-gradient(ellipse at 90% 85%,rgba(163,119,39,.13),transparent 33%),
+    linear-gradient(135deg,#050505,#111 55%,#080808);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
+  display:grid;
+  place-items:center;
+  padding:28px;
 }
 
-.container {
-    width: 100%;
-    max-width: 980px;
-    margin: 0 auto;
-    background: #111;
-    border: 1px solid #b99335;
-    border-radius: 18px;
-    padding: 30px 24px;
-    box-shadow: 0 0 30px rgba(185, 147, 53, 0.12);
+.shell {
+  width:min(1120px,100%);
+  min-height:680px;
+  display:grid;
+  grid-template-columns:1.08fr .92fr;
+  border:1px solid var(--line);
+  border-radius:26px;
+  overflow:hidden;
+  background:rgba(12,12,12,.94);
+  box-shadow:0 30px 100px #000b;
 }
 
-.brand {
-    text-align: center;
-    margin-bottom: 25px;
+.brand-panel {
+  position:relative;
+  padding:58px 54px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  overflow:hidden;
+  background:
+    linear-gradient(145deg,rgba(216,180,95,.13),transparent 42%),
+    linear-gradient(180deg,#17140e,#090909);
+}
+
+.brand-panel:before {
+  content:"";
+  position:absolute;
+  width:460px;
+  height:460px;
+  border:1px solid rgba(216,180,95,.17);
+  border-radius:50%;
+  right:-190px;
+  bottom:-160px;
+  box-shadow:
+    0 0 0 35px rgba(216,180,95,.025),
+    0 0 0 75px rgba(216,180,95,.02);
+}
+
+.brand-panel:after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
+    125deg,
+    transparent 0 45px,
+    rgba(255,255,255,.012) 46px 47px
+  );
+  pointer-events:none;
+}
+
+.brand,
+.brand-foot,
+.ornament {
+  position:relative;
+  z-index:1;
+}
+
+.brand-mark {
+  width:62px;
+  height:62px;
+  border:1px solid var(--gold);
+  border-radius:17px;
+  display:grid;
+  place-items:center;
+  color:var(--gold2);
+  font-family:Georgia,serif;
+  font-size:29px;
+  box-shadow:inset 0 0 25px #d8b45f18;
+  margin-bottom:30px;
+}
+
+.eyebrow {
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-size:11px;
+  font-weight:700;
 }
 
 .brand h1 {
-    color: #d8b45a;
-    font-size: 25px;
-    line-height: 1.4;
+  font-family:Georgia,'Times New Roman',serif;
+  font-weight:500;
+  font-size:clamp(36px,4.3vw,58px);
+  line-height:1.08;
+  max-width:540px;
+  margin:17px 0;
 }
 
-.brand p {
-    color: #aaa;
-    font-size: 13px;
-    margin-top: 8px;
+.brand h1 span {
+  color:var(--gold2);
+}
+
+.brand-copy {
+  color:#c4bdb0;
+  max-width:430px;
+  line-height:1.8;
+  font-size:15px;
+}
+
+.trust-row {
+  display:flex;
+  gap:22px;
+  flex-wrap:wrap;
+  margin-top:38px;
+}
+
+.trust {
+  border-left:2px solid var(--gold);
+  padding-left:12px;
+}
+
+.trust b {
+  display:block;
+  color:#fff;
+  font-size:14px;
+}
+
+.trust small {
+  color:var(--muted);
+  font-size:11px;
+}
+
+.brand-foot {
+  color:#777168;
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.ornament {
+  position:absolute;
+  right:55px;
+  top:60px;
+  color:rgba(216,180,95,.4);
+  font-family:Georgia,serif;
+  font-size:90px;
+}
+
+.form-panel {
+  padding:56px clamp(26px,5vw,64px);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  background:linear-gradient(160deg,#141414,#0c0c0c);
+}
+
+.form-head {
+  margin-bottom:32px;
+}
+
+.form-head .eyebrow {
+  font-size:10px;
+}
+
+.form-head h2 {
+  font:500 34px Georgia,serif;
+  margin:12px 0 8px;
+}
+
+.form-head p {
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+  margin:0;
 }
 
 .tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  padding:5px;
+  border:1px solid #30291c;
+  border-radius:12px;
+  background:#090909;
+  margin-bottom:26px;
 }
 
 .tab {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid #555;
-    background: #191919;
-    color: #ddd;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:#aaa;
+  padding:13px;
+  font-weight:650;
+  cursor:pointer;
 }
 
 .tab.active {
-    background: #c6a34a;
-    color: #080808;
-    border-color: #c6a34a;
-    font-weight: bold;
+  background:linear-gradient(135deg,#e4c777,#b58b39);
+  color:#17120a;
+  box-shadow:0 5px 18px #b58b3930;
 }
 
 .form {
-    display: none;
+  display:none;
 }
 
 .form.active {
-    display: block;
+  display:block;
 }
 
-.form h2 {
-    color: #d8b45a;
-    margin-bottom: 20px;
-    font-size: 21px;
+.field {
+  margin-bottom:18px;
 }
 
-.input-group {
-    margin-bottom: 14px;
+.field label {
+  display:block;
+  color:#d9d1c2;
+  font-size:12px;
+  font-weight:650;
+  margin-bottom:8px;
 }
 
-label {
-    display: block;
-    color: #ddd;
-    font-size: 13px;
-    margin-bottom: 7px;
+.field input {
+  width:100%;
+  height:51px;
+  border:1px solid #38332a;
+  border-radius:10px;
+  background:#090909;
+  color:#fff;
+  padding:0 15px;
+  outline:none;
+  font-size:15px;
+  transition:.2s;
 }
 
-input, textarea {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid #444;
-    background: #1b1b1b;
-    color: white;
-    border-radius: 7px;
-    outline: none;
-    font-size: 14px;
+.field input:focus {
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px #d8b45f18;
 }
 
-input:focus, textarea:focus {
-    border-color: #d8b45a;
+.field input::placeholder {
+  color:#68635b;
 }
 
-textarea {
-    resize: vertical;
-    min-height: 75px;
+.submit {
+  width:100%;
+  border:0;
+  border-radius:10px;
+  padding:15px;
+  background:linear-gradient(110deg,#e6c979,#b68c3e);
+  color:#181208;
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:.04em;
+  cursor:pointer;
+  margin-top:5px;
+  box-shadow:0 9px 24px #b68c3e24;
 }
 
-.submit-btn {
-    width: 100%;
-    padding: 14px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #e5c46b, #a77c24);
-    color: #080808;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.submit-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.submit:disabled {
+  opacity:.6;
+  cursor:wait;
 }
 
 .message {
-    display: none;
-    padding: 12px;
-    border-radius: 7px;
-    margin-bottom: 15px;
-    font-size: 13px;
-    line-height: 1.5;
+  display:none;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px 14px;
+  margin:-8px 0 18px;
+  font-size:13px;
 }
 
-.message.success {
-    display: block;
-    background: #12351f;
-    color: #8df0a8;
+.message.show {
+  display:block;
 }
 
 .message.error {
-    display: block;
-    background: #401919;
-    color: #ffaaaa;
+  color:#ffb4a9;
+  border-color:#8f4038;
+  background:#3b1512;
 }
 
-.certificates-section {
-    margin-top: 30px;
-    padding-top: 22px;
-    border-top: 1px solid #4b3b20;
+.message.success {
+  color:#d9f4c7;
+  border-color:#456b36;
+  background:#142411;
 }
 
-.certificates-section h2 {
-    color: #d8b45a;
-    font-size: 21px;
-    text-align: center;
-    margin-bottom: 8px;
+.hint {
+  margin-top:20px;
+  color:#79736a;
+  font-size:11px;
+  line-height:1.7;
+  text-align:center;
 }
 
-.certificates-intro {
-    color: #aaa;
-    text-align: center;
-    font-size: 13px;
-    line-height: 1.5;
-    margin-bottom: 16px;
+.secure {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  color:#8f897f;
+  font-size:11px;
+  margin-top:25px;
 }
 
-.certificate-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
+.secure i {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#8fba69;
+  box-shadow:0 0 10px #8fba69;
 }
 
-.certificate-card {
-    background: #191919;
-    border: 1px solid #514126;
-    border-radius: 10px;
-    padding: 14px;
-    min-width: 0;
+.foot-mobile {
+  display:none;
 }
 
-.certificate-card h3 {
-    color: #e2c36e;
-    font-size: 15px;
-    line-height: 1.4;
-    overflow-wrap: anywhere;
+@media(max-width:800px) {
+  body {
+    padding:14px;
+  }
+
+  .shell {
+    grid-template-columns:1fr;
+    min-height:0;
+    border-radius:20px;
+  }
+
+  .brand-panel {
+    padding:28px 27px 24px;
+    min-height:265px;
+  }
+
+  .brand-mark {
+    width:48px;
+    height:48px;
+    border-radius:13px;
+    font-size:23px;
+    margin-bottom:20px;
+  }
+
+  .brand h1 {
+    font-size:36px;
+    max-width:390px;
+    margin:12px 0;
+  }
+
+  .brand-copy {
+    font-size:13px;
+    max-width:430px;
+  }
+
+  .trust-row {
+    margin-top:18px;
+    gap:15px;
+  }
+
+  .brand-foot {
+    display:none;
+  }
+
+  .ornament {
+    right:25px;
+    top:26px;
+    font-size:62px;
+  }
+
+  .form-panel {
+    padding:32px 25px 27px;
+  }
+
+  .form-head {
+    margin-bottom:23px;
+  }
+
+  .form-head h2 {
+    font-size:29px;
+  }
+
+  .foot-mobile {
+    display:block;
+    text-align:center;
+    color:#70695e;
+    font-size:10px;
+    margin-top:22px;
+  }
 }
 
-.certificate-card p {
-    color: #aaa;
-    font-size: 12px;
-    line-height: 1.5;
-    margin: 7px 0 12px;
-    overflow-wrap: anywhere;
-}
+@media(max-width:380px) {
+  .brand h1 {
+    font-size:30px;
+  }
 
-.certificate-link {
-    display: inline-block;
-    color: #080808;
-    background: #d8b45a;
-    padding: 9px 12px;
-    border-radius: 7px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: bold;
-}
+  .brand-panel {
+    min-height:245px;
+  }
 
-.certificate-empty {
-    grid-column: 1 / -1;
-    color: #999;
-    text-align: center;
-    padding: 16px;
-    border: 1px dashed #514126;
-    border-radius: 9px;
-    font-size: 13px;
-}
-
-.footer {
-    text-align: center;
-    color: #777;
-    font-size: 12px;
-    margin-top: 25px;
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 25px 18px;
-    }
-
-    .brand h1 {
-        font-size: 22px;
-    }
+  .trust {
+    padding-left:8px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<main class="shell">
 
-    <div class="brand">
-        <h1>Handwriting Book Publication</h1>
-        <p>Customer Account Portal</p>
-    </div>
+<section class="brand-panel">
 
-    <div class="tabs">
-        <button class="tab active" id="loginTab" type="button">
-            Login
-        </button>
+<div class="brand">
 
-        <button class="tab" id="registerTab" type="button">
-            Register
-        </button>
-    </div>
+<div class="brand-mark">H</div>
 
-    <div id="message" class="message"></div>
+<div class="eyebrow">
+A trusted handwriting work partner
+</div>
 
-    <!-- LOGIN FORM -->
+<h1>
+Handwriting <span>Book</span><br>
+Publication
+</h1>
 
-    <form id="loginForm" class="form active">
+<p class="brand-copy">
+A professional work-from-home handwriting project.
+Register your account, choose a project and complete
+your assigned writing by hand at home.
+</p>
 
-        <h2>Customer Login</h2>
+<div class="trust-row">
 
-        <div class="input-group">
-            <label>Email or Mobile Number</label>
-            <input
-                type="text"
-                id="loginIdentifier"
-                required
-                autocomplete="username"
-                placeholder="Enter email or mobile number"
-            >
-        </div>
+<div class="trust">
+<b>Home Based</b>
+<small>Physical handwriting work</small>
+</div>
 
-        <div class="input-group">
-            <label>Password</label>
-            <input
-                type="password"
-                id="loginPassword"
-                required
-                autocomplete="current-password"
-                placeholder="Enter your password"
-            >
-        </div>
+<div class="trust">
+<b>Guided Projects</b>
+<small>Clear pages & timelines</small>
+</div>
 
-        <button class="submit-btn" type="submit">
-            Login to Account
-        </button>
+<div class="trust">
+<b>Direct Support</b>
+<small>Customer assistance</small>
+</div>
 
-    </form>
+</div>
+</div>
 
-    <!-- REGISTRATION FORM -->
+<div class="brand-foot">
+Quality · Commitment · Trust
+</div>
 
-    <form id="registerForm" class="form">
+<div class="ornament">✦</div>
 
-        <h2>Create Customer Account</h2>
+</section>
 
-        <div class="input-group">
-            <label>Full Name *</label>
-            <input type="text" id="fullName" required maxlength="100">
-        </div>
+<section class="form-panel">
 
-        <div class="input-group">
-            <label>Father's Name</label>
-            <input type="text" id="fatherName" maxlength="100">
-        </div>
+<div class="form-head">
 
-        <div class="input-group">
-            <label>Mobile Number *</label>
-            <input
-                type="tel"
-                id="mobile"
-                required
-                pattern="[0-9]{10}"
-                maxlength="10"
-                inputmode="numeric"
-                placeholder="10-digit mobile number"
-            >
-        </div>
+<div class="eyebrow">Customer portal</div>
 
-        <div class="input-group">
-            <label>WhatsApp Number</label>
-            <input
-                type="tel"
-                id="whatsapp"
-                maxlength="15"
-                placeholder="WhatsApp number"
-            >
-        </div>
+<h2>Welcome back</h2>
 
-        <div class="input-group">
-            <label>Email Address *</label>
-            <input
-                type="email"
-                id="email"
-                required
-                autocomplete="email"
-            >
-        </div>
-
-        <div class="input-group">
-            <label>Password *</label>
-            <input
-                type="password"
-                id="registerPassword"
-                required
-                minlength="8"
-                autocomplete="new-password"
-                placeholder="Minimum 8 characters"
-            >
-        </div>
-
-        <div class="input-group">
-            <label>Address</label>
-            <textarea id="address"></textarea>
-        </div>
-
-        <div class="input-group">
-            <label>State</label>
-            <input type="text" id="state">
-        </div>
-
-        <div class="input-group">
-            <label>District</label>
-            <input type="text" id="district">
-        </div>
-
-        <div class="input-group">
-            <label>City</label>
-            <input type="text" id="city">
-        </div>
-
-        <div class="input-group">
-            <label>PIN Code</label>
-            <input
-                type="text"
-                id="pinCode"
-                maxlength="6"
-                inputmode="numeric"
-            >
-        </div>
-
-        <button class="submit-btn" type="submit">
-            Create Account
-        </button>
-
-    </form>
-
-    <!-- PUBLIC COMPANY CERTIFICATES -->
-
-    <section class="certificates-section" aria-labelledby="companyCertificatesHeading">
-
-        <h2 id="companyCertificatesHeading">
-            Company Certificates & Documents
-        </h2>
-
-        <p class="certificates-intro">
-            View our published company certificates and supporting documents.
-            These documents are available to visitors without customer login.
-        </p>
-
-        <div id="publicCertificates" class="certificate-grid" aria-live="polite">
-            <div class="certificate-empty">
-                Loading company documents...
-            </div>
-        </div>
-
-    </section>
-
-    <div class="footer">
-        © 2026 Handwriting Book Publication. All Rights Reserved.
-    </div>
+<p>
+Sign in to continue, or create your customer account
+to explore available handwriting projects.
+</p>
 
 </div>
 
+<div class="tabs">
+
+<button class="tab active" id="loginTab" type="button">
+Login
+</button>
+
+<button class="tab" id="registerTab" type="button">
+Create account
+</button>
+
+</div>
+
+<div id="message" class="message" role="status"></div>
+
+<form id="loginForm" class="form active">
+
+<div class="field">
+<label for="loginIdentifier">Mobile number</label>
+
+<input
+id="loginIdentifier"
+type="tel"
+inputmode="numeric"
+maxlength="10"
+pattern="[0-9]{10}"
+placeholder="Enter your 10-digit mobile number"
+required
+autocomplete="username">
+</div>
+
+<div class="field">
+<label for="loginPassword">Password</label>
+
+<input
+id="loginPassword"
+type="password"
+placeholder="Enter your password"
+required
+autocomplete="current-password">
+</div>
+
+<button class="submit" type="submit">
+LOGIN TO YOUR ACCOUNT →
+</button>
+
+</form>
+
+<form id="registerForm" class="form">
+
+<div class="field">
+<label for="mobile">Mobile number</label>
+
+<input
+id="mobile"
+type="tel"
+inputmode="numeric"
+maxlength="10"
+pattern="[0-9]{10}"
+placeholder="Enter your 10-digit mobile number"
+required
+autocomplete="tel">
+</div>
+
+<div class="field">
+<label for="registerPassword">Create password</label>
+
+<input
+id="registerPassword"
+type="password"
+minlength="8"
+placeholder="At least 8 characters"
+required
+autocomplete="new-password">
+</div>
+
+<div class="field">
+<label for="confirmPassword">Confirm password</label>
+
+<input
+id="confirmPassword"
+type="password"
+minlength="8"
+placeholder="Re-enter your password"
+required
+autocomplete="new-password">
+</div>
+
+<button class="submit" type="submit">
+CREATE CUSTOMER ACCOUNT →
+</button>
+
+</form>
+
+<div class="secure">
+<i></i>
+Secure customer access · Your account is activated instantly
+</div>
+
+<div class="hint">
+Project application details and delivery address will be collected
+after login, when you apply for a project.
+</div>
+
+<div class="foot-mobile">
+© 2026 Handwriting Book Publication
+</div>
+
+</section>
+</main>
+
 <script>
+const $ = id => document.getElementById(id);
 
-"use strict";
+const loginForm = $("loginForm");
+const registerForm = $("registerForm");
+const messageBox = $("message");
 
-const loginTab = document.getElementById("loginTab");
-const registerTab = document.getElementById("registerTab");
-
-const loginForm = document.getElementById("loginForm");
-const registerForm = document.getElementById("registerForm");
-
-const messageBox = document.getElementById("message");
-
-function showMessage(text, type) {
-    messageBox.textContent = text;
-    messageBox.className = "message " + type;
+function message(text,type) {
+  messageBox.textContent = text;
+  messageBox.className = `message show ${type || ""}`;
 }
 
-function clearMessage() {
-    messageBox.textContent = "";
-    messageBox.className = "message";
+function switchTab(which) {
+
+  const login = which === "login";
+
+  $("loginTab").classList.toggle("active",login);
+  $("registerTab").classList.toggle("active",!login);
+
+  loginForm.classList.toggle("active",login);
+  registerForm.classList.toggle("active",!login);
+
+  messageBox.className = "message";
 }
 
-function showLogin() {
-    loginTab.classList.add("active");
-    registerTab.classList.remove("active");
+$("loginTab").onclick = () => switchTab("login");
+$("registerTab").onclick = () => switchTab("register");
 
-    loginForm.classList.add("active");
-    registerForm.classList.remove("active");
+async function send(url,payload) {
 
-    clearMessage();
+  const response = await fetch(url,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    credentials:"same-origin",
+    body:JSON.stringify(payload)
+  });
+
+  const data = await response.json();
+
+  if(!response.ok) {
+    throw new Error(
+      data.message ||
+      data.errors?.[0]?.msg ||
+      "Request failed"
+    );
+  }
+
+  return data;
 }
 
-function showRegister() {
-    registerTab.classList.add("active");
-    loginTab.classList.remove("active");
+loginForm.addEventListener("submit",async event => {
 
-    registerForm.classList.add("active");
-    loginForm.classList.remove("active");
+  event.preventDefault();
 
-    clearMessage();
-}
+  const button = loginForm.querySelector("button");
 
-loginTab.addEventListener("click", showLogin);
-registerTab.addEventListener("click", showRegister);
+  button.disabled = true;
+  button.textContent = "PLEASE WAIT…";
 
-// PUBLIC COMPANY CERTIFICATES
+  try {
 
-async function loadPublicCompanyCertificates() {
+    await send("/api/auth/login",{
+      identifier:$("loginIdentifier").value.trim(),
+      password:$("loginPassword").value
+    });
 
-    const container = document.getElementById("publicCertificates");
-    container.replaceChildren();
+    location.href = "/dashboard.html";
 
-    try {
+  } catch(error) {
 
-        const response = await fetch("/api/company-certificate", {
-            method: "GET",
-            credentials: "same-origin",
-            headers: {
-                "Accept": "application/json"
-            }
-        });
+    message(error.message,"error");
 
-        const data = await response.json();
+  } finally {
 
-        if (!response.ok || data.success === false) {
-            throw new Error(
-                data.message || "Unable to load company documents."
-            );
-        }
-
-        const certificates = Array.isArray(data.certificates)
-            ? data.certificates
-            : (data.certificate ? [data.certificate] : []);
-
-        if (!certificates.length) {
-
-            const empty = document.createElement("div");
-            empty.className = "certificate-empty";
-            empty.textContent = "No company documents have been published yet.";
-
-            container.appendChild(empty);
-            return;
-        }
-
-        certificates.forEach((certificate) => {
-
-            if (!certificate || !certificate.fileId) return;
-
-            const card = document.createElement("article");
-            card.className = "certificate-card";
-
-            const title = document.createElement("h3");
-            title.textContent = certificate.title || "Company Document";
-            card.appendChild(title);
-
-            const description = document.createElement("p");
-            description.textContent =
-                certificate.description || "Official company document.";
-
-            card.appendChild(description);
-
-            const link = document.createElement("a");
-
-            link.className = "certificate-link";
-
-            link.href =
-                "/api/uploads/" +
-                encodeURIComponent(String(certificate.fileId));
-
-            link.target = "_blank";
-            link.rel = "noopener noreferrer";
-
-            link.textContent =
-                certificate.fileType === "application/pdf"
-                    ? "View PDF Document"
-                    : "View Certificate";
-
-            card.appendChild(link);
-            container.appendChild(card);
-
-        });
-
-        if (!container.children.length) {
-
-            const empty = document.createElement("div");
-            empty.className = "certificate-empty";
-            empty.textContent = "No company documents are currently available.";
-
-            container.appendChild(empty);
-        }
-
-    } catch (error) {
-
-        console.error("Public company certificates error:", error);
-
-        const message = document.createElement("div");
-        message.className = "certificate-empty";
-        message.textContent =
-            "Company documents could not be loaded. Please refresh the page.";
-
-        container.appendChild(message);
-    }
-}
-
-loadPublicCompanyCertificates();
-
-// CUSTOMER LOGIN
-
-loginForm.addEventListener("submit", async function(event) {
-
-    event.preventDefault();
-
-    const button = loginForm.querySelector("button");
-
-    button.disabled = true;
-    button.textContent = "Please wait...";
-
-    try {
-
-        const response = await fetch("/api/auth/login", {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            credentials: "same-origin",
-
-            body: JSON.stringify({
-
-                identifier: document
-                    .getElementById("loginIdentifier")
-                    .value.trim(),
-
-                password: document
-                    .getElementById("loginPassword")
-                    .value
-
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || "Login failed.");
-        }
-
-        showMessage(
-            "Login successful. Opening your account...",
-            "success"
-        );
-
-        window.location.href = "/dashboard.html";
-
-    } catch (error) {
-
-        showMessage(error.message, "error");
-
-    } finally {
-
-        button.disabled = false;
-        button.textContent = "Login to Account";
-    }
+    button.disabled = false;
+    button.textContent = "LOGIN TO YOUR ACCOUNT →";
+  }
 });
 
-// CUSTOMER REGISTRATION
+registerForm.addEventListener("submit",async event => {
 
-registerForm.addEventListener("submit", async function(event) {
+  event.preventDefault();
 
-    event.preventDefault();
+  if($("registerPassword").value !== $("confirmPassword").value) {
+    message("Passwords do not match.","error");
+    return;
+  }
 
-    const button = registerForm.querySelector("button");
+  const button = registerForm.querySelector("button");
 
-    button.disabled = true;
-    button.textContent = "Creating Account...";
+  button.disabled = true;
+  button.textContent = "CREATING ACCOUNT…";
 
-    try {
+  try {
 
-        const response = await fetch("/api/auth/register", {
+    await send("/api/auth/register",{
+      mobile:$("mobile").value.trim(),
+      password:$("registerPassword").value,
+      confirmPassword:$("confirmPassword").value
+    });
 
-            method: "POST",
+    message(
+      "Account created successfully. Opening your dashboard…",
+      "success"
+    );
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+    setTimeout(() => {
+      location.href = "/dashboard.html";
+    },500);
 
-            credentials: "same-origin",
+  } catch(error) {
 
-            body: JSON.stringify({
+    message(error.message,"error");
 
-                fullName: document.getElementById("fullName").value.trim(),
+  } finally {
 
-                fatherName: document.getElementById("fatherName").value.trim(),
-
-                mobile: document.getElementById("mobile").value.trim(),
-
-                whatsapp: document.getElementById("whatsapp").value.trim(),
-
-                email: document.getElementById("email").value.trim(),
-
-                password: document.getElementById("registerPassword").value,
-
-                address: document.getElementById("address").value.trim(),
-
-                state: document.getElementById("state").value.trim(),
-
-                district: document.getElementById("district").value.trim(),
-
-                city: document.getElementById("city").value.trim(),
-
-                pinCode: document.getElementById("pinCode").value.trim()
-
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-
-            const validationMessage =
-                data.errors && data.errors.length
-                    ? data.errors[0].msg
-                    : data.message;
-
-            throw new Error(
-                validationMessage || "Registration failed."
-            );
-        }
-
-        registerForm.reset();
-
-        showMessage(
-            "Registration successful. Your account is awaiting approval. You can now login.",
-            "success"
-        );
-
-        setTimeout(showLogin, 2500);
-
-    } catch (error) {
-
-        showMessage(error.message, "error");
-
-    } finally {
-
-        button.disabled = false;
-        button.textContent = "Create Account";
-    }
+    button.disabled = false;
+    button.textContent = "CREATE CUSTOMER ACCOUNT →";
+  }
 });
 
-// CHECK EXISTING CUSTOMER SESSION
-
-async function checkSession() {
-
-    try {
-
-        const response = await fetch("/api/auth/me", {
-            credentials: "same-origin"
-        });
-
-        if (response.ok) {
-            window.location.href = "/dashboard.html";
-        }
-
-    } catch (error) {
-
-        console.error("Session check failed:", error);
-    }
-}
-
-checkSession();
-
+fetch("/api/auth/me",{
+  credentials:"same-origin"
+})
+.then(response => {
+  if(response.ok) {
+    location.href = "/dashboard.html";
+  }
+})
+.catch(() => {});
 </script>
 
 </body>
