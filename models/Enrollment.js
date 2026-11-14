@@ -15,37 +15,58 @@ const enrollmentSchema = new mongoose.Schema(
             required: true
         },
 
+        // CUSTOMER REGISTRATION FORM DETAILS
+        registrationDetails: {
+            name: {
+                type: String,
+                trim: true
+            },
+            address: {
+                type: String,
+                trim: true
+            },
+            mobile: {
+                type: String,
+                trim: true
+            },
+            pinCode: {
+                type: String,
+                trim: true
+            },
+            district: {
+                type: String,
+                trim: true
+            },
+            projectNo: {
+                type: Number
+            }
+        },
+
         projectSnapshot: {
             projectName: {
                 type: String,
                 required: true
             },
-
             projectNumber: {
                 type: Number,
                 required: true
             },
-
             pages: {
                 type: Number,
                 required: true
             },
-
             sides: {
                 type: Number,
                 required: true
             },
-
             durationDays: {
                 type: Number,
                 required: true
             },
-
             salary: {
                 type: Number,
                 required: true
             },
-
             registrationFee: {
                 type: Number,
                 required: true
@@ -54,22 +75,13 @@ const enrollmentSchema = new mongoose.Schema(
 
         registrationStatus: {
             type: String,
-            enum: [
-                "pending",
-                "approved",
-                "rejected"
-            ],
+            enum: ["pending", "approved", "rejected"],
             default: "pending"
         },
 
         paymentStatus: {
             type: String,
-            enum: [
-                "unpaid",
-                "pending",
-                "approved",
-                "rejected"
-            ],
+            enum: ["unpaid", "pending", "approved", "rejected"],
             default: "unpaid"
         },
 
