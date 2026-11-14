@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 
 const connectDB = require("./config/db");
+const seedDefaultProjects = require("./config/seedProjects");
 const User = require("./models/User");
 
 const app = express();
@@ -49,6 +50,11 @@ async function startServer() {
         await connectDB();
 
         console.log("Database connected successfully.");
+
+        // AUTOMATICALLY CREATE DEFAULT PROJECTS
+        await seedDefaultProjects();
+
+        console.log("Default projects setup completed.");
 
         app.use(session({
             name: "hbps.sid",
