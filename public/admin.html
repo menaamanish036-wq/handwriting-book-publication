@@ -39,11 +39,23 @@ button.success{background:#225c3b;color:white}
 a{color:var(--gold)} .item-title{font-weight:bold;margin-bottom:5px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 @media(max-width:600px){header{padding:13px}header h1{font-size:17px}.card{padding:14px}button{padding:9px 11px}}
+
+/* Premium responsive admin sidebar */
+#panel{position:relative;min-height:calc(100vh - 80px)}
+#adminSidebar.nav{position:fixed;z-index:50;left:0;top:72px;bottom:0;width:255px;overflow-y:auto;display:flex;flex-direction:column;flex-wrap:nowrap;gap:7px;margin:0;padding:20px 13px;background:linear-gradient(180deg,#111 0%,#090909 100%);border-right:1px solid rgba(215,173,88,.35);box-shadow:12px 0 30px #0008;transition:transform .22s ease}
+#adminSidebar.nav button{width:100%;text-align:left;margin:0;padding:13px 14px;border:1px solid transparent;border-radius:10px;background:transparent;color:#e7dfcf;font-size:13px;letter-spacing:.1px}
+#adminSidebar.nav button:hover{background:#211c13;border-color:#6d562e;color:var(--gold)}
+#adminSidebar.nav button.active{background:linear-gradient(100deg,rgba(215,173,88,.24),rgba(215,173,88,.06));border-color:rgba(215,173,88,.6);color:var(--gold)}
+#panel>.admin-section{margin-left:275px;max-width:calc(100% - 275px)}
+#adminMenuToggle{font-size:18px;padding:8px 13px}
+@media(min-width:761px){body.admin-menu-collapsed #adminSidebar.nav{transform:translateX(-110%)}body.admin-menu-collapsed #panel>.admin-section{margin-left:0;max-width:100%}}
+@media(max-width:760px){#adminSidebar.nav{transform:translateX(-110%);top:66px;width:min(280px,84vw)}body.admin-menu-open #adminSidebar.nav{transform:translateX(0)}#panel>.admin-section{margin-left:0;max-width:100%}body.admin-menu-open:after{content:"";position:fixed;z-index:40;inset:66px 0 0;background:#0009}}
+
 </style>
 </head>
 <body>
 <header>
-<h1>Handwriting Book Publication — Admin</h1>
+<div style="display:flex;align-items:center;gap:12px"><button id="adminMenuToggle" class="secondary" type="button" aria-label="Toggle menu">☰</button><h1>Handwriting Book Publication — Admin</h1></div>
 <div id="topActions" class="hidden"><span id="adminName" class="muted"></span><button class="secondary" onclick="logout()">Logout</button></div>
 </header>
 <main>
@@ -59,9 +71,9 @@ a{color:var(--gold)} .item-title{font-weight:bold;margin-bottom:5px}
 </section>
 <section id="panel" class="hidden">
 <div id="notice" class="status hidden"></div>
-<div class="nav">
-<button class="active" data-section="customers">Customers</button><button data-section="payments">Payments</button><button data-section="projects">Projects</button><button data-section="work">Work Assignment</button><button data-section="salary">Salary</button><button data-section="parcels">Parcel Tracking</button><button data-section="certificates">Customer Certificates</button><button data-section="charges">Customer Charges</button><button data-section="gallery">Work Gallery</button><button data-section="company">Company Certificates</button><button data-section="notifications">Notifications</button><button data-section="support">Support</button>
-</div>
+<aside class="nav" id="adminSidebar" aria-label="Admin menu">
+<button class="active" data-section="customers">♙ &nbsp; Customers</button><button data-section="payments">₹ &nbsp; Payments</button><button data-section="projects">▦ &nbsp; Projects</button><button data-section="work">✎ &nbsp; Work Assignment</button><button data-section="salary">◈ &nbsp; Salary</button><button data-section="parcels">▣ &nbsp; Parcel Tracking</button><button data-section="certificates">▤ &nbsp; Customer Certificates</button><button data-section="charges">＋ &nbsp; Customer Charges</button><button data-section="gallery">▧ &nbsp; Work Gallery</button><button data-section="company">▣ &nbsp; Company Certificates</button><button data-section="notifications">♢ &nbsp; Notifications</button><button data-section="support">✉ &nbsp; Support</button>
+</aside>
 
 <section id="customers" class="admin-section active card">
 <h2>Customer Management</h2><p class="section-note">View registered customers and manage their project registrations.</p>
@@ -156,11 +168,8 @@ a{color:var(--gold)} .item-title{font-weight:bold;margin-bottom:5px}
 
 <section id="gallery" class="admin-section card">
 <h2>Customer Work Showcase / Gallery</h2><p class="section-note">Upload real customer handwriting work. New uploads remain hidden until published.</p>
-<div class="grid">
-<div><label>Title</label><input id="showTitle"></div><div><label>Customer Name (Optional)</label><input id="showCustomer"></div>
-<div><label>Work Type</label><input id="showType" value="Handwriting Work"></div><div><label>Display Order</label><input id="showOrder" type="number" value="0"></div>
-</div>
-<label>Description</label><textarea id="showDescription"></textarea><label>Work Image or PDF</label><input id="showFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp">
+<p class="section-note">Select one or more photos. Each photo is saved as a separate gallery item. No title, name or description is required.</p>
+<label>Choose Work Photos</label><input id="showFile" type="file" multiple accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
 <button onclick="addShowcase()">Upload Work</button><hr style="border-color:var(--line);margin:20px 0"><div id="showcaseList"></div>
 </section>
 
@@ -357,6 +366,7 @@ async function logout(){
  }
 }
 
+document.getElementById("adminMenuToggle")?.addEventListener("click",()=>{if(window.matchMedia("(max-width:760px)").matches){document.body.classList.toggle("admin-menu-open");}else{document.body.classList.toggle("admin-menu-collapsed");}});
 document.querySelectorAll("[data-section]").forEach(button=>{
  button.addEventListener("click",()=>{
   document.querySelectorAll(".nav button").forEach(item=>item.classList.remove("active"));
@@ -364,6 +374,7 @@ document.querySelectorAll("[data-section]").forEach(button=>{
 
   button.classList.add("active");
   $(button.dataset.section).classList.add("active");
+  document.body.classList.remove("admin-menu-open");
  });
 });
 
@@ -952,9 +963,8 @@ async function loadShowcase(){
   $("showcaseList").innerHTML=items.length?
    items.map(x=>`<div class="row">
     <div>
-     <div class="item-title">${esc(x.title)} <span class="pill">${x.isPublished?"Published":"Hidden"}</span></div>
-     <div class="small muted">${esc(x.customerName||"")} · ${esc(x.workType||"")}</div>
-     ${x.fileId?`<p><a href="/api/uploads/${esc(x.fileId)}" target="_blank" rel="noopener">View File</a></p>`:""}
+     <div class="item-title"><span class="pill">${x.isPublished?"Published":"Hidden"}</span></div>
+     ${x.fileId?`<img src="/api/uploads/${esc(x.fileId)}" alt="Work sample" style="display:block;max-width:220px;max-height:220px;object-fit:contain;border-radius:10px;margin-top:8px">`:""}
     </div>
     <div class="actions">
      <button class="secondary" onclick="toggleShowcase('${esc(x._id)}',${!x.isPublished})">${x.isPublished?"Hide":"Publish"}</button>
@@ -968,30 +978,26 @@ async function loadShowcase(){
 
 async function addShowcase(){
  try{
-  const title=$("showTitle").value.trim();
-  if(!title)throw new Error("Enter a gallery title.");
-
-  const file=await uploadFile($("showFile").files[0]);
-
-  const data=await api("/api/showcase",json("POST",{
-   title,
-   customerName:$("showCustomer").value,
-   workType:$("showType").value,
-   description:$("showDescription").value,
-   displayOrder:$("showOrder").value,
-   fileId:file.fileId,
-   fileName:file.fileName,
-   fileType:file.fileType
-  }));
-
-  $("showTitle").value="";
-  $("showCustomer").value="";
-  $("showDescription").value="";
+  const selectedFiles=Array.from($("showFile").files||[]);
+  if(!selectedFiles.length)throw new Error("Please select at least one work photo.");
+  const allowed=["image/jpeg","image/png","image/webp"];
+  for(const selectedFile of selectedFiles){
+   if(!allowed.includes(selectedFile.type))throw new Error("Only JPG, PNG and WEBP photos are allowed.");
+   if(selectedFile.size>10*1024*1024)throw new Error("Each photo must not exceed 10 MB.");
+  }
+  let uploaded=0;
+  for(const selectedFile of selectedFiles){
+   const file=await uploadFile(selectedFile);
+   await api("/api/showcase",json("POST",{
+    fileId:file.fileId,
+    fileName:file.fileName,
+    fileType:file.fileType
+   }));
+   uploaded++;
+  }
   $("showFile").value="";
-
-  note(data.message||"Work uploaded.");
+  note(`${uploaded} work photo(s) uploaded successfully.`);
   await loadShowcase();
-
  }catch(error){showError(error)}
 }
 
