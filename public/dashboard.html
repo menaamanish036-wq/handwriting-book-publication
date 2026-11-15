@@ -368,6 +368,8 @@ button{
 
     <button data-page="certificates">My Completion Certificates</button>
 
+    <button data-page="companyCertificates">Company Certificates</button>
+
     <button data-page="notifications">Notifications</button>
 
     <button data-page="support">Customer Support</button>
@@ -492,6 +494,14 @@ button{
       <div class="card">
         <h2>My Completion Certificates</h2>
         <div id="certificates">Loading certificates...</div>
+      </div>
+    </section>
+
+    <section class="page-section" id="page-companyCertificates">
+      <div class="card">
+        <h2>Company Certificates &amp; Documents</h2>
+        <p class="muted">View official company certificates and documents.</p>
+        <div id="companyCertificates">Loading company certificates...</div>
       </div>
     </section>
 
@@ -1227,6 +1237,34 @@ async function loadCertificates(){
   }
 }
 
+/* COMPANY CERTIFICATES & DOCUMENTS */
+
+async function loadCompanyCertificates(){
+  const box = $("companyCertificates");
+  try{
+    const data = await api("/api/company-certificate");
+    const list = data.certificates || [];
+    if(!list.length){
+      box.innerHTML = '<p class="empty">No company certificates or documents are available yet.</p>';
+      return;
+    }
+    box.innerHTML = list.map(item=>{
+      const url = item.fileId
+        ? `/api/uploads/${encodeURIComponent(item.fileId)}`
+        : "";
+      return `
+        <div class="item">
+          <strong>${esc(item.fileName || "Company Certificate")}</strong>
+          <p>Uploaded: ${fmtDate(item.createdAt)}</p>
+          ${url ? `<a class="filelink" href="${esc(url)}" target="_blank" rel="noopener">View Document</a>` : ""}
+        </div>
+      `;
+    }).join("");
+  }catch(error){
+    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+  }
+}
+
 /* NOTIFICATIONS */
 
 async function loadNotifications(){
@@ -1404,6 +1442,7 @@ async function initDashboard(){
       loadGallery(),
       loadParcels(),
       loadCertificates(),
+      loadCompanyCertificates(),
       loadNotifications(),
       loadSupport(),
       loadProfile()
