@@ -1315,17 +1315,59 @@ async function submitChargePayment(event) {
   const button = form.querySelector('button[type="submit"]');
   const transactionId = form.elements.transactionId.value.trim();
   const file = form.elements.screenshot.files[0];
-  if (!file || !["image/jpeg","image/png","image/webp"].includes(file.type)) { message("Choose a JPG, PNG or WEBP screenshot.","error"); return; }
-  if (file.size > 5 * 1024 * 1024) { message("Screenshot must be under 5 MB.","error"); return; }
+
+  if (!transactionId) {
+    message("Please enter the UPI Transaction ID.", "error");
+    return;
+  }
+
+  if (!file || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    message("Choose a JPG, PNG or WEBP screenshot.", "error");
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    message("Screenshot must be under 5 MB.", "error");
+    return;
+  }
+
   button.disabled = true;
+  const originalText = button.textContent;
+
   try {
+    button.textContent = "Uploading screenshot...";
     const paymentScreenshotId = await uploadFile(file);
-    const result = await api(`/customer-charges/${encodeURIComponent(activeChargePaymentId)}/pay`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({transactionId,paymentScreenshotId})});
+
+    button.textContent = "Submitting payment...";
+    const result = await api("/payments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        paymentType: "customer_charge",
+        customerChargeId: activeChargePaymentId,
+        transactionId,
+        paymentScreenshotId
+      })
+    });
+
     document.getElementById("chargePaymentOverlay")?.remove();
-    message(result.message || "Charge payment submitted for verification.");
-    await Promise.all([loadCustomerCharges(),loadPayments()]);
-  } catch(error) { message(error.message || "Unable to submit charge payment.","error"); }
-  finally { button.disabled = false; }
+    activeChargePaymentId = null;
+
+    await Promise.all([
+      loadCustomerCharges(),
+      loadPayments(),
+      loadEnrollments()
+    ]);
+
+    message(result.message || "Charge payment submitted for admin verification.");
+    showDashboardView("registrationsCard");
+
+  } catch (error) {
+    message(error.message || "Unable to submit charge payment.", "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
 }
 
 /*
