@@ -9,7 +9,7 @@ const {
     requireAdmin
 } = require("../middleware/auth");
 
-// VERIFY THAT FILE BELONGS TO THE LOGGED-IN ADMIN
+// Verify uploaded image belongs to logged-in admin
 async function verifyAdminFile(fileId, userId) {
     if (!mongoose.isValidObjectId(fileId)) {
         return false;
@@ -28,11 +28,14 @@ async function verifyAdminFile(fileId, userId) {
     return Boolean(
         file &&
         file.metadata &&
-        file.metadata.uploadedBy === String(userId)
+        file.metadata.uploadedBy === String(userId) &&
+        ["image/jpeg", "image/png", "image/webp"].includes(
+            file.contentType
+        )
     );
 }
 
-// CUSTOMER: VIEW PUBLISHED SHOWCASE ITEMS
+// CUSTOMER: VIEW PUBLISHED PHOTOS
 router.get("/", requireLogin, async (req, res) => {
     try {
         const items = await Showcase.find({
@@ -54,12 +57,12 @@ router.get("/", requireLogin, async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Unable to load work showcase."
+            message: "Unable to load work gallery."
         });
     }
 });
 
-// ADMIN: VIEW ALL SHOWCASE ITEMS
+// ADMIN: VIEW ALL PHOTOS
 router.get(
     "/admin/all",
     requireLogin,
@@ -82,13 +85,13 @@ router.get(
 
             return res.status(500).json({
                 success: false,
-                message: "Unable to load showcase items."
+                message: "Unable to load gallery photos."
             });
         }
     }
 );
 
-// ADMIN: ADD SHOWCASE ITEM
+// ADMIN: ADD PHOTO
 router.post(
     "/",
     requireLogin,
@@ -96,95 +99,78 @@ router.post(
     async (req, res) => {
         try {
             const {
-                title,
-                description,
-                customerName,
-                workType,
                 fileId,
                 fileName,
                 fileType,
                 displayOrder
             } = req.body;
 
-            if (
-                typeof title !== "string" ||
-                !title.trim()
-            ) {
+            if (!fileId) {
                 return res.status(400).json({
                     success: false,
-                    message: "A title is required."
+                    message: "Please upload an image."
+                });
+            }
+
+            const validFile = await verifyAdminFile(
+                fileId,
+                req.user._id
+            );
+
+            if (!validFile) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Uploaded image is invalid."
                 });
             }
 
             if (
-                fileId &&
-                !(await verifyAdminFile(fileId, req.user._id))
+                !["image/jpeg", "image/png", "image/webp"].includes(fileType)
             ) {
                 return res.status(400).json({
                     success: false,
-                    message: "Uploaded file is invalid or not owned by admin."
+                    message: "Only JPG, PNG and WEBP images are allowed."
+                });
+            }
+
+            const order = Number(displayOrder || 0);
+
+            if (!Number.isFinite(order)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid display order."
                 });
             }
 
             const item = await Showcase.create({
-                title: title.trim(),
-
-                description:
-                    typeof description === "string"
-                        ? description.trim()
-                        : "",
-
-                customerName:
-                    typeof customerName === "string"
-                        ? customerName.trim()
-                        : "",
-
-                workType:
-                    typeof workType === "string" && workType.trim()
-                        ? workType.trim()
-                        : "Handwriting Work",
-
-                fileId: fileId
-                    ? new mongoose.Types.ObjectId(fileId)
-                    : null,
-
-                fileName:
-                    typeof fileName === "string"
-                        ? fileName.trim()
-                        : "",
-
-                fileType:
-                    typeof fileType === "string"
-                        ? fileType
-                        : "",
-
-                displayOrder:
-                    displayOrder === undefined
-                        ? 0
-                        : Number(displayOrder),
-
+                fileId: new mongoose.Types.ObjectId(fileId),
+                fileName: typeof fileName === "string"
+                    ? fileName.trim()
+                    : "",
+                fileType,
+                displayOrder: order,
                 isPublished: false,
                 uploadedBy: req.user._id
             });
 
             return res.status(201).json({
                 success: true,
-                message: "Showcase item added successfully.",
+                message: "Gallery photo added successfully.",
                 item
             });
 
         } catch (error) {
-            console.error("Add showcase error:", error);
+            console.error("Add showcase photo error:", error);
 
             return res.status(500).json({
                 success: false,
-                message: "Unable to add showcase item."
+                message: "Unable to add gallery photo."
             });
         }
     }
 );
 
-// ADMIN: UPDATE OR PUBLISH/HIDE SHOWCASE ITEM
+// ADMIN: PUBLISH OR HIDE PHOTO
 router.patch(
     "/:id",
     requireLogin,
@@ -194,7 +180,7 @@ router.patch(
             if (!mongoose.isValidObjectId(req.params.id)) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalid showcase item ID."
+                    message: "Invalid gallery photo ID."
                 });
             }
 
@@ -203,110 +189,21 @@ router.patch(
             if (!item) {
                 return res.status(404).json({
                     success: false,
-                    message: "Showcase item not found."
+                    message: "Gallery photo not found."
                 });
             }
 
-            const {
-                title,
-                description,
-                customerName,
-                workType,
-                fileId,
-                fileName,
-                fileType,
-                displayOrder,
-                isPublished
-            } = req.body;
+            const { isPublished, displayOrder } = req.body;
 
-            if (title !== undefined) {
-                if (
-                    typeof title !== "string" ||
-                    !title.trim()
-                ) {
+            if (isPublished !== undefined) {
+                if (typeof isPublished !== "boolean") {
                     return res.status(400).json({
                         success: false,
-                        message: "Invalid showcase title."
+                        message: "Invalid publish status."
                     });
                 }
 
-                item.title = title.trim();
-            }
-
-            if (description !== undefined) {
-                if (typeof description !== "string") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid description."
-                    });
-                }
-
-                item.description = description.trim();
-            }
-
-            if (customerName !== undefined) {
-                if (typeof customerName !== "string") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid customer name."
-                    });
-                }
-
-                item.customerName = customerName.trim();
-            }
-
-            if (workType !== undefined) {
-                if (typeof workType !== "string") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid work type."
-                    });
-                }
-
-                item.workType = workType.trim();
-            }
-
-            if (fileId !== undefined) {
-                if (fileId === null || fileId === "") {
-                    item.fileId = null;
-                } else {
-                    const validFile = await verifyAdminFile(
-                        fileId,
-                        req.user._id
-                    );
-
-                    if (!validFile) {
-                        return res.status(400).json({
-                            success: false,
-                            message: "Uploaded file is invalid or not owned by admin."
-                        });
-                    }
-
-                    item.fileId =
-                        new mongoose.Types.ObjectId(fileId);
-                }
-            }
-
-            if (fileName !== undefined) {
-                if (typeof fileName !== "string") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid file name."
-                    });
-                }
-
-                item.fileName = fileName.trim();
-            }
-
-            if (fileType !== undefined) {
-                if (typeof fileType !== "string") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid file type."
-                    });
-                }
-
-                item.fileType = fileType;
+                item.isPublished = isPublished;
             }
 
             if (displayOrder !== undefined) {
@@ -322,37 +219,26 @@ router.patch(
                 item.displayOrder = order;
             }
 
-            if (isPublished !== undefined) {
-                if (typeof isPublished !== "boolean") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid publish status."
-                    });
-                }
-
-                item.isPublished = isPublished;
-            }
-
             await item.save();
 
             return res.json({
                 success: true,
-                message: "Showcase item updated successfully.",
+                message: "Gallery photo updated successfully.",
                 item
             });
 
         } catch (error) {
-            console.error("Update showcase error:", error);
+            console.error("Update showcase photo error:", error);
 
             return res.status(500).json({
                 success: false,
-                message: "Unable to update showcase item."
+                message: "Unable to update gallery photo."
             });
         }
     }
 );
 
-// ADMIN: DELETE SHOWCASE ITEM
+// ADMIN: DELETE PHOTO
 router.delete(
     "/:id",
     requireLogin,
@@ -362,7 +248,7 @@ router.delete(
             if (!mongoose.isValidObjectId(req.params.id)) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalid showcase item ID."
+                    message: "Invalid gallery photo ID."
                 });
             }
 
@@ -373,21 +259,21 @@ router.delete(
             if (!item) {
                 return res.status(404).json({
                     success: false,
-                    message: "Showcase item not found."
+                    message: "Gallery photo not found."
                 });
             }
 
             return res.json({
                 success: true,
-                message: "Showcase item deleted successfully."
+                message: "Gallery photo deleted successfully."
             });
 
         } catch (error) {
-            console.error("Delete showcase error:", error);
+            console.error("Delete showcase photo error:", error);
 
             return res.status(500).json({
                 success: false,
-                message: "Unable to delete showcase item."
+                message: "Unable to delete gallery photo."
             });
         }
     }
