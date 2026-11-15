@@ -8,280 +8,687 @@
 <title>Customer Dashboard | Handwriting Book Publication</title>
 
 <style>
-:root{--bg:#08090c;--panel:#111318;--panel2:#171a21;--gold:#d8b45a;--gold2:#f0d995;--line:rgba(216,180,90,.24);--muted:#a9abb3;--text:#f4f1e8;--green:#52c58a;}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(ellipse at 75% 0%,#242014 0%,#0b0c10 38%,var(--bg) 75%);color:var(--text);min-height:100vh}
-button,input,textarea,select{font:inherit}button{cursor:pointer}
-.app{display:flex;min-height:100vh}
-.sidebar{width:268px;min-width:268px;background:linear-gradient(180deg,#14151a 0%,#0d0e12 100%);border-right:1px solid var(--line);min-height:100vh;padding:20px 15px;position:fixed;top:0;bottom:0;left:0;overflow-y:auto;z-index:100;box-shadow:12px 0 35px rgba(0,0,0,.28)}
-.brand{text-align:left;padding:13px 12px 22px;border-bottom:1px solid var(--line);margin-bottom:18px;position:relative}
-.brand:before{content:"";display:block;width:42px;height:3px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:14px;border-radius:5px}
-.brand h2{color:var(--gold2);font-size:18px;line-height:1.4;letter-spacing:.15px}
-.brand p{color:#9b927c;font-size:10px;margin-top:7px;letter-spacing:2px;font-weight:700}
-.menu-title{color:#9e8957;font-size:10px;font-weight:800;letter-spacing:2px;padding:8px 12px 12px}
-.menu{display:grid;gap:7px}
-.menu button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;position:relative;padding:11px 12px;margin:0;border:1px solid rgba(255,255,255,.045);border-radius:11px;background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.012));color:#c6c6c9;font-size:12.5px;font-weight:650;letter-spacing:.1px;min-height:47px;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease}
-.menu button:before{content:"";width:29px;height:29px;flex:0 0 29px;display:grid;place-items:center;border-radius:8px;background:rgba(216,180,90,.10);border:1px solid rgba(216,180,90,.17);color:var(--gold2);font-size:15px;line-height:1}
-.menu button:after{content:"›";margin-left:auto;color:#766b50;font-size:20px;font-weight:400;transition:transform .18s ease,color .18s ease}
-.menu button[data-page="home"]:before{content:"⌂"}.menu button[data-page="projects"]:before{content:"▦"}.menu button[data-page="registrations"]:before{content:"▤"}.menu button[data-page="registrationPayment"]:before{content:"₹"}.menu button[data-page="payments"]:before{content:"⇄"}.menu button[data-page="charges"]:before{content:"＋"}.menu button[data-page="work"]:before{content:"✎"}.menu button[data-page="salary"]:before{content:"◈"}.menu button[data-page="gallery"]:before{content:"▧"}.menu button[data-page="parcels"]:before{content:"▣"}.menu button[data-page="certificates"]:before{content:"♧"}.menu button[data-page="companyCertificates"]:before{content:"▱"}.menu button[data-page="notifications"]:before{content:"♢"}.menu button[data-page="support"]:before{content:"?"}.menu button[data-page="profile"]:before{content:"◎"}
-.menu button:hover{transform:translateX(3px);border-color:rgba(216,180,90,.38);background:linear-gradient(100deg,rgba(216,180,90,.13),rgba(255,255,255,.025));color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.2)}
-.menu button:hover:after{color:var(--gold2);transform:translateX(2px)}
-.menu button.active{color:#fff;border-color:rgba(216,180,90,.65);background:linear-gradient(105deg,rgba(174,133,43,.28),rgba(216,180,90,.08) 65%,rgba(255,255,255,.025));box-shadow:inset 3px 0 0 var(--gold),0 7px 20px rgba(0,0,0,.24)}
-.menu button.active:before{background:linear-gradient(145deg,#e4c879,#98752d);color:#17130a;border-color:#f0d995;font-weight:900}
-.menu button.active:after{color:var(--gold2)}
-.main{width:calc(100% - 268px);margin-left:268px;min-height:100vh}
-.topbar{background:rgba(15,16,20,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);min-height:72px;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:50}
-.topbar h2{color:var(--gold2);font-size:17px;letter-spacing:.3px}.top-actions{display:flex;align-items:center;gap:12px}
-.logout-btn{background:linear-gradient(135deg,#f0d995,#b58b35);color:#17130a;border:1px solid #f1d98e;border-radius:9px;padding:10px 17px;font-weight:800;font-size:12px;letter-spacing:.3px;box-shadow:0 5px 16px rgba(190,148,54,.18)}.logout-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
-.menu-toggle{display:none;background:#211d12;color:var(--gold2);border:1px solid #80652c;padding:9px 12px;border-radius:8px}
-.content{padding:28px;max-width:1450px;margin:auto}
-.welcome{background:linear-gradient(115deg,rgba(70,54,20,.55),rgba(24,25,30,.96) 62%,rgba(16,17,21,.96));border:1px solid rgba(216,180,90,.35);border-radius:17px;padding:27px 30px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 15px 35px rgba(0,0,0,.22)}
-.welcome:after{content:"";position:absolute;width:230px;height:230px;border:1px solid rgba(216,180,90,.13);border-radius:50%;right:-70px;top:-120px;box-shadow:0 0 0 25px rgba(216,180,90,.025),0 0 0 55px rgba(216,180,90,.02)}
-.welcome h1{color:var(--gold2);font-size:26px;margin-bottom:8px;position:relative;z-index:1}.welcome p{color:#c4c1b8;font-size:13px;line-height:1.6;position:relative;z-index:1}
-.page-section{display:none}.page-section.active{display:block;animation:fadeIn .22s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.card{background:linear-gradient(145deg,rgba(25,27,33,.98),rgba(15,16,20,.98));border:1px solid rgba(216,180,90,.22);border-radius:15px;padding:23px;margin-bottom:19px;box-shadow:0 12px 28px rgba(0,0,0,.18)}
-.card h2{color:var(--gold2);font-size:18px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(216,180,90,.15);letter-spacing:.2px}.card h3{color:#e8d49d;font-size:15px;margin-bottom:10px}.card p{color:#d0cfd0;font-size:13px;line-height:1.7}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.item,.project,.work{background:linear-gradient(145deg,#1d2027,#14161b);border:1px solid rgba(216,180,90,.2);border-radius:13px;padding:18px;margin:12px 0;box-shadow:0 8px 20px rgba(0,0,0,.16);transition:border-color .18s ease,transform .18s ease}.item:hover,.project:hover,.work:hover{border-color:rgba(216,180,90,.55);transform:translateY(-2px)}
-.item strong,.project strong{color:var(--gold2);font-size:14px}.item p,.project p,.work p{margin-top:7px;color:#c8c8ca;font-size:13px}
-.project h3,.work h3{color:var(--gold2);font-size:17px;margin-bottom:12px}.project button,.formbox button,.paymentForm button{background:linear-gradient(135deg,#e7ca7d,#b48a37);color:#17130a;border:0;border-radius:8px;padding:10px 15px;font-size:12px;font-weight:800;margin-top:13px;box-shadow:0 5px 14px rgba(190,148,54,.14)}
-.project button:hover,.formbox button:hover,.paymentForm button:hover{filter:brightness(1.08);transform:translateY(-1px)}
-.formbox{background:linear-gradient(145deg,#1a1c22,#111318);border:1px solid rgba(216,180,90,.23);border-radius:13px;padding:20px;margin:14px 0}.formbox h3{color:var(--gold2);margin-bottom:14px}
-label{display:block;color:#d9c58f;font-size:12px;font-weight:700;margin:13px 0 7px}input,textarea,select{width:100%;background:#0d0f13;color:#f5f1e7;border:1px solid #454039;border-radius:8px;padding:11px 12px;outline:none;font-size:13px}input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(216,180,90,.1)}textarea{min-height:105px;resize:vertical}
-.filelink{display:inline-block;color:var(--gold2);text-decoration:none;border:1px solid rgba(216,180,90,.35);border-radius:7px;padding:8px 11px;margin:8px 7px 0 0;font-size:12px}.filelink:hover{background:rgba(216,180,90,.1)}
-.empty{color:#999;padding:14px 0;font-size:13px}.muted{color:var(--muted);font-size:12px}.message{display:none;padding:12px 15px;border-radius:9px;margin-bottom:15px;font-size:13px}.message.success{display:block;background:#10291d;border:1px solid #286c48;color:#9aefbd}.message.error{display:block;background:#351719;border:1px solid #804044;color:#ffb4b4}
-.status{background:linear-gradient(100deg,rgba(40,34,15,.8),rgba(25,24,20,.8));border:1px solid rgba(216,180,90,.42);color:#f0d995;border-radius:10px;padding:13px 16px;margin-bottom:20px;font-size:13px}.badge{display:inline-block;padding:5px 10px;background:rgba(216,180,90,.13);border:1px solid rgba(216,180,90,.25);color:#f0d995;border-radius:20px;font-size:11px;font-weight:700}.hidden{display:none!important}
-@media(max-width:900px){.sidebar{width:250px;min-width:250px}.main{width:calc(100% - 250px);margin-left:250px}.content{padding:20px}}
-@media(max-width:800px){.sidebar{width:275px;min-width:275px;transform:translateX(-105%);transition:transform .25s ease;box-shadow:20px 0 45px rgba(0,0,0,.55)}.sidebar.open{transform:translateX(0)}.main{width:100%;margin-left:0}.menu-toggle{display:block}.topbar{padding:13px 15px}.content{padding:15px}.welcome{padding:22px}.welcome h1{font-size:22px}}
-@media(max-width:420px){.topbar h2{font-size:14px}.logout-btn{padding:9px 11px;font-size:11px}.card{padding:17px}.welcome h1{font-size:20px}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+
+body{
+  margin:0;
+  background:#090909;
+  color:#f5f1e8;
+  font-family:Arial,sans-serif;
+}
+
+header{
+  background:#111;
+  border-bottom:1px solid #c6a34a;
+  padding:16px 5%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+header h2{
+  color:#d8b45a;
+  margin:0;
+  font-size:19px;
+}
+
+main{
+  max-width:1150px;
+  margin:auto;
+  padding:22px 16px;
+}
+
+.welcome{margin-bottom:20px}
+
+.welcome h1{
+  color:#d8b45a;
+  font-size:26px;
+}
+
+.muted{
+  color:#aaa;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.card{
+  background:#141414;
+  border:1px solid #393024;
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:18px;
+}
+
+.card h2{
+  color:#d8b45a;
+  font-size:19px;
+  margin:0 0 15px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+
+.project,.work,.item{
+  background:#1b1b1b;
+  border:1px solid #514124;
+  border-radius:9px;
+  padding:15px;
+  margin:10px 0;
+  overflow-wrap:anywhere;
+}
+
+.project h3,.work h3,.item h4{
+  color:#e3c36d;
+  margin:0 0 10px;
+}
+
+.project p,.work p,.item p{
+  color:#ccc;
+  font-size:14px;
+  line-height:1.6;
+  margin:7px 0;
+}
+
+.status{
+  background:#28220f;
+  border:1px solid #8c702c;
+  color:#f0d58d;
+  padding:13px;
+  border-radius:8px;
+  margin-bottom:18px;
+  line-height:1.5;
+}
+
+.message{
+  display:none;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+
+.message.success{
+  display:block;
+  background:#12351f;
+  color:#8df0a8;
+}
+
+.message.error{
+  display:block;
+  background:#401919;
+  color:#ffaaaa;
+}
+
+.empty{
+  color:#999;
+  padding:10px 0;
+  font-size:14px;
+}
+
+button{
+  border:0;
+  border-radius:7px;
+  padding:11px 15px;
+  background:#c6a34a;
+  color:#111;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:8px;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.logout{margin:0}
+
+.project-apply-form{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #514124;
+}
+
+.project-apply-form h4{
+  color:#e3c36d;
+  margin:0 0 8px;
+}
+
+.project-apply-form .formbox{
+  margin-top:10px;
+}
+
+.formbox{
+  background:#1b1b1b;
+  border:1px solid #514124;
+  border-radius:9px;
+  padding:15px;
+  margin-top:12px;
+}
+
+label{
+  display:block;
+  margin:12px 0 6px;
+  color:#ddd;
+  font-size:14px;
+}
+
+input,textarea,select{
+  width:100%;
+  padding:11px;
+  border:1px solid #555;
+  border-radius:6px;
+  background:#101010;
+  color:white;
+  font-size:14px;
+}
+
+textarea{
+  min-height:85px;
+  resize:vertical;
+}
+
+.formbox button{width:100%}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  background:#28220f;
+  color:#f0d58d;
+  border-radius:5px;
+  font-size:12px;
+}
+
+.instructions{
+  white-space:pre-wrap;
+  background:#101010;
+  padding:12px;
+  border-radius:6px;
+  color:#ddd;
+  line-height:1.6;
+}
+
+.gallery-image{
+  display:block;
+  width:100%;
+  max-width:450px;
+  height:auto;
+  max-height:420px;
+  object-fit:contain;
+  margin-top:12px;
+  border-radius:8px;
+  border:1px solid #514124;
+  background:#080808;
+}
+
+.filelink{
+  display:inline-block;
+  color:#e3c36d;
+  margin:8px 5px;
+  overflow-wrap:anywhere;
+}
+
+a{color:#e3c36d}
+
+@media(max-width:500px){
+  header{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .welcome h1{font-size:22px}
+  .card{padding:14px}
+}
+
+.payment-details{
+  background:#1b1b1b;
+  border:1px solid #8c702c;
+  border-radius:10px;
+  padding:16px;
+  margin:14px 0 18px;
+  text-align:center;
+}
+
+.payment-details h3{
+  color:#e3c36d;
+  margin:0 0 10px;
+}
+
+.payment-qr{
+  display:block;
+  width:210px;
+  max-width:100%;
+  height:auto;
+  margin:12px auto;
+  padding:8px;
+  background:#fff;
+  border-radius:8px;
+}
+
+.payment-upi{
+  display:inline-block;
+  color:#f0d58d;
+  font-weight:bold;
+  overflow-wrap:anywhere;
+  margin:6px 0;
+}
+
+.payment-note{
+  color:#aaa;
+  font-size:13px;
+  line-height:1.5;
+}
+
+
+/* PREMIUM CUSTOMER DASHBOARD REFRESH */
+:root{--gold:#d8b45a;--gold2:#f0d58d;--bg:#08090b;--panel:#111317;--panel2:#171a20;--line:rgba(216,180,90,.25);--muted:#a9adb6;--text:#f4f1e8;--green:#76d69a;--red:#ff9999}
+html{scroll-behavior:smooth;scroll-padding-top:112px}
+body{background:radial-gradient(ellipse at 50% -15%,rgba(190,147,49,.13),transparent 42%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.55}
+header{position:sticky;top:0;z-index:50;background:rgba(10,11,13,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:14px clamp(16px,4vw,56px);box-shadow:0 8px 28px rgba(0,0,0,.22)}
+header h2{font-size:clamp(16px,2vw,21px);letter-spacing:.2px;color:var(--gold2)}
+header .logout{border:1px solid var(--line);background:linear-gradient(135deg,#e4c36c,#b58b31);padding:10px 18px;border-radius:999px;transition:.2s}
+header .logout:hover,button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+main{max-width:1220px;padding:30px clamp(14px,3vw,30px) 70px}
+.welcome{padding:28px clamp(18px,4vw,34px);border:1px solid var(--line);border-radius:20px;background:linear-gradient(120deg,rgba(216,180,90,.12),rgba(19,21,26,.94) 55%),var(--panel);box-shadow:0 18px 48px rgba(0,0,0,.2);margin:12px 0 18px}
+.welcome h1{font-size:clamp(25px,4vw,36px);line-height:1.2;margin:0 0 8px;color:var(--gold2)}
+.welcome .muted{font-size:15px;margin:0}
+.status{border:1px solid var(--line);background:rgba(216,180,90,.08);color:#ead9aa;border-radius:12px;padding:13px 16px}
+.card{background:linear-gradient(145deg,rgba(255,255,255,.025),transparent 55%),var(--panel);border:1px solid var(--line);border-radius:17px;padding:clamp(16px,2.5vw,24px);margin:18px 0;box-shadow:0 12px 32px rgba(0,0,0,.16)}
+.card>h2{font-size:clamp(18px,2.4vw,22px);letter-spacing:.1px;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid rgba(216,180,90,.16);color:var(--gold2)}
+.card>h2:before{content:"";display:inline-block;width:4px;height:19px;border-radius:8px;background:var(--gold);margin-right:10px;vertical-align:-3px}
+#projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr));gap:16px}
+.project,.work,.item{background:linear-gradient(155deg,rgba(216,180,90,.045),transparent 45%),var(--panel2);border:1px solid rgba(216,180,90,.2);border-radius:14px;padding:17px;margin:0;box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.project{display:flex;flex-direction:column;min-width:0}
+.project h3,.work h3,.item h4{font-size:17px;color:var(--gold2);line-height:1.35}
+.project p,.work p,.item p{color:#c9cbd0;line-height:1.55}
+.project>button{margin-top:auto;align-self:flex-start;min-width:125px}
+button{background:linear-gradient(135deg,#f0d58d,#bd963f);color:#17130a;border-radius:9px;padding:11px 17px;font-size:14px;box-shadow:0 5px 15px rgba(0,0,0,.16);transition:.18s}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.project-apply-form{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.project-apply-form .formbox,.formbox{background:#0e1014;border:1px solid rgba(216,180,90,.18);border-radius:12px;padding:16px}
+.project-apply-form h4{font-size:16px;color:var(--gold2)}
+label{font-weight:600;color:#e6e1d5;margin:13px 0 7px}
+input,textarea,select{background:#090b0e;border:1px solid #3b3e45;border-radius:8px;color:#fff;padding:12px 13px;min-height:44px}
+input::placeholder,textarea::placeholder{color:#777d87}
+input:focus,textarea:focus,select:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(216,180,90,.1)}
+.formbox button{margin-top:16px}
+.badge{background:rgba(216,180,90,.12);border:1px solid rgba(216,180,90,.28);color:var(--gold2);border-radius:999px;padding:4px 10px;font-weight:600}
+.empty{color:var(--muted);padding:14px 0}
+.message{position:sticky;top:76px;z-index:40;box-shadow:0 8px 25px rgba(0,0,0,.25)}
+.message.success,.message.error{border:1px solid rgba(255,255,255,.12);border-radius:11px}
+.payment-details{background:linear-gradient(145deg,rgba(216,180,90,.09),transparent),#0d0f13;border:1px solid var(--line);border-radius:14px}
+.payment-qr{width:220px;border:5px solid white}
+.payment-upi{font-size:16px}
+.gallery-image{border-radius:12px;border:1px solid var(--line);background:#08090b}
+.instructions{border:1px solid rgba(216,180,90,.12);border-radius:9px}
+.filelink{font-weight:600}
+.dashboard-nav{position:sticky;top:65px;z-index:40;display:flex;gap:8px;overflow-x:auto;padding:10px clamp(12px,4vw,52px);background:rgba(13,14,17,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(216,180,90,.14);scrollbar-width:thin}
+.dashboard-nav a{white-space:nowrap;text-decoration:none;font-size:12px;font-weight:650;color:#d8d3c7;padding:8px 12px;border:1px solid rgba(216,180,90,.18);border-radius:999px;background:#17191e}
+.dashboard-nav a:hover{color:#17130a;background:var(--gold2)}
+.grid{gap:12px}
+@media(max-width:600px){header{padding:12px 15px;flex-direction:row;align-items:center}header h2{font-size:15px}.dashboard-nav{top:57px;padding:8px 12px}main{padding:18px 12px 50px}.welcome{padding:22px 17px;border-radius:15px}.card{padding:15px;margin:13px 0}.project{padding:15px}.project>button{width:100%}.formbox{padding:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+
+/* SINGLE-VIEW CUSTOMER DASHBOARD LAYOUT */
+html{scroll-behavior:auto}
+header{position:sticky;top:0;display:flex;min-height:66px;flex-direction:row;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:13px}
+.menu-toggle{display:none;margin:0;padding:9px 12px;border:1px solid var(--line);background:#191b20;color:var(--gold2);font-size:19px}
+.app-shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:calc(100vh - 66px);max-width:1500px;margin:0 auto}
+.sidebar{position:sticky;top:66px;align-self:start;height:calc(100vh - 66px);overflow-y:auto;padding:22px 14px;background:rgba(13,14,17,.96);border-right:1px solid var(--line)}
+.sidebar-title{padding:0 12px 14px;color:var(--gold2);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+.sidebar-nav{display:flex;flex-direction:column;gap:6px}
+.sidebar-nav a{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid transparent;border-radius:9px;color:#d6d2c8;text-decoration:none;font-size:13px;font-weight:650;transition:.18s}
+.sidebar-nav a:hover{background:#1a1c21;border-color:var(--line);color:var(--gold2)}
+.sidebar-nav a.active{background:linear-gradient(100deg,rgba(216,180,90,.19),rgba(216,180,90,.05));border-color:rgba(216,180,90,.38);color:var(--gold2)}
+.sidebar-nav .nav-icon{width:20px;text-align:center;font-size:15px}
+main{width:100%;min-width:0;max-width:1100px;margin:0 auto;padding:26px clamp(14px,3vw,32px) 60px}
+.view-card{margin-top:18px}
+.view-card[hidden],#dashboardHome[hidden]{display:none!important}
+#dashboardHome .welcome{margin-top:0}
+#dashboardHome .home-shortcuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:18px}
+.home-shortcuts button{width:100%;min-height:58px;text-align:left;background:#171a20;color:var(--gold2);border:1px solid var(--line)}
+.message:empty{display:none}
+@media(max-width:760px){
+ .menu-toggle{display:inline-block}
+ .app-shell{display:block}
+ .sidebar{position:fixed;z-index:100;left:0;top:66px;bottom:0;width:min(290px,84vw);height:auto;transform:translateX(-105%);transition:transform .22s ease;box-shadow:18px 0 40px #0008}
+ body.sidebar-open .sidebar{transform:translateX(0)}
+ body.sidebar-open:after{content:"";position:fixed;z-index:90;inset:66px 0 0;background:rgba(0,0,0,.58)}
+ main{padding:18px 12px 45px}
+}
+@media(min-width:761px){.sidebar{transform:none!important}}
+
+/* PROFESSIONAL CUSTOMER HOME HERO - preserves existing black and gold theme */
+.home-hero{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:center;padding:clamp(18px,3vw,30px);margin:0 0 20px;border:1px solid rgba(216,180,90,.28);border-radius:18px;background:linear-gradient(120deg,rgba(216,180,90,.10),rgba(20,20,20,.96) 58%),#141414;box-shadow:0 14px 34px rgba(0,0,0,.22);overflow:hidden}
+.home-hero-copy{min-width:0}
+.home-hero-kicker{display:inline-block;color:#e3c36d;border:1px solid rgba(216,180,90,.35);background:rgba(216,180,90,.09);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase}
+.home-hero h1{color:#e3c36d;font-size:clamp(25px,3.5vw,39px);line-height:1.18;margin:15px 0 10px}
+.home-hero p{color:#c9cbd0;font-size:14px;line-height:1.75;margin:0 0 18px;max-width:560px}
+.home-hero-actions{display:flex;flex-wrap:wrap;gap:10px}
+.home-hero-actions button{min-width:145px}
+.home-hero-image-wrap{min-width:0;position:relative}
+.home-hero-image{display:block;width:100%;height:clamp(210px,28vw,330px);object-fit:cover;object-position:center 42%;border:1px solid rgba(216,180,90,.38);border-radius:14px;box-shadow:0 12px 28px rgba(0,0,0,.28)}
+.home-hero-image-wrap:after{content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.home-hero-image-wrap.image-missing{min-height:230px;border:1px dashed rgba(216,180,90,.45);border-radius:14px;background:linear-gradient(135deg,#171717,#242016);display:grid;place-items:center}.home-hero-image-wrap.image-missing:before{content:"Handwriting Book Publication";color:#e3c36d;padding:20px;text-align:center;font-size:14px}
+#dashboardHome .welcome{margin-top:0}
+@media(max-width:760px){.home-hero{grid-template-columns:1fr;gap:18px;padding:17px}.home-hero-image{height:230px}.home-hero h1{font-size:28px}.home-hero-actions button{flex:1 1 145px}}
+
+
+/* Homepage salary advance and professional information cards */
+.salary-advance-highlight{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;margin:18px 0;padding:22px 24px;border:1px solid #d8b45a;border-radius:18px;background:linear-gradient(115deg,rgba(216,180,90,.20),rgba(22,22,22,.98) 72%);box-shadow:0 12px 30px rgba(0,0,0,.28),inset 0 0 22px rgba(216,180,90,.05)}
+.salary-advance-badge{grid-column:1/-1;display:inline-flex;width:max-content;padding:6px 12px;border-radius:999px;background:#d8b45a;color:#17130a;font-size:11px;font-weight:900;letter-spacing:1px}
+.salary-advance-copy h2{margin:0 0 8px;color:#f0d58c;font-size:clamp(20px,3vw,27px)}
+.salary-advance-copy p{margin:5px 0;color:#e0e0e0;line-height:1.65}
+.salary-advance-copy strong{color:#f4d77e}
+.salary-remaining-note{font-size:13px;color:#c7c7c7!important}
+.salary-advance-mark{font-size:clamp(42px,8vw,68px);font-weight:900;line-height:1;color:#e6c36e;text-shadow:0 3px 18px rgba(216,180,90,.22)}
+.salary-advance-mark span{font-size:.48em}
+.home-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:18px 0}
+.home-info-card{padding:18px;border:1px solid rgba(216,180,90,.25);border-radius:15px;background:linear-gradient(145deg,#191919,#101114);box-shadow:0 8px 22px rgba(0,0,0,.18)}
+.home-info-icon{display:inline-grid;place-items:center;width:38px;height:38px;border:1px solid rgba(216,180,90,.45);border-radius:11px;color:#e3c36d;background:rgba(216,180,90,.09);font-size:20px}
+.home-info-card h3{margin:12px 0 6px;color:#e3c36d;font-size:16px}
+.home-info-card p,.home-about p{margin:0;color:#c7c7c7;font-size:13px;line-height:1.7}
+.home-about{margin:18px 0;padding:22px;border:1px solid rgba(216,180,90,.25);border-radius:16px;background:#141414}
+.home-about h2{margin:0 0 9px;color:#e3c36d;font-size:20px}
+.home-about-brands{margin-top:12px!important;color:#e5c879!important;font-weight:700}
+#companyCertificates .item{display:block;margin:14px 0;padding:12px;border:1px solid rgba(216,180,90,.25);border-radius:14px;background:#151515}
+#companyCertificates .gallery-image{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:8px}
+@media(max-width:600px){.salary-advance-highlight{padding:17px;grid-template-columns:1fr auto}.salary-advance-mark{font-size:44px}.home-info-grid{grid-template-columns:1fr 1fr}.home-info-card{padding:14px}}
+
 </style>
 </head>
 
 <body>
 
-<div class="app">
-
-<aside class="sidebar" id="sidebar">
-
-  <div class="brand">
+<header>
+  <div class="header-left">
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open dashboard menu" aria-expanded="false">☰</button>
     <h2>Handwriting Book Publication</h2>
-    <p>CUSTOMER DASHBOARD</p>
   </div>
+  <button class="logout" id="logoutBtn" type="button">Logout</button>
+</header>
 
-  <div class="menu-title">CUSTOMER MENU</div>
-
-  <nav class="menu">
-
-    <button class="active" data-page="home">Dashboard Home</button>
-
-    <button data-page="projects">Available Projects</button>
-
-    <button data-page="registrations">My Registrations</button>
-
-    <button data-page="registrationPayment">Registration Payment</button>
-
-    <button data-page="payments">My Payment History</button>
-
-    <button data-page="charges">My Charges</button>
-
-    <button data-page="work">My Work</button>
-
-    <button data-page="salary">My Salary</button>
-
-    <button data-page="gallery">Customer Work Gallery</button>
-
-    <button data-page="parcels">My Parcel Tracking</button>
-
-    <button data-page="certificates">My Completion Certificates</button>
-
-    <button data-page="companyCertificates">Company Certificates</button>
-
-    <button data-page="notifications">Notifications</button>
-
-    <button data-page="support">Customer Support</button>
-
-    <button data-page="profile">Account Information</button>
-
+<div class="app-shell">
+<aside class="sidebar" id="dashboardSidebar">
+  <div class="sidebar-title">Customer Menu</div>
+  <nav class="sidebar-nav" id="sidebarNav" aria-label="Dashboard sections">
+    <a href="#dashboardHome" data-view="dashboardHome" class="active"><span class="nav-icon">⌂</span>Dashboard Home</a>
+    <a href="#projectsCard" data-view="projectsCard"><span class="nav-icon">▦</span>Available Projects</a>
+    <a href="#registrationsCard" data-view="registrationsCard"><span class="nav-icon">▤</span>My Registrations</a>
+    <a href="#registrationPaymentCard" data-view="registrationPaymentCard"><span class="nav-icon">₹</span>Registration Payment</a>
+    <a href="#paymentHistoryCard" data-view="paymentHistoryCard"><span class="nav-icon">◷</span>My Payment History</a>
+    <a href="#chargesCard" data-view="chargesCard"><span class="nav-icon">＋</span>My Charges</a>
+    <a href="#workCard" data-view="workCard"><span class="nav-icon">✎</span>My Work</a>
+    <a href="#salaryCard" data-view="salaryCard"><span class="nav-icon">₹</span>My Salary</a>
+    <a href="#galleryCard" data-view="galleryCard"><span class="nav-icon">▧</span>Customer Work Gallery</a>
+    <a href="#companyCertificatesCard" data-view="companyCertificatesCard"><span class="nav-icon">▣</span>Company Certificates</a>
+    <a href="#parcelCard" data-view="parcelCard"><span class="nav-icon">▰</span>My Parcel Tracking</a>
+    <a href="#completionCertificatesCard" data-view="completionCertificatesCard"><span class="nav-icon">◇</span>My Completion Certificates</a>
+    <a href="#notificationsCard" data-view="notificationsCard"><span class="nav-icon">♢</span>Notifications</a>
+    <a href="#supportCard" data-view="supportCard"><span class="nav-icon">☏</span>Customer Support</a>
+    <a href="#profileCard" data-view="profileCard"><span class="nav-icon">◎</span>Account Information</a>
   </nav>
-
 </aside>
 
-<div class="main">
+<main>
 
-  <header class="topbar">
+  <div id="message" class="message" aria-live="polite"></div>
 
-    <div class="top-actions">
-      <button class="menu-toggle" id="menuToggle" type="button">☰</button>
-      <h2>Customer Panel</h2>
-    </div>
-
-    <button class="logout-btn" id="logoutBtn" type="button">
-      Logout
-    </button>
-
-  </header>
-
-  <main class="content">
-
-    <div id="message" class="message" aria-live="polite"></div>
-
+  <section class="view-card" id="dashboardHome">
+    <section class="home-hero" aria-label="Welcome to Handwriting Book Publication">
+      <div class="home-hero-copy">
+        <span class="home-hero-kicker">Handwriting Book Publication</span>
+        <h1>Welcome, <span id="customerName">Customer</span></h1>
+        <p>Manage your projects, registration, payments and handwriting work from one convenient place. We are here to make your work journey simple and organised.</p>
+        <div class="home-hero-actions">
+          <button type="button" onclick="showDashboardView('projectsCard')">Explore Projects</button>
+          <button type="button" onclick="showDashboardView('workCard')">View My Work</button>
+        </div>
+      </div>
+      <div class="home-hero-image-wrap">
+        <img class="home-hero-image" src="/assets/writing-at-home.png" id="homeHeroImage" alt="A woman working carefully on handwriting in a notebook" loading="eager" onerror="this.style.display='none';this.parentElement.classList.add('image-missing');">
+      </div>
+    </section>
     <section class="welcome">
-      <h1>Welcome, <span id="customerName">Customer</span></h1>
-      <p>Your personal customer dashboard.</p>
+      <h1>Your Customer Dashboard</h1>
+      <p class="muted">Your personal workspace for projects, payments and work updates.</p>
+    </section>
+    <div id="accountStatus" class="status">Loading account status...</div>
+
+    <section class="salary-advance-highlight" aria-label="Salary advance information">
+      <div class="salary-advance-badge">50% SALARY ADVANCE</div>
+      <div class="salary-advance-copy">
+        <h2>Get 50% Salary Advance</h2>
+        <p>After your registration is completed and approved by the admin, 50% of your project salary advance will be payable after <strong>15 minutes</strong>.</p>
+        <p class="salary-remaining-note">The remaining 50% will be payable after successful completion of your assigned work.</p>
+      </div>
+      <div class="salary-advance-mark">50<span>%</span></div>
     </section>
 
-    <div id="accountStatus" class="status">
-      Loading account status...
+    <section class="home-info-grid" aria-label="How your project works">
+      <article class="home-info-card"><span class="home-info-icon">▦</span><h3>Choose a Project</h3><p>Explore available handwriting projects and select the one that suits you.</p></article>
+      <article class="home-info-card"><span class="home-info-icon">✎</span><h3>Complete Registration</h3><p>Fill in your name, address, mobile number, PIN code and district.</p></article>
+      <article class="home-info-card"><span class="home-info-icon">₹</span><h3>Submit Payment</h3><p>Pay the registration fee and upload your transaction details for admin verification.</p></article>
+      <article class="home-info-card"><span class="home-info-icon">✓</span><h3>Start Your Work</h3><p>After approval, check your assigned work and project updates in your dashboard.</p></article>
+    </section>
+
+    <section class="home-about">
+      <h2>Your Work, Payments &amp; Progress in One Place</h2>
+      <p>Use this dashboard to manage project applications, registration payments, assigned handwriting work, salary records, certificates, parcel updates and customer support.</p>
+      <p class="home-about-brands">Handwriting Book Publication &nbsp;·&nbsp; Alia Book Publication &nbsp;·&nbsp; Alien Book Publication</p>
+    </section>
+
+    <div class="home-shortcuts">
+      <button type="button" onclick="showDashboardView('projectsCard')">▦ &nbsp; Available Projects</button>
+      <button type="button" onclick="showDashboardView('registrationPaymentCard')">₹ &nbsp; Registration Payment</button>
+      <button type="button" onclick="showDashboardView('workCard')">✎ &nbsp; My Work</button>
+      <button type="button" onclick="showDashboardView('salaryCard')">₹ &nbsp; My Salary</button>
+    </div>
+  </section>
+
+  <section class="card view-card" id="projectsCard" hidden>
+    <h2>Available Projects</h2>
+    <div id="projects">Loading projects...</div>
+  </section>
+
+  <section class="card view-card" id="registrationsCard" hidden>
+    <h2>My Registrations</h2>
+    <div id="enrollments">Loading registrations...</div>
+  </section>
+
+  <section class="card view-card" id="registrationPaymentCard" hidden>
+    <h2>Registration Payment</h2>
+
+    <p class="muted">
+      Pay the registration fee using the UPI QR code below, then submit your transaction ID and payment screenshot for admin verification.
+    </p>
+
+    <div class="payment-details">
+      <h3>Pay Registration Fee</h3>
+
+      <p class="muted">
+        Scan this QR code with any UPI payment app.
+      </p>
+
+      <img
+        class="payment-qr"
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATgAAAE4AQAAAADnBNLHAAAB/klEQVR4nO1a7W4DMQizp73/K3s/+Aib1GunTYWTSNX22li6w4JgSCi8ND5egy1ucYt7I+4TAO1SoADat33lzHg7OvmDAIAg4BQCEKWcmW9HK3+gMSX6NRGu5zPj7RiEEygRIN9739vjRMFWQFJ6jPvv+94ZZ/GbZAkU5asfy8x0O1r5i7VO8bJfZ2a+HV04ljglRGXGAFHmptvRyV/429GBkHtf0jndjlb+XLHILhAqujA53o4B+jnUnwUy0ve4/vd4WP51pgRjS8jwjVVwuh3N+deimIdCygth/5xuRyd/ApEVm4oahBB/T7ej1/90VjymeHb9p13/LkaqZO+0yLmMxot8brodvf0/JYeEcVZbget/1ziJ0cCqKZj2Nhe8gx0dOKZEyUqOmTRc/m3+fTxcP2eegF+4/ssaeLodrfELb1yBIEgP3ShLtv59grO6Td5AkCRF/QufvoUdHbiz/0FvXsFzRkZw6/NNx3mtppNDsmkQ1dzqv4tR8+/pO9fd360/robVv0DxNdMvdFnt7+l29NYfAADPGilfEJpw/e8JTpJMxCD7qPkH9/zBxfh2/oCibL2jQNkGulqfbzru88dv38EE5VtI23/5Bc66L+aFRbyMeb55uLp/GR+pZbIjPd+O1vg9Z63O+bXSTN38+3jU8wfvvO/iFre4v+O+APFR83b3Q765AAAAAElFTkSuQmCC"
+        alt="UPI payment QR code for Ankur Meena">
+
+      <p>
+        UPI ID:
+        <span class="payment-upi">8504823316@thecardco</span>
+      </p>
+
+      <p>Payee Name: <strong>Ankur Meena</strong></p>
+
+      <p class="payment-note">
+        Enter the exact registration fee shown for your selected project. After payment, enter the transaction ID and upload the payment screenshot below. Payment is subject to admin verification.
+      </p>
     </div>
 
-    <section class="page-section active" id="page-home">
+    <div id="paymentSection">
+      Loading payment information...
+    </div>
+  </section>
 
-      <div class="card">
-        <h2>Dashboard Overview</h2>
-        <p>Welcome to your Handwriting Book Publication customer account.</p>
-      </div>
+  <section class="card view-card" id="paymentHistoryCard" hidden>
+    <h2>My Payment History</h2>
+    <div id="payments">Loading payment records...</div>
+  </section>
 
-      <div class="card">
-        <h2>Important Work Instructions</h2>
-        <p>Write all assigned work in English uppercase letters A-Z.</p>
-      </div>
+  <section class="card view-card" id="chargesCard" hidden>
+    <h2>My Charges</h2>
 
-    </section>
+    <p class="muted">
+      View additional charges added to your account.
+      These are separate from your registration fee
+      and project salary.
+    </p>
 
-    <section class="page-section" id="page-projects">
-      <div class="card">
-        <h2>Available Projects</h2>
-        <div id="projects">Loading projects...</div>
-      </div>
-    </section>
+    <div id="customerCharges">Loading your charges...</div>
+  </section>
 
-    <section class="page-section" id="page-registrations">
-      <div class="card">
-        <h2>My Registrations</h2>
-        <div id="enrollments">Loading registrations...</div>
-      </div>
-    </section>
+  <section class="card view-card" id="workCard" hidden>
+    <h2>My Work</h2>
 
-    <section class="page-section" id="page-registrationPayment">
-      <div class="card">
-        <h2>Registration Payment</h2>
-        <p class="muted">Submit your transaction ID and payment screenshot for verification.</p>
-        <div id="paymentSection">Loading payment information...</div>
-      </div>
-    </section>
+    <p class="muted">
+      View your assigned handwriting work and
+      submit completed files here.
+    </p>
 
-    <section class="page-section" id="page-payments">
-      <div class="card">
-        <h2>My Payment History</h2>
-        <div id="payments">Loading payment records...</div>
-      </div>
-    </section>
+    <div id="workAssignments">Loading assigned work...</div>
+  </section>
 
-    <section class="page-section" id="page-charges">
-      <div class="card">
-        <h2>My Charges</h2>
-        <div id="charges">Loading charges...</div>
-      </div>
-    </section>    <section class="page-section" id="page-work">
-      <div class="card">
-        <h2>My Work</h2>
-        <p class="muted">View assigned handwriting work and submit completed files here.</p>
-        <div id="workAssignments">Loading assigned work...</div>
-      </div>
-    </section>
+  <section class="card view-card" id="salaryCard" hidden>
+    <h2>My Salary</h2>
+    <div id="salaries">Loading salary records...</div>
+  </section>
 
-    <section class="page-section" id="page-salary">
-      <div class="card">
-        <h2>My Salary</h2>
-        <div class="item">
-          <strong>Salary Payment Rule</strong>
-          <p>50% of the project salary advance is payable 15 minutes after your registration is complete and approved.</p>
-          <p>The remaining 50% is payable after successful completion of your assigned work.</p>
-        </div>
-        <div id="salaries">Loading salary records...</div>
-      </div>
-    </section>
+  <section class="card view-card" id="galleryCard" hidden>
+    <h2>Customer Work Gallery</h2>
 
-    <section class="page-section" id="page-gallery">
-      <div class="card">
-        <h2>Customer Work Gallery</h2>
-        <div id="gallery">Loading gallery...</div>
-      </div>
-    </section>
+    <p class="muted">View published handwriting work.</p>
 
-    <section class="page-section" id="page-parcels">
-      <div class="card">
-        <h2>My Parcel Tracking</h2>
-        <div id="parcels">Loading parcel information...</div>
-      </div>
-    </section>
+    <div id="gallery">Loading customer work gallery...</div>
+  </section>
 
-    <section class="page-section" id="page-certificates">
-      <div class="card">
-        <h2>My Completion Certificates</h2>
-        <div id="certificates">Loading certificates...</div>
-      </div>
-    </section>
+  <section class="card view-card" id="companyCertificatesCard" hidden>
+    <h2>Company Certificates</h2>
 
-    <section class="page-section" id="page-companyCertificates">
-      <div class="card">
-        <h2>Company Certificates &amp; Documents</h2>
-        <p class="muted">View official company certificates and documents.</p>
-        <div id="companyCertificates">Loading company certificates...</div>
-      </div>
-    </section>
+    <p class="muted">
+      View our company certificates and documents.
+    </p>
 
-    <section class="page-section" id="page-notifications">
-      <div class="card">
-        <h2>Notifications</h2>
-        <div id="notifications">Loading notifications...</div>
-      </div>
-    </section>
+    <div id="companyCertificates">
+      Loading company certificates...
+    </div>
+  </section>
 
-    <section class="page-section" id="page-support">
-      <div class="card">
-        <h2>Customer Support</h2>
-        <div id="supportTickets">Loading support messages...</div>
+  <section class="card view-card" id="parcelCard" hidden>
+    <h2>My Parcel Tracking</h2>
+    <div id="parcels">Loading parcel information...</div>
+  </section>
 
-        <div class="formbox">
-          <h3>Contact Support</h3>
-          <form id="supportForm">
-            <label for="supportSubject">Subject</label>
-            <input id="supportSubject" name="subject" maxlength="150" required>
+  <section class="card view-card" id="completionCertificatesCard" hidden>
+    <h2>My Completion Certificates</h2>
+    <div id="certificates">Loading certificates...</div>
+  </section>
 
-            <label for="supportMessage">Message</label>
-            <textarea id="supportMessage" name="message" maxlength="3000" required></textarea>
+  <section class="card view-card" id="notificationsCard" hidden>
+    <h2>Notifications</h2>
+    <div id="notifications">Loading notifications...</div>
+  </section>
 
-            <button type="submit">Send Message</button>
-          </form>
-        </div>
-      </div>
-    </section>
+  <section class="card view-card" id="supportCard" hidden>
+    <h2>Customer Support</h2>
 
-    <section class="page-section" id="page-profile">
-      <div class="card">
-        <h2>Account Information</h2>
-        <div id="profile">Loading profile...</div>
-      </div>
-    </section>
+    <form id="supportForm" class="formbox">
 
-  </main>
-</div>
-</div>
+      <label for="supportSubject">Subject</label>
+      <input
+        id="supportSubject"
+        name="subject"
+        type="text"
+        maxlength="150"
+        required>
+
+      <label for="supportCategory">Category</label>
+
+      <select id="supportCategory" name="category" required>
+        <option value="registration">Registration</option>
+        <option value="payment">Payment</option>
+        <option value="project">Project</option>
+        <option value="salary">Salary</option>
+        <option value="work">Work</option>
+        <option value="parcel">Parcel</option>
+        <option value="certificate">Certificate</option>
+        <option value="account">Account</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label for="supportMessage">Message</label>
+
+      <textarea
+        id="supportMessage"
+        name="message"
+        maxlength="3000"
+        required></textarea>
+
+      <button type="submit">Submit Support Request</button>
+    </form>
+
+    <h3>My Support Requests</h3>
+    <div id="supportTickets">Loading support requests...</div>
+  </section>
+
+  <section class="card view-card" id="profileCard" hidden>
+    <h2>Account Information</h2>
+    <div id="profile">Loading profile...</div>
+  </section>
+
+</main>
+</div><!-- /.app-shell -->
 
 <script>
-"use strict";const $ = id => document.getElementById(id);
+"use strict";
+
+const API_BASE = "/api";
+
+/* Embedded homepage photo: no separate image upload is required. */
+const HOME_HERO_IMAGE_DATA =
+  "data:image/webp;base64," +
+  "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";
+
+const homeHeroImage = document.getElementById("homeHeroImage");
+if(homeHeroImage){ homeHeroImage.src = HOME_HERO_IMAGE_DATA; }
+
+const $ = id => document.getElementById(id);
+
 let enrollments = [];
+let selectedEnrollmentId = null;
+
+/*
+  COMMON HELPERS
+*/
 
 function esc(value){
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
+  return String(value ?? "").replace(/[&<>"']/g,char=>({
     "&":"&amp;",
     "<":"&lt;",
     ">":"&gt;",
     '"':"&quot;",
     "'":"&#39;"
-  }[c]));
+  })[char]);
 }
 
 function money(value){
@@ -290,34 +697,38 @@ function money(value){
 
 function fmtDate(value){
   if(!value) return "Not available";
+
   const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? "Not available"
-    : date.toLocaleString("en-IN");
-}
 
-function showMessage(text, type="success"){
-  const box = $("message");
-  box.className = "message " + type;
-  box.textContent = text;
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-
-async function api(url, options={}){
-  const config = {
-    credentials:"same-origin",
-    ...options,
-    headers:{...(options.headers || {})}
-  };
-
-  if(config.body && !(config.body instanceof FormData)
-     && typeof config.body !== "string"){
-    config.headers["Content-Type"] = "application/json";
-    config.body = JSON.stringify(config.body);
+  if(Number.isNaN(date.getTime())){
+    return "Not available";
   }
 
-  const response = await fetch(url, config);
-  let data = {};
+  return date.toLocaleString("en-IN");
+}
+
+function message(text,type="success"){
+  const box = $("message");
+
+  box.textContent = text;
+  box.className = "message " + type;
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+}
+
+async function api(url,options={}){
+  const response = await fetch(API_BASE + url,{
+    credentials:"same-origin",
+    ...options,
+    headers:{
+      ...(options.headers || {})
+    }
+  });
+
+  let data;
 
   try{
     data = await response.json();
@@ -326,130 +737,210 @@ async function api(url, options={}){
   }
 
   if(!response.ok){
-    throw new Error(data.message || data.error || "Request failed.");
+    throw new Error(data.message || "Request failed.");
   }
 
   return data;
 }
 
-/* MENU NAVIGATION */
+function showError(elementId,error){
+  const box = $(elementId);
 
-function openPage(page){
-  document.querySelectorAll(".page-section").forEach(section=>{
-    section.classList.remove("active");
-  });
-
-  document.querySelectorAll(".menu button").forEach(button=>{
-    button.classList.toggle("active", button.dataset.page === page);
-  });
-
-  const section = $("page-" + page);
-  if(section) section.classList.add("active");
-
-  $("sidebar").classList.remove("open");
+  if(box){
+    box.innerHTML =
+      `<p class="empty">${esc(error.message || "Unable to load information.")}</p>`;
+  }
 }
 
-document.querySelectorAll(".menu button").forEach(button=>{
-  button.addEventListener("click",()=>{
-    openPage(button.dataset.page);
-  });
-});
-
-$("menuToggle").addEventListener("click",()=>{
-  $("sidebar").classList.toggle("open");
-});
-
-/* ACCOUNT */
+/*
+  ACCOUNT INFORMATION
+*/
 
 async function loadAccount(){
-  const data = await api("/api/auth/me");
-  const customer = data.customer;
+  const data = await api("/auth/me");
 
-  if(!customer){
-    throw new Error("Customer account was not returned.");
+  if(!data.customer){
+    throw new Error("Customer account not found.");
   }
 
-  $("customerName").textContent = customer.fullName || "Customer";
+  $("customerName").textContent =
+    data.customer.fullName || "Customer";
 
-  const status = customer.accountStatus;
+  const status = data.customer.accountStatus;
 
-  $("accountStatus").textContent =
-    status === "approved"
-      ? "Your customer account is approved."
-      : status === "pending"
-      ? "Your account is awaiting admin approval."
-      : "Your account is not approved. Please contact customer support.";
+  if(status === "approved"){
+    $("accountStatus").textContent =
+      "Your customer account is approved.";
+  }else if(status === "pending"){
+    $("accountStatus").textContent =
+      "Your account is awaiting admin approval.";
+  }else{
+    $("accountStatus").textContent =
+      "Your account is not approved. Please contact support.";
+  }
 }
 
-/* PROJECTS */
+/*
+  AVAILABLE PROJECTS AND INLINE APPLICATION FORM
+*/
 
 async function loadProjects(){
   const box = $("projects");
 
   try{
-    const data = await api("/api/projects");
-    const list = data.projects || [];
+    const data = await api("/projects");
+    const projects = data.projects || [];
 
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No projects are currently available.</p>';
+    if(!projects.length){
+      box.innerHTML =
+        '<p class="empty">No projects are currently available.</p>';
       return;
     }
 
-    box.innerHTML = list.map(project=>`
-      <article class="project">
-        <h3>${esc(project.projectName)}</h3>
-        <p>Pages: ${Number(project.pages)||0}</p>
-        <p>Sides: ${Number(project.sides)||0}</p>
-        <p>Duration: ${Number(project.durationDays)||0} days</p>
-        <p>Salary: ${money(project.salary)}</p>
-        <p>Registration Fee: ${money(project.registrationFee)}</p>
-        <p>${esc(project.description || "")}</p>
-        <button type="button" data-project-id="${esc(project._id)}">
-          Select Project
-        </button>
-      </article>
-    `).join("");
+    box.innerHTML = projects.map(project=>{
+      const projectId = String(project._id || "");
+      const projectNo = project.projectNumber ?? "";
 
-    box.querySelectorAll("[data-project-id]").forEach(button=>{
-      button.addEventListener("click",()=>{
-        applyProject(button.dataset.projectId);
-      });
-    });
+      return `
+        <article class="project">
+          <h3>${esc(project.projectName || "Project")}</h3>
+          <p><strong>Project No.:</strong> ${esc(projectNo || "-")}</p>
+          <p><strong>Pages (front/back):</strong> ${esc(project.pages ?? "-")}</p>
+          <p><strong>Total sides:</strong> ${esc(project.sides ?? "-")}</p>
+          <p><strong>Completion time:</strong> ${esc(project.durationDays ?? "-")} days</p>
+          <p><strong>Project salary:</strong> ${money(project.salary)}</p>
+          <p><strong>Registration fee:</strong> ${money(project.registrationFee)}</p>
+          ${project.description ? `<p>${esc(project.description)}</p>` : ""}
+          ${project.instructions ? `<div class="instructions">${esc(project.instructions)}</div>` : ""}
+
+          <button
+            type="button"
+            onclick="applyProject('${esc(projectId)}')">
+            Apply Now
+          </button>
+
+          <div id="applicationForm-${esc(projectId)}" class="project-apply-form" hidden>
+            <h4>Project Registration Form</h4>
+            <p class="muted">Complete these six details to continue to payment.</p>
+
+            <form class="formbox" onsubmit="submitEnrollment(event,'${esc(projectId)}')">
+              <label>NAME</label>
+              <input name="name" type="text" maxlength="100" autocomplete="name" required>
+
+              <label>ADDRESS</label>
+              <input name="address" type="text" maxlength="300" autocomplete="street-address" required>
+
+              <label>MOBILE NUMBER</label>
+              <input name="mobile" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" autocomplete="tel" required>
+
+              <label>PIN CODE</label>
+              <input name="pinCode" type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="postal-code" required>
+
+              <label>DISTRICT</label>
+              <input name="district" type="text" maxlength="100" autocomplete="address-level2" required>
+
+              <label>PROJECT NO.</label>
+              <input name="projectNo" type="text" value="${esc(projectNo)}" readonly>
+
+              <button type="submit">Submit &amp; Continue to Payment</button>
+            </form>
+          </div>
+        </article>
+      `;
+    }).join("");
 
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("projects",error);
   }
 }
 
-async function applyProject(id){
-  if(!confirm("Do you want to register for this project?")) return;
+function applyProject(projectId){
+  const formBox = $("applicationForm-" + projectId);
+
+  if(!formBox){
+    message("Unable to open this project form. Please refresh the page.","error");
+    return;
+  }
+
+  const willOpen = formBox.hidden;
+
+  document.querySelectorAll(".project-apply-form").forEach(box=>{
+    box.hidden = true;
+  });
+
+  if(willOpen){
+    formBox.hidden = false;
+    formBox.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+
+async function submitEnrollment(event,projectId){
+  event.preventDefault();
+
+  const form = event.target;
+  const button = form.querySelector('button[type="submit"]');
+  const formData = new FormData(form);
+
+  const payload = {
+    projectId,
+    name: String(formData.get("name") || "").trim(),
+    address: String(formData.get("address") || "").trim(),
+    mobile: String(formData.get("mobile") || "").trim(),
+    pinCode: String(formData.get("pinCode") || "").trim(),
+    district: String(formData.get("district") || "").trim()
+  };
+
+  if(!/^[0-9]{10}$/.test(payload.mobile)){
+    message("Please enter a valid 10-digit mobile number.","error");
+    return;
+  }
+
+  if(!/^[0-9]{6}$/.test(payload.pinCode)){
+    message("Please enter a valid 6-digit PIN code.","error");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Submitting details...";
 
   try{
-    const data = await api("/api/enrollments",{
+    const data = await api("/enrollments",{
       method:"POST",
-      body:{projectId:id}
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
     });
 
-    showMessage(data.message || "Project registration submitted.");
+    selectedEnrollmentId = data.enrollment?._id || null;
+    message(data.message || "Registration details submitted. Continue to payment.");
+
     await loadEnrollments();
-    await loadPaymentSection();
+    showDashboardView("registrationPaymentCard");
 
   }catch(error){
-    showMessage(error.message,"error");
+    message(error.message || "Unable to submit registration details.","error");
+  }finally{
+    button.disabled = false;
+    button.textContent = "Submit & Continue to Payment";
   }
 }
 
-/* REGISTRATIONS */
+/*
+  CUSTOMER REGISTRATIONS
+*/
 
 async function loadEnrollments(){
   const box = $("enrollments");
 
   try{
-    const data = await api("/api/enrollments/my");
+    const data = await api("/enrollments/my");
+
     enrollments = data.enrollments || [];
 
     if(!enrollments.length){
-      box.innerHTML = '<p class="empty">You have not registered for any project yet.</p>';
+      box.innerHTML =
+        '<p class="empty">You have not registered for any project yet.</p>';
+
+      await loadPaymentSection();
       return;
     }
 
@@ -458,311 +949,509 @@ async function loadEnrollments(){
 
       return `
         <div class="item">
-          <strong>${esc(project.projectName || "Project")}</strong>
-          <p>Registration: ${esc(item.registrationStatus)}</p>
-          <p>Payment: ${esc(item.paymentStatus)}</p>
+          <h4>${esc(project.projectName || "Project")}</h4>
+          <p>Project Number: ${esc(project.projectNumber ?? "-")}</p>
+          <p>Pages: ${esc(project.pages ?? "-")}</p>
+          <p>Sides: ${esc(project.sides ?? "-")}</p>
+          <p>Duration: ${esc(project.durationDays ?? "-")} days</p>
           <p>Salary: ${money(project.salary)}</p>
           <p>Registration Fee: ${money(project.registrationFee)}</p>
-          <p>Registered: ${fmtDate(item.createdAt)}</p>
+
+          <p>
+            Registration Status:
+            <span class="badge">
+              ${esc(item.registrationStatus || "pending")}
+            </span>
+          </p>
+
+          <p>
+            Payment Status:
+            <span class="badge">
+              ${esc(item.paymentStatus || "unpaid")}
+            </span>
+          </p>
+
+          <p>Registration Date: ${fmtDate(item.createdAt)}</p>
+        </div>
+      `;
+    }).join("");
+
+    await loadPaymentSection();
+
+  }catch(error){
+    showError("enrollments",error);
+  }
+}
+
+/*
+  FILE UPLOAD
+*/
+
+async function uploadFile(file){
+  if(!file){
+    throw new Error("Please select a file.");
+  }
+
+  const formData = new FormData();
+  formData.append("file",file);
+
+  const response = await fetch(API_BASE + "/uploads",{
+    method:"POST",
+    credentials:"same-origin",
+    body:formData
+  });
+
+  let data;
+
+  try{
+    data = await response.json();
+  }catch(error){
+    throw new Error("Invalid file upload response.");
+  }
+
+  if(!response.ok){
+    throw new Error(data.message || "File upload failed.");
+  }
+
+  if(!data.file || !data.file.fileId){
+    throw new Error("Uploaded file ID was not returned.");
+  }
+
+  return String(data.file.fileId);
+}
+
+/*
+  REGISTRATION PAYMENT SECTION
+*/
+
+async function loadPaymentSection(){
+  const box = $("paymentSection");
+  if(!box) return;
+
+  // Keep the QR/UPI details visible in the payment card at all times.
+  // This function only loads the project-specific transaction form.
+  box.innerHTML = '<p class="empty">Checking your registrations...</p>';
+
+  try{
+    if(!Array.isArray(enrollments) || enrollments.length === 0){
+      box.innerHTML = '<p class="empty">First apply for an available project. After your registration details are submitted, the payment form for that project will appear here. The QR code and UPI ID above are ready to use.</p>';
+      return;
+    }
+
+    const paymentData = await api("/payments/my");
+    const payments = Array.isArray(paymentData.payments) ? paymentData.payments : [];
+
+    const eligible = enrollments.filter(item=>{
+      const paymentEnrollmentIds = payments
+        .filter(payment => ["pending","approved"].includes(String(payment.status || "").toLowerCase()))
+        .map(payment => String(payment.enrollment?._id || payment.enrollment || ""));
+      const hasSubmittedPayment = paymentEnrollmentIds.includes(String(item._id));
+      const paymentStatus = String(item.paymentStatus || "").toLowerCase();
+      const registrationStatus = String(item.registrationStatus || "").toLowerCase();
+
+      return !hasSubmittedPayment &&
+        !["approved","paid","pending"].includes(paymentStatus) &&
+        !["approved","completed","rejected","cancelled"].includes(registrationStatus);
+    });
+
+    eligible.sort((a,b)=>{
+      if(String(a._id) === String(selectedEnrollmentId)) return -1;
+      if(String(b._id) === String(selectedEnrollmentId)) return 1;
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+
+    if(!eligible.length){
+      box.innerHTML = '<p class="empty">No unpaid registration is waiting for payment submission. If you have already submitted payment, check My Payment History for its verification status.</p>';
+      return;
+    }
+
+    box.innerHTML = eligible.map(item=>{
+      const project = item.projectSnapshot || {};
+      const projectName = project.projectName || "Project Registration";
+      const projectNumber = project.projectNumber ?? item.projectNumber ?? "-";
+      const fee = project.registrationFee ?? item.registrationFee ?? item.amount ?? 0;
+
+      return `
+        <div class="formbox">
+          <h3>${esc(projectName)}</h3>
+          <p>Project Number: ${esc(projectNumber)}</p>
+          <p>Registration Fee: <strong>${money(fee)}</strong></p>
+          <p class="muted">Pay using the QR code or UPI ID shown above, then submit the details below.</p>
+          <form onsubmit="submitPayment(event,'${esc(item._id)}')">
+            <label>Transaction ID</label>
+            <input name="transactionId" type="text" maxlength="120" autocomplete="off" required>
+            <label>Payment Screenshot</label>
+            <input name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required>
+            <button type="submit">Submit Payment</button>
+          </form>
         </div>
       `;
     }).join("");
 
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    box.innerHTML = `<p class="empty">${esc(error.message || "Unable to load payment form.")} The UPI QR code and UPI ID are displayed above.</p>`;
   }
 }
 
-/* REGISTRATION PAYMENT */
-
-async function loadPaymentSection(){
-  const box = $("paymentSection");
-
-  try{
-    if(!enrollments.length){
-      box.innerHTML = '<p class="empty">Register for a project first to see payment information.</p>';
-      return;
-    }
-
-    const data = await api("/api/payments/my");
-    const payments = data.payments || [];
-
-    const pending = enrollments.filter(item=>
-      item.registrationStatus === "pending" &&
-      item.paymentStatus !== "approved" &&
-      !payments.some(payment=>
-        String(payment.enrollment?._id || payment.enrollment) === String(item._id) &&
-        payment.status === "pending"
-      )
-    );
-
-    if(!pending.length){
-      box.innerHTML = '<p class="empty">No registration payment is waiting for submission. Check payment history for updates.</p>';
-      return;
-    }
-
-    box.innerHTML = `
-      <div class="item">
-        <strong>UPI Payment Details</strong>
-        <p>Payee Name: Ankur Meena</p>
-        <p>UPI ID: 8504823316@thecardco</p>
-        <a class="filelink"
-           href="upi://pay?pa=8504823316@thecardco&pn=Ankur%20Meena"
-           target="_blank">Open UPI Payment App</a>
-      </div>
-    ` + pending.map(item=>`
-      <div class="formbox">
-        <h3>${esc(item.projectSnapshot?.projectName || "Project")}</h3>
-        <p>Registration Fee: ${money(item.projectSnapshot?.registrationFee)}</p>
-
-        <form class="paymentForm" data-enrollment-id="${esc(item._id)}">
-          <label>Transaction ID</label>
-          <input name="transactionId" maxlength="120" required>
-
-          <label>Payment Screenshot</label>
-          <input name="screenshot" type="file"
-                 accept="image/jpeg,image/png,image/webp" required>
-
-          <button type="submit">Submit Payment</button>
-        </form>
-      </div>
-    `).join("");
-
-    box.querySelectorAll(".paymentForm").forEach(form=>{
-      form.addEventListener("submit",event=>{
-        submitPayment(event,form.dataset.enrollmentId);
-      });
-    });
-
-  }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
-  }
-}
+/*
+  SUBMIT REGISTRATION PAYMENT
+*/
 
 async function submitPayment(event,enrollmentId){
   event.preventDefault();
 
   const form = event.target;
-  const button = form.querySelector("button");
-  const transactionId = form.elements.transactionId.value.trim();
-  const file = form.elements.screenshot.files[0];
+
+  const button =
+    form.querySelector('button[type="submit"]');
+
+  const transactionId =
+    form.elements.transactionId.value.trim();
+
+  const file =
+    form.elements.screenshot.files[0];
 
   if(!transactionId || !file){
-    showMessage("Enter transaction ID and select screenshot.","error");
+    message("Enter transaction ID and select screenshot.","error");
     return;
   }
 
-  if(!["image/jpeg","image/png","image/webp"].includes(file.type)
-     || file.size > 5*1024*1024){
-    showMessage("Choose a JPG, PNG or WEBP screenshot under 5 MB.","error");
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
+
+  if(!allowedTypes.includes(file.type)){
+    message("Only JPG, PNG and WEBP screenshots are allowed.","error");
+    return;
+  }
+
+  if(file.size > 5 * 1024 * 1024){
+    message("Payment screenshot must be under 5 MB.","error");
     return;
   }
 
   button.disabled = true;
 
   try{
-    const formData = new FormData();
-    formData.append("file",file);
-
     button.textContent = "Uploading screenshot...";
 
-    const uploadResponse = await fetch("/api/uploads",{
-      method:"POST",
-      credentials:"same-origin",
-      body:formData
-    });
-
-    const uploadData = await uploadResponse.json();
-
-    if(!uploadResponse.ok){
-      throw new Error(uploadData.message || "Screenshot upload failed.");
-    }
-
-    const fileId = uploadData.file && uploadData.file.fileId;
-
-    if(!fileId){
-      throw new Error("Screenshot file ID was not returned.");
-    }
+    const paymentScreenshotId =
+      await uploadFile(file);
 
     button.textContent = "Submitting payment...";
 
-    const result = await api("/api/payments",{
+    const data = await api("/payments",{
       method:"POST",
-      body:{
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
         enrollmentId,
         transactionId,
-        paymentScreenshotId:fileId
-      }
+        paymentScreenshotId
+      })
     });
 
-    showMessage(result.message || "Payment submitted for verification.");
+    message(
+      data.message || "Payment submitted for verification."
+    );
 
     form.reset();
-    await loadEnrollments();
-    await loadPayments();
-    await loadPaymentSection();
+
+    await Promise.all([
+      loadEnrollments(),
+      loadPayments()
+    ]);
 
   }catch(error){
-    showMessage(error.message,"error");
+    message(error.message,"error");
+
   }finally{
     button.disabled = false;
     button.textContent = "Submit Payment";
   }
 }
 
-/* PAYMENT HISTORY */
+
+/*
+  PAYMENT HISTORY
+*/
 
 async function loadPayments(){
   const box = $("payments");
 
   try{
-    const data = await api("/api/payments/my");
-    const list = data.payments || [];
+    const data = await api("/payments/my");
+    const payments = data.payments || [];
 
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No payment records available.</p>';
+    if(!payments.length){
+      box.innerHTML =
+        '<p class="empty">No payment records available.</p>';
       return;
     }
 
-    box.innerHTML = list.map(payment=>`
+    box.innerHTML = payments.map(item=>`
       <div class="item">
-        <strong>${money(payment.amount)}</strong>
-        <p>Type: ${esc(payment.paymentType)}</p>
-        <p>Transaction ID: ${esc(payment.transactionId)}</p>
-        <p>Status: <span class="badge">${esc(payment.status)}</span></p>
-        <p>Submitted: ${fmtDate(payment.createdAt)}</p>
-        ${payment.adminRemarks
-          ? `<p>Admin Remarks: ${esc(payment.adminRemarks)}</p>`
-          : ""}
+
+        <h4>${money(item.amount)}</h4>
+
+        <p>Payment Type: ${esc(item.paymentType || "-")}</p>
+
+        <p>Transaction ID: ${esc(item.transactionId || "-")}</p>
+
+        <p>Payment Method: ${esc(item.paymentMethod || "-")}</p>
+
+        <p>
+          Status:
+          <span class="badge">${esc(item.status || "-")}</span>
+        </p>
+
+        <p>Admin Remarks: ${esc(item.adminRemarks || "-")}</p>
+
+        <p>Submitted: ${fmtDate(item.createdAt)}</p>
+
       </div>
     `).join("");
 
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
-  }
-  }/* CUSTOMER CHARGES */
-
-async function loadCharges(){
-  const box = $("charges");
-
-  try{
-    const data = await api("/api/customer-charges");
-    const list = data.charges || [];
-
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No customer charges available.</p>';
-      return;
-    }
-
-    box.innerHTML = list.map(charge=>`
-      <div class="item">
-        <strong>${money(charge.amount)}</strong>
-        <p>Reason: ${esc(charge.reason)}</p>
-        <p>Notes: ${esc(charge.notes || "Not available")}</p>
-        <p>Status: <span class="badge">${esc(charge.status)}</span></p>
-        <p>Date: ${fmtDate(charge.createdAt)}</p>
-      </div>
-    `).join("");
-
-  }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("payments",error);
   }
 }
 
-/* WORK ASSIGNMENTS */
+
+/*
+  CUSTOMER CHARGES
+*/
+
+async function loadCustomerCharges(){
+  const box = $("customerCharges");
+
+  try{
+    const data = await api("/customer-charges");
+    const charges = data.charges || [];
+
+    if(!charges.length){
+      box.innerHTML =
+        '<p class="empty">No additional charges have been added to your account.</p>';
+      return;
+    }
+
+    const totals = charges.reduce((result,item)=>{
+      const amount = Number(item.amount) || 0;
+
+      if(item.status === "unpaid"){
+        result.unpaid += amount;
+      }else if(item.status === "paid"){
+        result.paid += amount;
+      }else if(item.status === "waived"){
+        result.waived += amount;
+      }
+
+      return result;
+    },{
+      unpaid:0,
+      paid:0,
+      waived:0
+    });
+
+    box.innerHTML = `
+      <div class="grid">
+
+        <div class="project">
+          <h3>Unpaid</h3>
+          <p>${money(totals.unpaid)}</p>
+        </div>
+
+        <div class="project">
+          <h3>Paid</h3>
+          <p>${money(totals.paid)}</p>
+        </div>
+
+        <div class="project">
+          <h3>Waived</h3>
+          <p>${money(totals.waived)}</p>
+        </div>
+
+      </div>
+    ` + charges.map(item=>`
+      <div class="item">
+
+        <h4>${esc(item.reason || "Customer Charge")}</h4>
+
+        <p>Amount: ${money(item.amount)}</p>
+
+        <p>Status: <span class="badge">${esc(item.status || "unpaid")}</span></p>
+
+        <p>Payment Reference: ${esc(item.paymentReference || "-")}</p>
+
+        <p>Notes: ${esc(item.notes || "-")}</p>
+
+        <p>Date: ${fmtDate(item.createdAt)}</p>
+
+      </div>
+    `).join("");
+
+  }catch(error){
+    showError("customerCharges",error);
+  }
+}
+
+
+/*
+  WORK ASSIGNMENTS
+*/
 
 async function loadWorkAssignments(){
   const box = $("workAssignments");
 
   try{
-    const data = await api("/api/work-assignments/my");
-    const list = data.assignments || [];
+    const data = await api("/work-assignments/my");
+    const assignments = data.assignments || [];
 
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No work has been assigned to you yet.</p>';
+    if(!assignments.length){
+      box.innerHTML =
+        '<p class="empty">No work has been assigned to you yet.</p>';
       return;
     }
 
-    box.innerHTML = list.map(work=>{
+    box.innerHTML = assignments.map(item=>{
+
       const canSubmit = [
         "assigned",
         "in_progress",
         "correction_required"
-      ].includes(work.status);
+      ].includes(item.status);
 
-      const links = (work.submissionFileIds || []).map(id=>`
-        <a class="filelink"
-           href="/api/uploads/${encodeURIComponent(id)}"
-           target="_blank" rel="noopener">View submitted file</a>
-      `).join("");
+      const submittedFiles =
+        (item.submissionFileIds || []).map(id=>`
+          <a
+            class="filelink"
+            href="${API_BASE}/uploads/${encodeURIComponent(id)}"
+            target="_blank"
+            rel="noopener">
+            View submitted file
+          </a>
+        `).join("");
 
       return `
         <article class="work">
-          <h3>${esc(work.title)}</h3>
-          <p>Assigned Pages: ${Number(work.totalPages)||0}</p>
-          <p>Assigned Date: ${fmtDate(work.assignedDate)}</p>
-          <p>Deadline: ${fmtDate(work.deadline)}</p>
-          <p>Status: <span class="badge">${esc(work.status)}</span></p>
+
+          <h3>${esc(item.title || "Handwriting Work")}</h3>
+
+          <p>Assigned Pages: ${esc(item.totalPages ?? "-")}</p>
+
+          <p>Assigned Date: ${fmtDate(item.assignedDate)}</p>
+
+          <p>Deadline: ${fmtDate(item.deadline)}</p>
+
+          <p>
+            Status:
+            <span class="badge">${esc(item.status || "assigned")}</span>
+          </p>
 
           <p>Instructions:</p>
-          <div class="instructions">${esc(work.instructions || "Write all assigned work in English uppercase letters A-Z.")}</div>
 
-          ${work.adminRemarks ? `
-            <p>Admin Remarks:</p>
-            <div class="instructions">${esc(work.adminRemarks)}</div>
-          ` : ""}
+          <div class="instructions">${esc(item.instructions || "Write all assigned work in English uppercase letters A-Z.")}</div>
 
-          ${links ? `<p>Previously submitted files:</p>${links}` : ""}
+          ${
+            item.adminRemarks
+              ? `
+                <p>Admin Remarks:</p>
+                <div class="instructions">${esc(item.adminRemarks)}</div>
+              `
+              : ""
+          }
 
-          ${canSubmit ? `
-            <form class="formbox workForm" data-work-id="${esc(work._id)}">
-              <label>Completed Work (1–20 images or PDFs, max 10 MB each)</label>
-              <input name="workFiles" type="file"
-                accept="image/jpeg,image/png,image/webp,application/pdf"
-                multiple required>
+          ${
+            submittedFiles
+              ? `
+                <p>Previously Submitted Files:</p>
+                ${submittedFiles}
+              `
+              : ""
+          }
 
-              <label>Remarks (optional)</label>
-              <textarea name="customerRemarks" maxlength="2000"></textarea>
+          ${
+            canSubmit
+              ? `
+                <form
+                  class="formbox"
+                  onsubmit="submitWork(event,'${esc(item._id)}')">
 
-              <button type="submit">Submit Completed Work</button>
-            </form>
-          ` : ""}
+                  <label>Completed Work Files</label>
 
-          ${["submitted","under_review"].includes(work.status)
-            ? "<p>Your work has been submitted. Please wait for admin review.</p>"
-            : ""}
+                  <input
+                    name="workFiles"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    multiple
+                    required>
 
-          ${work.status === "approved"
-            ? "<p>Your work has been approved and is awaiting completion.</p>"
-            : ""}
+                  <label>Customer Remarks</label>
 
-          ${work.status === "completed"
-            ? "<p>This assignment has been completed.</p>"
-            : ""}
+                  <textarea
+                    name="customerRemarks"
+                    maxlength="2000"
+                    placeholder="Write remarks (optional)"></textarea>
+
+                  <button type="submit">
+                    Submit Completed Work
+                  </button>
+
+                </form>
+              `
+              : ""
+          }
+
+          ${
+            ["submitted","under_review"].includes(item.status)
+              ? "<p>Your work has been submitted. Please wait for admin review.</p>"
+              : ""
+          }
+
+          ${
+            item.status === "approved"
+              ? "<p>Your work has been approved.</p>"
+              : ""
+          }
+
+          ${
+            item.status === "completed"
+              ? "<p>This assignment has been completed.</p>"
+              : ""
+          }
+
         </article>
       `;
     }).join("");
 
-    box.querySelectorAll(".workForm").forEach(form=>{
-      form.addEventListener("submit",event=>{
-        submitWork(event,form.dataset.workId);
-      });
-    });
-
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("workAssignments",error);
   }
 }
 
-async function submitWork(event,id){
+
+/*
+  SUBMIT COMPLETED WORK
+*/
+
+async function submitWork(event,assignmentId){
   event.preventDefault();
 
   const form = event.target;
-  const button = form.querySelector("button");
-  const files = Array.from(form.elements.workFiles.files || []);
-  const remarks = form.elements.customerRemarks.value.trim();
 
-  const allowed = [
+  const button =
+    form.querySelector('button[type="submit"]');
+
+  const files =
+    Array.from(form.elements.workFiles.files || []);
+
+  const remarks =
+    form.elements.customerRemarks.value.trim();
+
+  const allowedTypes = [
     "image/jpeg",
     "image/png",
     "image/webp",
@@ -770,13 +1459,18 @@ async function submitWork(event,id){
   ];
 
   if(files.length < 1 || files.length > 20){
-    showMessage("Select between 1 and 20 files.","error");
+    message("Select between 1 and 20 files.","error");
     return;
   }
 
   for(const file of files){
-    if(!allowed.includes(file.type) || file.size > 10*1024*1024){
-      showMessage("Each file must be JPG, PNG, WEBP or PDF and under 10 MB.","error");
+    if(!allowedTypes.includes(file.type)){
+      message("Only JPG, PNG, WEBP and PDF files are allowed.","error");
+      return;
+    }
+
+    if(file.size > 10 * 1024 * 1024){
+      message("Each file must be under 10 MB.","error");
       return;
     }
   }
@@ -784,414 +1478,686 @@ async function submitWork(event,id){
   button.disabled = true;
 
   try{
-    const ids = [];
+    const fileIds = [];
 
-    for(let i=0;i<files.length;i++){
-      const formData = new FormData();
-      formData.append("file",files[i]);
+    for(let index=0;index<files.length;index++){
+      button.textContent =
+        `Uploading ${index+1} of ${files.length}...`;
 
-      button.textContent = `Uploading ${i+1} of ${files.length}...`;
+      const fileId = await uploadFile(files[index]);
 
-      const response = await fetch("/api/uploads",{
-        method:"POST",
-        credentials:"same-origin",
-        body:formData
-      });
-
-      const data = await response.json();
-
-      if(!response.ok){
-        throw new Error(data.message || "Work file upload failed.");
-      }
-
-      const fileId = data.file && data.file.fileId;
-
-      if(!fileId){
-        throw new Error("Uploaded file ID was not returned.");
-      }
-
-      ids.push(String(fileId));
+      fileIds.push(fileId);
     }
 
     button.textContent = "Submitting work...";
 
-    const result = await api(
-      `/api/work-assignments/${encodeURIComponent(id)}/submit`,
+    const data = await api(
+      `/work-assignments/${encodeURIComponent(assignmentId)}/submit`,
       {
         method:"POST",
-        body:{
-          fileIds:ids,
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          fileIds,
           customerRemarks:remarks
-        }
+        })
       }
     );
 
-    showMessage(result.message || "Work submitted successfully.");
+    message(
+      data.message || "Your completed work has been submitted."
+    );
+
     form.reset();
 
     await loadWorkAssignments();
-    await loadNotifications();
 
   }catch(error){
-    showMessage(error.message,"error");
+    message(error.message,"error");
+
   }finally{
     button.disabled = false;
     button.textContent = "Submit Completed Work";
   }
 }
 
-/* SALARY */
 
-async function loadSalaries(){
-  const box = $("salaries");
-
-  try{
-    const data = await api("/api/salaries/my");
-    const list = data.salaries || [];
-
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No salary records available yet. Details appear after registration approval.</p>';
-      return;
-    }
-
-    box.innerHTML = list.map(salary=>`
-      <div class="item">
-        <strong>Total Salary: ${money(salary.totalSalary)}</strong>
-        <p>50% Advance: ${money(salary.advanceAmount)} — ${esc(salary.advanceStatus || "pending")}</p>
-        <p>Advance due: ${fmtDate(salary.advanceDueAt)}</p>
-        <p>Remaining 50%: ${money(salary.remainingAmount)} — ${esc(salary.remainingStatus || "pending")}</p>
-        <p>Work completion: ${salary.workCompletedAt ? fmtDate(salary.workCompletedAt) : "Not completed yet"}</p>
-      </div>
-    `).join("");
-
-  }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
-  }
-}
-
-/* CUSTOMER WORK GALLERY */
+/*
+  CUSTOMER WORK GALLERY
+*/
 
 async function loadGallery(){
   const box = $("gallery");
 
   try{
-    const data = await api("/api/showcase");
-    const list = data.items || [];
+    const data = await api("/showcase");
+    const items = data.items || [];
 
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No gallery items are available yet.</p>';
+    if(!items.length){
+      box.innerHTML =
+        '<p class="empty">No customer work has been published yet.</p>';
       return;
     }
 
-    box.innerHTML = list.map(item=>{
-      const url = item.fileUrl || item.url ||
-        (item.fileId ? `/api/uploads/${encodeURIComponent(item.fileId)}` : "");
+    box.innerHTML = items.map(item=>{
+
+      const fileId = item.fileId
+        ? encodeURIComponent(item.fileId)
+        : "";
+
+      const fileUrl = fileId
+        ? `${API_BASE}/uploads/${fileId}`
+        : "";
+
+      const isImage = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ].includes(item.fileType);
 
       return `
         <div class="item">
-          <strong>${esc(item.title || "Customer Work Sample")}</strong>
+
+          <h4>${esc(item.title || "Customer Work")}</h4>
+
           <p>${esc(item.description || "")}</p>
-          ${url ? `<a class="filelink" href="${esc(url)}" target="_blank" rel="noopener">View Work Sample</a>` : ""}
+
+          <p>Customer: ${esc(item.customerName || "-")}</p>
+
+          <p>Work Type: ${esc(item.workType || "-")}</p>
+
+          ${
+            fileUrl && isImage
+              ? `
+                <a href="${fileUrl}" target="_blank" rel="noopener">
+                  <img
+                    class="gallery-image"
+                    src="${fileUrl}"
+                    alt="${esc(item.title || "Customer Work")}"
+                    loading="lazy">
+                </a>
+              `
+              : fileUrl
+                ? `
+                  <a
+                    class="filelink"
+                    href="${fileUrl}"
+                    target="_blank"
+                    rel="noopener">
+                    View Work File
+                  </a>
+                `
+                : '<p class="muted">No file attached.</p>'
+          }
+
         </div>
       `;
     }).join("");
 
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("gallery",error);
   }
 }
 
-/* PARCELS */
+/*
+  COMPANY CERTIFICATES
+*/
+
+async function loadCompanyCertificates(){
+  const box = $("companyCertificates");
+
+  try{
+    const data = await api("/company-certificate");
+    const certificates = data.certificates || [];
+
+    if(!certificates.length){
+      box.innerHTML =
+        '<p class="empty">No company certificates available yet.</p>';
+      return;
+    }
+
+    box.innerHTML = certificates.map(item=>{
+      if(!item.fileId){
+        return "";
+      }
+
+      const fileUrl =
+        `${API_BASE}/uploads/${encodeURIComponent(item.fileId)}`;
+
+      return `
+        <div class="item company-certificate-item">
+          <img
+            class="gallery-image"
+            src="${fileUrl}"
+            alt="Company Certificate"
+            loading="lazy">
+        </div>
+      `;
+    }).join("");
+
+  }catch(error){
+    showError("companyCertificates",error);
+  }
+}
+
+
+/*
+  PARCEL TRACKING
+  Customer view does not show tracking number or tracking link.
+*/
 
 async function loadParcels(){
   const box = $("parcels");
 
   try{
-    const data = await api("/api/customer-records/parcels");
-    const list = data.parcels || [];
+    const data = await api("/customer-records/parcels");
+    const parcels = data.parcels || [];
 
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No parcel information available.</p>';
+    if(!parcels.length){
+      box.innerHTML =
+        '<p class="empty">No parcel records available.</p>';
       return;
     }
 
-    box.innerHTML = list.map(parcel=>`
+    box.innerHTML = parcels.map(item=>`
       <div class="item">
-        <strong>${esc(parcel.status || "Parcel")}</strong>
-        <p>Courier: ${esc(parcel.courierName || "Not available")}</p>
-        <p>Dispatch Date: ${fmtDate(parcel.dispatchDate)}</p>
-        <p>Status: ${esc(parcel.status || "Not available")}</p>
-        ${parcel.remarks ? `<p>Remarks: ${esc(parcel.remarks)}</p>` : ""}
+
+        <h4>Parcel: ${esc(item.parcelNumber || "-")}</h4>
+
+        <p>Courier: ${esc(item.courierName || "-")}</p>
+
+        <p>
+          Status:
+          <span class="badge">${esc(item.status || "-")}</span>
+        </p>
+
+        <p>Dispatch Date: ${fmtDate(item.dispatchDate)}</p>
+
+        <p>Delivery Date: ${fmtDate(item.deliveryDate)}</p>
+
+        <p>Admin Remarks: ${esc(item.adminRemarks || "-")}</p>
+
       </div>
     `).join("");
 
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("parcels",error);
   }
 }
 
-/* COMPLETION CERTIFICATES */
+
+/*
+  CUSTOMER COMPLETION CERTIFICATES
+*/
 
 async function loadCertificates(){
   const box = $("certificates");
 
   try{
-    const data = await api("/api/customer-records/certificates");
-    const list = data.certificates || [];
+    const data = await api("/customer-records/certificates");
+    const certificates = data.certificates || [];
 
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No completion certificates available yet.</p>';
+    if(!certificates.length){
+      box.innerHTML =
+        '<p class="empty">No completion certificates have been issued yet.</p>';
       return;
     }
 
-    box.innerHTML = list.map(certificate=>{
-      const url = certificate.fileUrl || certificate.url ||
-        (certificate.fileId
-          ? `/api/uploads/${encodeURIComponent(certificate.fileId)}`
-          : "");
+    box.innerHTML = certificates.map(item=>{
 
-      return `
-        <div class="item">
-          <strong>${esc(certificate.title || "Completion Certificate")}</strong>
-          <p>Issued: ${fmtDate(certificate.issuedAt || certificate.createdAt)}</p>
-          ${url ? `<a class="filelink" href="${esc(url)}" target="_blank" rel="noopener">View Certificate</a>` : ""}
-        </div>
-      `;
-    }).join("");
-
-  }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
-  }
-}
-
-/* COMPANY CERTIFICATES & DOCUMENTS */
-
-async function loadCompanyCertificates(){
-  const box = $("companyCertificates");
-  try{
-    const data = await api("/api/company-certificate");
-    const list = data.certificates || [];
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No company certificates or documents are available yet.</p>';
-      return;
-    }
-    box.innerHTML = list.map(item=>{
-      const url = item.fileId
-        ? `/api/uploads/${encodeURIComponent(item.fileId)}`
+      const fileUrl = item.certificateFileId
+        ? `${API_BASE}/uploads/${encodeURIComponent(item.certificateFileId)}`
         : "";
+
       return `
         <div class="item">
-          <strong>${esc(item.fileName || "Company Certificate")}</strong>
-          <p>Uploaded: ${fmtDate(item.createdAt)}</p>
-          ${url ? `<a class="filelink" href="${esc(url)}" target="_blank" rel="noopener">View Document</a>` : ""}
+
+          <h4>${esc(item.projectName || "Completion Certificate")}</h4>
+
+          <p>Certificate Number: ${esc(item.certificateNumber || "-")}</p>
+
+          <p>Issue Date: ${fmtDate(item.issueDate)}</p>
+
+          <p>Completion Date: ${fmtDate(item.completionDate)}</p>
+
+          <p>Status: ${esc(item.status || "-")}</p>
+
+          <p>Remarks: ${esc(item.remarks || "-")}</p>
+
+          ${
+            fileUrl
+              ? `
+                <a
+                  class="filelink"
+                  href="${fileUrl}"
+                  target="_blank"
+                  rel="noopener">
+                  View Completion Certificate
+                </a>
+              `
+              : '<p class="muted">Certificate file is not attached.</p>'
+          }
+
         </div>
       `;
     }).join("");
+
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("certificates",error);
   }
 }
 
-/* NOTIFICATIONS */
+
+/*
+  SALARY RECORDS
+*/
+
+async function loadSalaries(){
+  const box = $("salaries");
+
+  try{
+    const data = await api("/salaries/my");
+    const salaries = data.salaries || [];
+
+    if(!salaries.length){
+      box.innerHTML =
+        '<p class="empty">No salary records available yet. Salary details appear after registration approval.</p>';
+      return;
+    }
+
+    box.innerHTML = salaries.map(item=>`
+      <div class="item">
+
+        <h4>Project Salary Details</h4>
+
+        <p>Total Salary: ${money(item.totalSalary)}</p>
+
+        <p>
+          50% Advance:
+          ${money(item.advanceAmount)}
+        </p>
+
+        <p>
+          Advance Status:
+          <span class="badge">${esc(item.advanceStatus || "pending")}</span>
+        </p>
+
+        <p>Advance Due Date: ${fmtDate(item.advanceDueAt)}</p>
+
+        <p>Advance Paid Date: ${fmtDate(item.advancePaidAt)}</p>
+
+        <p>
+          Remaining 50%:
+          ${money(item.remainingAmount)}
+        </p>
+
+        <p>
+          Remaining Status:
+          <span class="badge">${esc(item.remainingStatus || "pending")}</span>
+        </p>
+
+        <p>Remaining Paid Date: ${fmtDate(item.remainingPaidAt)}</p>
+
+        <p>Work Completed Date: ${fmtDate(item.workCompletedAt)}</p>
+
+        <p>Admin Remarks: ${esc(item.adminRemarks || "-")}</p>
+
+      </div>
+    `).join("");
+
+  }catch(error){
+    showError("salaries",error);
+  }
+}
+
+
+/*
+  NOTIFICATIONS
+*/
 
 async function loadNotifications(){
   const box = $("notifications");
 
   try{
-    const data = await api("/api/notifications");
-    const list = data.notifications || [];
+    const data = await api("/notifications");
+    const notifications = data.notifications || [];
 
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No notifications yet.</p>';
+    if(!notifications.length){
+      box.innerHTML =
+        '<p class="empty">No notifications available.</p>';
       return;
     }
 
-    box.innerHTML = list.map(item=>`
+    box.innerHTML = notifications.map(item=>`
       <div class="item">
-        <strong>${esc(item.title || "Notification")}</strong>
+
+        <h4>${esc(item.title || "Notification")}</h4>
+
         <p>${esc(item.message || "")}</p>
-        <p class="muted">${fmtDate(item.createdAt)} · ${item.isRead ? "Read" : "Unread"}</p>
-        ${!item.isRead
-          ? `<button type="button" data-notification-id="${esc(item._id)}">Mark as read</button>`
-          : ""}
+
+        <p class="muted">${fmtDate(item.createdAt)}</p>
+
+        ${
+          item.isRead
+            ? '<span class="badge">Read</span>'
+            : `
+              <button
+                type="button"
+                onclick="markNotificationRead('${esc(item._id)}')">
+                Mark as read
+              </button>
+            `
+        }
+
       </div>
     `).join("");
 
-    box.querySelectorAll("[data-notification-id]").forEach(button=>{
-      button.addEventListener("click",()=>{
-        markNotificationRead(button.dataset.notificationId);
-      });
-    });
-
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("notifications",error);
   }
 }
 
+
 async function markNotificationRead(id){
   try{
-    await api(`/api/notifications/${encodeURIComponent(id)}/read`,{
-      method:"PATCH"
-    });
+    await api(
+      `/notifications/${encodeURIComponent(id)}/read`,
+      {method:"PATCH"}
+    );
 
     await loadNotifications();
 
   }catch(error){
-    showMessage(error.message,"error");
+    message(error.message,"error");
   }
 }
 
-/* SUPPORT */
+
+/*
+  CUSTOMER SUPPORT
+*/
 
 async function loadSupport(){
   const box = $("supportTickets");
 
   try{
-    const data = await api("/api/support");
-    const list = data.tickets || [];
+    const data = await api("/support");
+    const tickets = data.tickets || [];
 
-    if(!list.length){
-      box.innerHTML = '<p class="empty">No support messages yet.</p>';
+    if(!tickets.length){
+      box.innerHTML =
+        '<p class="empty">No support requests found.</p>';
       return;
     }
 
-    box.innerHTML = list.map(ticket=>`
+    box.innerHTML = tickets.map(item=>`
       <div class="item">
-        <strong>${esc(ticket.subject || "Support Request")}</strong>
-        <p>${esc(ticket.message || "")}</p>
-        <p>Status: <span class="badge">${esc(ticket.status || "Open")}</span></p>
-        <p>Date: ${fmtDate(ticket.createdAt)}</p>
-        ${ticket.adminReply ? `<p>Admin Reply: ${esc(ticket.adminReply)}</p>` : ""}
+
+        <h4>${esc(item.subject || "Support Request")}</h4>
+
+        <p>Category: ${esc(item.category || "-")}</p>
+
+        <p>Message: ${esc(item.message || "-")}</p>
+
+        <p>
+          Status:
+          <span class="badge">${esc(item.status || "open")}</span>
+        </p>
+
+        <p>Admin Reply: ${esc(item.adminReply || "No reply yet.")}</p>
+
+        <p>Submitted: ${fmtDate(item.createdAt)}</p>
+
+        <p>Reply Date: ${fmtDate(item.repliedAt)}</p>
+
       </div>
     `).join("");
 
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("supportTickets",error);
   }
 }
 
-$("supportForm").addEventListener("submit",async event=>{
+
+/*
+  SUPPORT FORM SUBMISSION
+*/
+
+$("supportForm").addEventListener("submit",async function(event){
   event.preventDefault();
 
   const form = event.target;
-  const button = form.querySelector("button");
+
+  const subject =
+    form.elements.subject.value.trim();
+
+  const category =
+    form.elements.category.value;
+
+  const supportMessage =
+    form.elements.message.value.trim();
+
+  if(!subject || !category || !supportMessage){
+    message("Please complete all support fields.","error");
+    return;
+  }
+
+  const button =
+    form.querySelector('button[type="submit"]');
 
   button.disabled = true;
+  button.textContent = "Submitting...";
 
   try{
-    const result = await api("/api/support",{
+    const data = await api("/support",{
       method:"POST",
-      body:{
-        subject:form.elements.subject.value.trim(),
-        message:form.elements.message.value.trim()
-      }
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        subject,
+        category,
+        message:supportMessage
+      })
     });
 
-    showMessage(result.message || "Support message submitted.");
+    message(
+      data.message || "Support request submitted successfully."
+    );
+
     form.reset();
+
     await loadSupport();
 
   }catch(error){
-    showMessage(error.message,"error");
+    message(error.message,"error");
+
   }finally{
     button.disabled = false;
+    button.textContent = "Submit Support Request";
   }
 });
 
-/* PROFILE */
+
+/*
+  CUSTOMER PROFILE
+*/
 
 async function loadProfile(){
   const box = $("profile");
 
   try{
-    const data = await api("/api/profile");
+    const data = await api("/profile");
     const profile = data.profile || {};
 
     const rows = [
       ["Customer ID",profile.customerId],
       ["Full Name",profile.fullName],
       ["Father's Name",profile.fatherName],
-      ["Email",profile.email],
       ["Mobile",profile.mobile],
       ["WhatsApp",profile.whatsapp],
+      ["Email",profile.email],
+      ["Date of Birth",fmtDate(profile.dateOfBirth)],
+      ["Gender",profile.gender],
       ["Address",profile.address],
-      ["City / District",[profile.city,profile.district].filter(Boolean).join(" / ")],
       ["State",profile.state],
+      ["District",profile.district],
+      ["City",profile.city],
       ["PIN Code",profile.pinCode],
-      ["Account Status",profile.accountStatus]
+      ["Account Status",profile.accountStatus],
+      ["Registration Date",fmtDate(profile.registrationDate)]
     ];
 
-    box.innerHTML = '<div class="grid">' +
-      rows.map(row=>`
-        <div class="item">
-          <strong>${esc(row[0])}</strong>
-          <p>${esc(row[1] || "Not available")}</p>
-        </div>
-      `).join("") +
-      '</div>';
+    box.innerHTML = `
+      <div class="grid">
+
+        ${rows.map(row=>`
+          <div class="item">
+
+            <h4>${esc(row[0])}</h4>
+
+            <p>${esc(row[1] || "Not available")}</p>
+
+          </div>
+        `).join("")}
+
+      </div>
+    `;
 
   }catch(error){
-    box.innerHTML = `<p class="empty">${esc(error.message)}</p>`;
+    showError("profile",error);
   }
 }
 
-/* LOGOUT */
+
+/*
+  LOGOUT
+*/
 
 async function logout(){
   const button = $("logoutBtn");
+
   button.disabled = true;
 
   try{
-    await api("/api/auth/logout",{method:"POST"});
-    window.location.replace("/index.html");
+    await api("/auth/logout",{
+      method:"POST"
+    });
+
+    window.location.replace("/");
 
   }catch(error){
-    showMessage(error.message,"error");
+    message(error.message,"error");
     button.disabled = false;
   }
 }
 
-$("logoutBtn").addEventListener("click",logout);
 
-/* DASHBOARD START */
+/*
+  SINGLE-VIEW NAVIGATION: only one dashboard section is visible at a time.
+*/
+const dashboardViewIds = [
+  "dashboardHome","projectsCard","registrationsCard","registrationPaymentCard",
+  "paymentHistoryCard","chargesCard","workCard","salaryCard","galleryCard",
+  "companyCertificatesCard","parcelCard","completionCertificatesCard",
+  "notificationsCard","supportCard","profileCard"
+];
+
+function showDashboardView(viewId, updateHash=true){
+  if(!dashboardViewIds.includes(viewId)) viewId = "dashboardHome";
+  dashboardViewIds.forEach(id=>{
+    const section = $(id);
+    if(section) section.hidden = id !== viewId;
+  });
+  document.querySelectorAll("#sidebarNav a[data-view]").forEach(link=>{
+    const active = link.dataset.view === viewId;
+    link.classList.toggle("active",active);
+    if(active) link.setAttribute("aria-current","page");
+    else link.removeAttribute("aria-current");
+  });
+  if(updateHash){
+    try{history.replaceState(null,"","#"+viewId);}catch(error){}
+  }
+  document.body.classList.remove("sidebar-open");
+  const toggle = $("menuToggle");
+  if(toggle) toggle.setAttribute("aria-expanded","false");
+  window.scrollTo({top:0,behavior:"auto"});
+}
+
+function setupDashboardNavigation(){
+  const nav = $("sidebarNav");
+  nav.addEventListener("click",event=>{
+    const link = event.target.closest("a[data-view]");
+    if(!link) return;
+    event.preventDefault();
+    showDashboardView(link.dataset.view);
+  });
+  const toggle = $("menuToggle");
+  toggle.addEventListener("click",()=>{
+    const open = document.body.classList.toggle("sidebar-open");
+    toggle.setAttribute("aria-expanded",String(open));
+  });
+  document.addEventListener("click",event=>{
+    if(!document.body.classList.contains("sidebar-open")) return;
+    if(event.target.closest("#dashboardSidebar") || event.target.closest("#menuToggle")) return;
+    document.body.classList.remove("sidebar-open");
+    toggle.setAttribute("aria-expanded","false");
+  });
+  const requested = location.hash.slice(1);
+  showDashboardView(dashboardViewIds.includes(requested)?requested:"dashboardHome",false);
+}
+
+/*
+  DASHBOARD INITIALIZATION
+*/
 
 async function initDashboard(){
+
   try{
     await loadAccount();
 
-    await Promise.allSettled([
+    const tasks = [
       loadProjects(),
       loadEnrollments(),
       loadPayments(),
-      loadCharges(),
+      loadCustomerCharges(),
       loadWorkAssignments(),
       loadSalaries(),
       loadGallery(),
+      loadCompanyCertificates(),
       loadParcels(),
       loadCertificates(),
-      loadCompanyCertificates(),
       loadNotifications(),
       loadSupport(),
       loadProfile()
-    ]);
+    ];
 
-    await loadPaymentSection();
+    await Promise.allSettled(tasks);
 
   }catch(error){
-    showMessage(error.message || "Unable to load dashboard.","error");
 
-    const text = String(error.message || "").toLowerCase();
+    message(
+      error.message || "Unable to load your dashboard.",
+      "error"
+    );
 
     if(
-      text.includes("unauthorized") ||
-      text.includes("login") ||
-      text.includes("not authenticated")
+      error.message &&
+      error.message.toLowerCase().includes("login")
     ){
-      window.location.replace("/index.html");
+      window.location.replace("/");
     }
   }
 }
 
+
+/*
+  START DASHBOARD
+*/
+
+$("logoutBtn").addEventListener("click",logout);
+setupDashboardNavigation();
 initDashboard();
 
 </script>
