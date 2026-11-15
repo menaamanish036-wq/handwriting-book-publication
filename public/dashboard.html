@@ -1154,16 +1154,14 @@ async function submitPayment(event,enrollmentId){
       })
     });
 
-    message(
-      data.message || "Payment submitted for verification."
-    );
-
+    message(data.message || "Payment submitted for verification.");
     form.reset();
-
-    await Promise.all([
-      loadEnrollments(),
-      loadPayments()
-    ]);
+    await Promise.all([loadEnrollments(), loadPayments()]);
+    const done = document.createElement("div");
+    done.className = "item";
+    done.innerHTML = '<p><strong>Your payment has been submitted successfully for admin verification.</strong></p><button type="button" class="gold-btn" id="goMyRegistrationsBtn">OK – Go to My Registrations</button>';
+    form.replaceWith(done);
+    document.getElementById("goMyRegistrationsBtn").addEventListener("click", () => showDashboardView("registrationsCard"));
 
   }catch(error){
     message(error.message,"error");
@@ -1289,7 +1287,7 @@ async function loadCustomerCharges(){
         <p>Notes: ${esc(item.notes || "-")}</p>
 
         <p>Date: ${fmtDate(item.createdAt)}</p>
-
+        ${item.status === "unpaid" ? `<button type="button" class="gold-btn" onclick="openChargePayment('${esc(item._id)}',${Number(item.amount)||0})">Pay This Charge</button>` : ""}
       </div>
     `).join("");
 
@@ -1298,6 +1296,37 @@ async function loadCustomerCharges(){
   }
 }
 
+
+let activeChargePaymentId = null;
+function openChargePayment(chargeId, amount) {
+  activeChargePaymentId = chargeId;
+  const qr = document.querySelector(".payment-qr");
+  const overlay = document.createElement("div");
+  overlay.id = "chargePaymentOverlay";
+  overlay.style.cssText = "position:fixed;inset:0;background:#000d;z-index:9999;display:grid;place-items:center;padding:18px;overflow:auto";
+  overlay.innerHTML = `<div class="card" style="max-width:520px;width:100%;background:#151515;border:1px solid #d8b45a;padding:22px;border-radius:16px"><h2>Pay This Charge</h2><p>Amount: <strong>${money(amount)}</strong></p>${qr ? `<img src="${qr.src}" alt="UPI QR" style="width:190px;max-width:100%;display:block;margin:14px auto">` : ""}<p>UPI ID: <strong>8504823316@thecardco</strong></p><p>Payee Name: Ankur Meena</p><form id="chargePaymentForm"><label>Transaction ID</label><input name="transactionId" required maxlength="120"><label>Payment Screenshot</label><input name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required><button type="submit">Submit Charge Payment</button><button type="button" class="secondary" id="closeChargePayment">Cancel</button></form></div>`;
+  document.body.appendChild(overlay);
+  document.getElementById("closeChargePayment").onclick = () => overlay.remove();
+  document.getElementById("chargePaymentForm").onsubmit = submitChargePayment;
+}
+async function submitChargePayment(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = form.querySelector('button[type="submit"]');
+  const transactionId = form.elements.transactionId.value.trim();
+  const file = form.elements.screenshot.files[0];
+  if (!file || !["image/jpeg","image/png","image/webp"].includes(file.type)) { message("Choose a JPG, PNG or WEBP screenshot.","error"); return; }
+  if (file.size > 5 * 1024 * 1024) { message("Screenshot must be under 5 MB.","error"); return; }
+  button.disabled = true;
+  try {
+    const paymentScreenshotId = await uploadFile(file);
+    const result = await api(`/customer-charges/${encodeURIComponent(activeChargePaymentId)}/pay`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({transactionId,paymentScreenshotId})});
+    document.getElementById("chargePaymentOverlay")?.remove();
+    message(result.message || "Charge payment submitted for verification.");
+    await Promise.all([loadCustomerCharges(),loadPayments()]);
+  } catch(error) { message(error.message || "Unable to submit charge payment.","error"); }
+  finally { button.disabled = false; }
+}
 
 /*
   WORK ASSIGNMENTS
@@ -1559,13 +1588,6 @@ async function loadGallery(){
       return `
         <div class="item">
 
-          <h4>${esc(item.title || "Customer Work")}</h4>
-
-          <p>${esc(item.description || "")}</p>
-
-          <p>Customer: ${esc(item.customerName || "-")}</p>
-
-          <p>Work Type: ${esc(item.workType || "-")}</p>
 
           ${
             fileUrl && isImage
@@ -1574,7 +1596,7 @@ async function loadGallery(){
                   <img
                     class="gallery-image"
                     src="${fileUrl}"
-                    alt="${esc(item.title || "Customer Work")}"
+                    alt="Customer Work Sample"
                     loading="lazy">
                 </a>
               `
